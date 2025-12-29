@@ -20,4 +20,8 @@ public class MemberService {
 		return result;
 	}
 
+	public List<MemberDTO> searchOwner(String keyword) {
+		return memberDAO.searchOwner(keyword);
+	}
+
 }

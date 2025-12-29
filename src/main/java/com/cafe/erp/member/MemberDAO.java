@@ -9,5 +9,5 @@ public interface MemberDAO {
 	
 	public List<MemberDTO> list(MemberDTO memberDTO) throws Exception;
 	public int add(MemberDTO memberDTO) throws Exception;
-
+	public List<MemberDTO> searchOwner(String keyword);
 }

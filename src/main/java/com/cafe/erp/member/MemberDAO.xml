@@ -58,6 +58,11 @@
 		(#{memberId}, 1234, #{memName}, #{memZipCode}, #{memAddress}, #{memAddressDetail}, #{memEmail}, #{memPhone},  #{memHireDate}, 1,  #{deptCode}, #{positionCode})
 	</insert>
 	
+	<select id="searchOwner" parameterType="String" resultType="MemberDTO"> 
+		SELECT m.member_id, m.mem_name 
+		FROM member m LEFT JOIN store s ON m.member_id = s.member_id 
+		WHERE m.mem_name LIKE CONCAT(#{keyword}, '%') AND s.member_id IS NULL AND m.member_id LIKE '2%' 
+	</select>
 	
 <!-- 	INSERT INTO member 
 		(member_id, mem_password, mem_name, mem_zip_code, mem_address, mem_address_detail, mem_email, mem_phone, mem_hire_date, mem_is_active, dept_code, position_code)
