@@ -269,3 +269,64 @@ function downloadAttachment(fileSavedName, fileOriginalName) {
 	
 	location.href = url;
 }
+
+function downloadContractPdf() {
+    // 1. 모달에 떠있는 데이터 가져오기
+    const contractId = document.getElementById('detailContractId').value;
+    const storeName = document.getElementById('detailStoreName').value;
+    
+    // 콤마가 포함된 문자열 그대로 가져옴 (예: "350,000 원")
+    const royalty = document.getElementById('detailRoyalty').value; 
+    const deposit = document.getElementById('detailDeposit').value; 
+    
+    const startDate = document.getElementById('detailStartDate').value;
+    const endDate = document.getElementById('detailEndDate').value;
+
+    // ★ [수정된 부분] detailStatus(없음) -> detailStatusArea(존재함)
+    // 텍스트(innerText)를 가져오면 "PENDING (대기)" 같은 글자를 가져옵니다.
+    const statusArea = document.getElementById('detailStatusArea');
+    const status = statusArea ? statusArea.innerText : ""; 
+
+    // 2. 숨겨진 PDF 양식(Template)에 데이터 매핑
+    document.getElementById('pdfContractId').innerText = contractId;
+    document.getElementById('pdfStoreName').innerText = storeName;
+    document.getElementById('pdfStoreNameTable').innerText = storeName;
+    
+    // 상태값 넣기
+    document.getElementById('pdfStatus').innerText = status;
+
+    // 기간
+    document.getElementById('pdfStartDate').innerText = startDate;
+    document.getElementById('pdfEndDate').innerText = endDate;
+
+    // 금액
+    document.getElementById('pdfRoyalty').innerText = royalty;
+    document.getElementById('pdfDeposit').innerText = deposit;
+
+    // 서명란
+    document.getElementById('pdfSignStoreName').innerText = storeName;
+    document.getElementById('pdfSignOwner').innerText = ""; // 점주명 (필요시 추가)
+    
+    // 주소 (모달에 주소 input이 없다면 공란 처리 혹은 하드코딩)
+    // 만약 모달에 주소를 표시하는 id="detailAddress"가 있다면 .value로 가져오면 됨
+    document.getElementById('pdfSignAddress').innerText = " "; 
+
+    // 오늘 날짜
+    const today = new Date();
+    const dateString = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+    document.getElementById('pdfToday').innerText = dateString;
+
+    // 3. PDF 변환 및 다운로드
+    const element = document.getElementById('contractPdfTemplate');
+    
+    // PDF 옵션 설정
+    const opt = {
+        margin:       0,
+        filename:     `가맹계약서_${storeName}_${contractId}.pdf`,
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2, scrollY: 0 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
