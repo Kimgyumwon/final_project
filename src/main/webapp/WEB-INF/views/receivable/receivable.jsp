@@ -74,85 +74,73 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <div class="row">
-				    <div class="card">
-				      <div class="card-header d-flex justify-content-between align-items-center">
-				        <h5 class="card-title mb-0">채권 목록 (미수금)</h5>
-				        <small class="text-muted">기준일: 2025-12-29</small>
+              
+				<!-- 조회 조건 -->
+				<div class="card mb-4">
+				  <div class="card-header">
+				    <h5 class="mb-0">조회 조건</h5>
+				  </div>
+				
+				  <div class="card-body">
+				    <form id="searchForm" class="row g-3">
+				      <!-- 채권 발생 구분 -->
+				      <div class="col-md-3">
+				        <label class="form-label">채권 발생 구분</label>
+				        <select name="sourceType" class="form-select">
+				          <option value="">전체</option>
+				          <option value="CONTRACT">계약 미수금</option>
+				          <option value="ORDER">발주 미수금</option>
+				        </select>
 				      </div>
-
-				      <div class="card-body">
-				        <div class="table-responsive">
-				          <table class="table table-hover align-middle">
-				            <thead class="table-light">
-				              <tr>
-				                <th>채권 ID</th>
-				                <th>유형</th>
-				                <th class="text-end">공급가액</th>
-				                <th class="text-end">세액</th>
-				                <th class="text-end">합계</th>
-				                <th>발생일</th>
-				                <th>상태</th>
-				                <th class="text-center">관리</th>
-				              </tr>
-				            </thead>
-				            <tbody>
-				              <c:forEach var="r" items="${receivables}">
-				                <tr>
-				                  <td class="fw-semibold">${r.receivableId}</td>
 				
-				                  <td>
-				                    <span class="badge bg-label-primary">미수금</span>
-				                  </td>
-				
-				                  <td class="text-end">
-				                    <fmt:formatNumber value="${r.receivableSupplyAmount}" type="number" />
-				                  </td>
-				
-				                  <td class="text-end">
-				                    <fmt:formatNumber value="${r.receivableTaxAmount}" type="number" />
-				                  </td>
-				
-				                  <td class="text-end fw-bold text-primary">
-				                    <fmt:formatNumber value="${r.receivableTotalAmount}" type="number" />
-				                  </td>
-				
-				                  <td>${r.receivableDate}</td>
-				
-				                  <td>
-				                    <c:choose>
-				                      <c:when test="${r.receivableStatus eq 'O'}">
-				                        <span class="badge bg-label-warning">미지급</span>
-				                      </c:when>
-				                      <c:when test="${r.receivableStatus eq 'P'}">
-				                        <span class="badge bg-label-info">부분지급</span>
-				                      </c:when>
-				                      <c:when test="${r.receivableStatus eq 'C'}">
-				                        <span class="badge bg-label-success">완납</span>
-				                      </c:when>
-				                    </c:choose>
-				                  </td>
-				
-				                  <td class="text-center">
-				                    <a href="/receivable/detail?id=${r.receivableId}"
-				                       class="btn btn-sm btn-outline-primary">
-				                      상세
-				                    </a>
-				                  </td>
-				                </tr>
-				              </c:forEach>
-				
-				              <c:if test="${empty receivables}">
-				                <tr>
-				                  <td colspan="8" class="text-center text-muted py-4">
-				                    조회된 채권 데이터가 없습니다.
-				                  </td>
-				                </tr>
-				              </c:if>
-				            </tbody>
-				          </table>
-				        </div>
+				      <!-- 기준 월 -->
+				      <div class="col-md-3">
+				        <label class="form-label">기준 월</label>
+				        <input type="month" name="baseMonth" class="form-control" />
 				      </div>
+				
+				      <!-- 지점명 -->
+				      <div class="col-md-3">
+				        <label class="form-label">지점명</label>
+				        <input type="text"
+				               name="storeName"
+				               class="form-control"
+				               placeholder="지점명 입력" />
+				      </div>
+				      <!-- 조회 버튼 -->
+				      <div class="col-md-3 d-flex align-items-end">
+				        <button type="button"
+				                class="btn btn-primary w-100"
+				                onclick="searchReceivables()">
+				          조회
+				        </button>
+				      </div>
+				    </form>
+				  </div>
+				</div>
+				<!-- 조회 조건 끝 -->
+				
+				<div class="card">
+				  <div class="card-header d-flex justify-content-between align-items-center">
+				    <h5 class="mb-0">채권 목록 (미수금)</h5>
+				    <small class="text-muted">※ 조회 조건 선택 후 조회</small>
+				  </div>
+				
+				  <div class="card-body">
+				
+				    <!-- 조회 전 안내 -->
+				    <div id="emptyMessage"
+				         class="text-center text-muted py-5">
+				      조회 조건을 선택한 후 검색하세요.
 				    </div>
+				
+				    <!-- 조회 결과 테이블 -->
+				    <div id="receivableTableArea" class="table-responsive d-none">
+				      <!-- AJAX로 테이블 삽입 -->
+				    </div>
+				
+				  </div>
+				</div>
               </div>
             </div>
             <!-- / Content -->
@@ -195,5 +183,6 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script type="text/javascript" src="/js/receivable/receivable.js"></script>
   </body>
 </html>

@@ -15445,7 +15445,6 @@ html:not(.layout-footer-fixed) .content-wrapper {
 @media (max-width: 1199.98px) {
   .layout-menu {
     width: 80px !important;
-    position: fixed !important;
     top: 0 !important;
     bottom: 0 !important;
     left: 0 !important;

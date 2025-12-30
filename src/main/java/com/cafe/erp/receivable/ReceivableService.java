@@ -12,8 +12,12 @@ public class ReceivableService {
 	private ReceivableDAO dao;
 	
 	
-	public List<ReceivableDTO> receivableList() throws Exception {
-		return dao.receivableList();
+	public List<ReceivableSummaryDTO> receivableSearchList(
+			ReceivableSearchDTO receivableSearchDTO
+			){
+		
+		return dao.receivableSearchList(receivableSearchDTO);
+		
 	}
 	
 	

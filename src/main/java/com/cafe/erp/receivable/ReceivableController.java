@@ -5,8 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/receivable/*")
@@ -17,17 +21,27 @@ public class ReceivableController {
 	
 	
 	@GetMapping("receivable")
-	public void receivableList(Model model) throws Exception {
-		
-		List<ReceivableDTO> list = service.receivableList();
-		model.addAttribute("receivables", list);
-		
+	public void receivableList() throws Exception {
 	}
 	
-	
-	
-	
-	
-	
-	
+	@PostMapping("search")
+	public String searchReceivable(
+			@Valid ReceivableSearchDTO receivableSearchDTO,
+			BindingResult bindingResult,
+			Model model
+			){
+		
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("errorMessage", bindingResult.getFieldError().getDefaultMessage());
+			return "receivable/receivable-table";
+		}
+		
+		
+		
+		List<ReceivableSummaryDTO> list = service.receivableSearchList(receivableSearchDTO);
+		model.addAttribute("receivables", list);
+		
+		
+		return "receivable/receivable-table";
+	}
 }

@@ -6,10 +6,49 @@
   
   <mapper namespace="com.cafe.erp.receivable.ReceivableDAO">
   	
-  	
-  	<!-- 전체 리스트 -->
-  	<select id="receivableList" resultType="ReceivableDTO">
-  		SELECT * FROM receivable
+  	<!-- 가맹 미수금 조회 SQL -->
+  	<select 
+  		id="receivableSearchList" 
+  		parameterType="ReceivableSearchDTO"
+  		resultType="ReceivableSummaryDTO">
+  		
+  		SELECT
+  			s.store_id,
+  			s.store_name,
+  			DATE_FORMAT(r.receivable_date, '%Y-%m') AS base_month,
+  			SUM(r.receivable_total_amount) AS total_amount
+  		
+  		FROM receivable r
+  		
+  		LEFT JOIN store_contract c
+  			ON r.contract_id = c.contract_id
+  		LEFT JOIN order_store so
+  			ON r.store_order_id = so.store_order_id
+ 		JOIN store s 
+  			ON s.store_id = COALESCE(c.store_id, so.store_id)
+  		
+  		WHERE r.receivable_type = 'R'
+  		
+  		<if test="baseMonth != null and baseMonth != ''">
+  			AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
+  		</if>
+  		
+  		<if test="storeName != null and storeName != ''">
+  			AND s.store_name LIKE CONCAT('%',#{storeName},'%')
+  		</if>
+  		
+  		<if test="sourceType == 'CONTRACT'">
+		    AND r.contract_id IS NOT NULL
+		</if>
+		
+		<if test="sourceType == 'ORDER'">
+		    AND r.store_order_id IS NOT NULL
+		</if>
+		
+		GROUP BY
+			s.store_id,
+			s.store_name,
+			base_month
   	</select>
   
   
