@@ -4,20 +4,9 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
   
-  <mapper namespace="com.cafe.erp.receivable.ReceivableDAO">
+<mapper namespace="com.cafe.erp.receivable.ReceivableDAO">
   	
-  	<!-- 가맹 미수금 조회 SQL -->
-  	<select 
-  		id="receivableSearchList" 
-  		parameterType="ReceivableSearchDTO"
-  		resultType="ReceivableSummaryDTO">
-  		
-  		SELECT
-  			s.store_id,
-  			s.store_name,
-  			DATE_FORMAT(r.receivable_date, '%Y-%m') AS base_month,
-  			SUM(r.receivable_total_amount) AS total_amount
-  		
+  	<sql id="receivableSearchBase">
   		FROM receivable r
   		
   		LEFT JOIN store_contract c
@@ -44,14 +33,48 @@
 		<if test="sourceType == 'ORDER'">
 		    AND r.store_order_id IS NOT NULL
 		</if>
+  	</sql>
+  	
+  	
+  	<!-- 가맹 미수금 조회 SQL -->
+  	<select 
+  		id="receivableSearchList" 
+  		parameterType="ReceivableSearchDTO"
+  		resultType="ReceivableSummaryDTO">
+  		SELECT
+  			s.store_id,
+  			s.store_name,
+  			DATE_FORMAT(r.receivable_date, '%Y-%m') AS base_month,
+  			SUM(r.receivable_total_amount) AS total_amount
+  			
+		<include refid="receivableSearchBase"/>
 		
 		GROUP BY
 			s.store_id,
 			s.store_name,
 			base_month
+		LIMIT #{pager.perPage} OFFSET #{pager.startNum}
   	</select>
-  
-  
-  
-  
-  </mapper>
+  	
+  	<select 
+  		id="receivableSearchCount"
+  		parameterType="ReceivableSearchDTO"
+  		resultType="Long">
+  	
+  	SELECT COUNT(*)
+  	FROM (
+  		SELECT
+  			s.store_id,
+  			DATE_FORMAT(r.receivable_date, '%Y-%m')
+		<include refid="receivableSearchBase"/>  	
+  	
+  	GROUP BY
+  		s.store_id,
+  		DATE_FORMAT(r.receivable_date, '%Y-%m')
+  	) t
+  	</select>
+  	
+  	
+  	
+  	
+</mapper>

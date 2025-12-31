@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.cafe.erp.util.Pager;
+
 import jakarta.validation.Valid;
 
 @Controller
@@ -40,7 +42,9 @@ public class ReceivableController {
 		
 		List<ReceivableSummaryDTO> list = service.receivableSearchList(receivableSearchDTO);
 		model.addAttribute("receivables", list);
+		Pager pager  = receivableSearchDTO.getPager();
 		
+		model.addAttribute("pager", receivableSearchDTO.getPager());
 		
 		return "receivable/receivable-table";
 	}

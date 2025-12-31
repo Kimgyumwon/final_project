@@ -21,7 +21,18 @@
     <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
 
     <meta name="description" content="" />
-
+	
+	
+	<!-- flatpickr 기본 -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	
+	<!-- 월 선택 플러그인 -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+		
+		
+	
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
 
@@ -96,7 +107,12 @@
 				      <!-- 기준 월 -->
 				      <div class="col-md-3">
 				        <label class="form-label">기준 월</label>
-				        <input type="month" name="baseMonth" class="form-control" />
+				        <input 
+				        	type="text"
+				        	id="baseMonth" 
+				        	name="baseMonth"
+				        	placeholder="기준 월 선택"
+				        	class="form-control" />
 				      </div>
 				
 				      <!-- 지점명 -->
@@ -115,6 +131,7 @@
 				          조회
 				        </button>
 				      </div>
+				      <input type="hidden" name="pager.page" value="1">
 				    </form>
 				  </div>
 				</div>
@@ -161,15 +178,22 @@
     </div>
     <!-- / Layout wrapper -->
 
-
+	
+	
+	
+	
+	
+	
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
     <script src="/vendor/libs/jquery/jquery.js"></script>
     <script src="/vendor/libs/popper/popper.js"></script>
     <script src="/vendor/js/bootstrap.js"></script>
     <script src="/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-
     <script src="/vendor/js/menu.js"></script>
+    
+    
+    
     <!-- endbuild -->
 
     <!-- Vendors JS -->
@@ -183,6 +207,11 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    
+    
+    <script type="text/javascript" src="/js/pager/pagination.js"></script>
     <script type="text/javascript" src="/js/receivable/receivable.js"></script>
   </body>
 </html>
+
+
