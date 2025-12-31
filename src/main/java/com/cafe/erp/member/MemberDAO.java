@@ -12,6 +12,9 @@ public interface MemberDAO {
 	public List<MemberDTO> searchOwner(String keyword);
 	public MemberDTO detail(MemberDTO memberDTO) throws Exception;
 	public int update(MemberDTO memberDTO) throws Exception;
+	public int resetPw(MemberDTO memberDTO) throws Exception;
+	public int InActive(MemberDTO memberDTO) throws Exception;
+	public MemberDTO findById(MemberDTO memberDTO) throws Exception;
 	
 	
 	

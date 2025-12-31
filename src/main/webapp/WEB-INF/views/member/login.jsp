@@ -1,19 +1,8 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-
-<!-- =========================================================
-* Sneat - Bootstrap 5 HTML Admin Template - Pro | v1.0.0
-==============================================================
-
-* Product Page: https://themeselection.com/products/sneat-bootstrap-html-admin-template/
-* Created by: ThemeSelection
-* License: You must have a valid license purchased in order to legally use the theme for your project.
-* Copyright ThemeSelection (https://themeselection.com)
-
-=========================================================
- -->
 <!-- beautify ignore:start -->
 <html
-  lang="en"
+  lang="ko"
   class="light-style customizer-hide"
   dir="ltr"
   data-theme="theme-default"
@@ -62,6 +51,86 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
+    
+    <style type="text/css">
+   	* {
+	  margin: 0;
+	  padding: 0;
+	  box-sizing: border-box;
+	}
+	
+	body{
+	  background-color: #2d499d;
+	  margin: 0;
+	}
+	
+	.auth-wrapper {
+	  width: 40%;
+	  min-height: 100vh;
+	  display: flex;
+	  align-items: center;
+	  background: #fff;
+	}
+	
+	.auth-card {
+	  width: 100%;
+	  height: 100%;
+	  padding: 32px;
+	}
+	
+	.logo_image_text{
+	  margin-left: 80px;
+	  display: flex;
+	  align-items: center;
+	}
+	
+	span{
+	  font-size: 30px;
+	}
+	
+	.logo {
+	  display: flex;
+	  align-items: center;
+	  gap: 10px;
+	  margin-bottom: 24px;
+	  text-decoration: none;
+	  color: #000;
+	}
+	
+	.logo img {
+	  width: 60px;
+	  height: 60px;
+	}
+	form {
+	  width: 80%;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 12px;
+	  margin: 0 auto;
+	}
+	
+	input {
+	  padding: 10px;
+	  border-radius: 8px;
+	  border: 1px solid #ddd;
+	  transition: border-color 0.2s ease-in-out;
+	}
+	input:focus {
+      border: 1px solid #696cff;
+      outline: none; 
+    }
+	button {
+	  margin-top: 10px;
+	  padding: 12px;
+	  border: none;
+	  border-radius: 8px;
+	  background: #696cff;
+	  color: #fff;
+	  cursor: pointer;
+	}
+	    	
+    
+    </style>
   </head>
 
   <body>
@@ -72,13 +141,13 @@
 
           <div class="logo_image_text logo">
               <img src="./ATI.jpg" alt="Logo" />
-              <span>ERD</span>
+              <span>ERP</span>
           </div>
 
-          <form action="index.html" class="auth-login-form">
-            <input type="text" placeholder="아이디를 입력하세요" />
+          <form action="member/login" class="auth-login-form" method="post">
+            <input type="text" name="memberId" id="memberId" placeholder="아이디를 입력하세요" />
 
-            <input type="password" placeholder="비밀번호를 입력하세요" />
+            <input type="password" name="memPassword" id="memPasswrod" placeholder="비밀번호를 입력하세요" />
 
             <label class="remember">
               <input type="checkbox" />
@@ -91,9 +160,6 @@
         </div>
       </div>
           <!-- /Register -->
-        </div>
-      </div>
-    </div>
 
     <!-- / Content -->
 

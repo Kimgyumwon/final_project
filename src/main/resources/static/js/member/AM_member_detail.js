@@ -1,3 +1,92 @@
+	function toggleEditMode(isEdit, tabName) {
+	    const viewArea = document.getElementById('view-area-' + tabName);
+	    const editArea = document.getElementById('edit-area-' + tabName);
+	
+	    if (!viewArea || !editArea) return;
+	
+	    if (isEdit) {
+	        viewArea.style.display = 'none';
+	        editArea.style.display = 'block';
+	    } else {
+	        viewArea.style.display = 'block';
+	        editArea.style.display = 'none';
+	    }
+	}
+	
+	
+	function saveData(tabName) {
+	    if(!confirm('수정된 정보를 저장하시겠습니까?')) return;
+	    
+	    toggleEditMode(false, tabName); 
+	}
+	function DaumPostcode() {
+	          new daum.Postcode({
+	              oncomplete: function(data) {
+	                  document.getElementById("memZipCode").value = data.zonecode;
+	                  document.getElementById("memAddress").value = data.address;
+	                  document.getElementById("memAddressDetail").focus(); 
+	              }
+	          }).open();
+	      }
+	      
+	      $('#addMemberModal').on('hidden.bs.modal', function () {
+			$(this).find('form')[0].reset();
+		})
+		
+		const autoHyphen = (target) => {
+		    target.value = target.value
+		        .replace(/[^0-9]/g, '')
+		        .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3")
+		        .replace(/(\-{1,2})$/g, "");
+		}
+
+	
+	
+	function resetPassword(memberId) {
+	    if (!confirm('정말로 비밀번호를 초기화 하시겠습니까?')) {
+	        return;
+	    }
+
+	    $.ajax({
+	        url: '/member/reset_password', 
+	        type: 'POST',
+	        data: { memberId: memberId },
+	        success: function(response) {
+	            if(response === "success") {
+	                alert('변경된 비밀번호가 메일로 발송되었습니다.');
+	            } else {
+	                alert('초기화 실패');
+	            }
+	        },
+	        error: function() {
+	            alert('서버 에러가 발생했습니다.');
+	        }
+	    });
+	}
+	
+	function InActive(memberId){
+		if(!confirm('정말 퇴직 처리하시겠습니까?')){
+			return;
+		}
+		$.ajax({
+			        url: '/member/InActive', 
+			        type: 'POST',
+			        data: { memberId: memberId },
+			        success: function(response) {
+			            if(response === "success") {
+			                alert('퇴직상태로 변경되었습니다.');
+							location.reload();
+			            } else {
+			                alert('처리 실패');
+			            }
+			        },
+			        error: function() {
+			            alert('서버 에러가 발생했습니다.');
+			        }
+			    });
+	}
+
+
 
     function toggleDateInputs() {
         const type = document.getElementById("dateType").value;
@@ -126,45 +215,3 @@
     }
 
 	
-	/* 탭별 수정 모드 토글 함수 */
-	function toggleEditMode(isEdit, tabName) {
-	    const viewArea = document.getElementById('view-area-' + tabName);
-	    const editArea = document.getElementById('edit-area-' + tabName);
-
-	    if (!viewArea || !editArea) return;
-
-	    if (isEdit) {
-	        viewArea.style.display = 'none';
-	        editArea.style.display = 'block';
-	    } else {
-	        viewArea.style.display = 'block';
-	        editArea.style.display = 'none';
-	    }
-	}
-
-
-	function saveData(tabName) {
-	    if(!confirm('수정된 정보를 저장하시겠습니까?')) return;
-	    
-	    toggleEditMode(false, tabName); 
-	}
-	function DaumPostcode() {
-	          new daum.Postcode({
-	              oncomplete: function(data) {
-	                  document.getElementById("memZipCode").value = data.zonecode;
-	                  document.getElementById("memAddress").value = data.address;
-	                  document.getElementById("memAddressDetail").focus(); 
-	              }
-	          }).open();
-	      }
-	      
-	      $('#addMemberModal').on('hidden.bs.modal', function () {
-			$(this).find('form')[0].reset();
-		})
-		
-		const autoHyphen = (target) => {
-		    target.value = target.value
-		        .replace(/[^0-9]/g, '')
-		        .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3")
-		        .replace(/(\-{1,2})$/g, "");
-		}

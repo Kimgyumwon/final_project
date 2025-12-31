@@ -1,5 +1,6 @@
 package com.cafe.erp.member;
 
+import java.security.PublicKey;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +12,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cafe.erp.member.commute.MemberCommuteDTO;
+import com.cafe.erp.member.commute.MemberCommuteService;
+
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("/member/*")
 public class MemberController {
 	
 	@Autowired
 	private MemberService memberService;
+	
+	@Autowired
+	private MemberCommuteService commuteService; 
+	
+	
+	@GetMapping("login")
+	public void login()throws Exception{
+		
+	}
+	@PostMapping("login")
+	public String login(MemberDTO memberDTO, HttpSession session, Model model)throws Exception{
+		MemberDTO db = memberService.getMemberId(memberDTO);
+		
+		if(db == null || memberDTO.getMemPassword().equals(db.getMemPassword())) {
+			model.addAttribute("msg", "아이디 또는 비밀번호가 틀렸습니다.");
+			return "./login";
+		}
+		
+		return "member/admin_member_list";
+	}
+	
+	
+	
+	
 
 	@GetMapping("admin_member_list")
 	public String list(MemberDTO memberDTO, Model model)throws Exception{
@@ -43,13 +73,19 @@ public class MemberController {
 		
 		model.addAttribute("msg", msg);
 		model.addAttribute("url", "./AM_user_detail");
-		return "reidrect:./AM_member_detail" + memid;
+		return "redirect:./AM_member_detail?memberId=" + memid;
 	}
 	
 	@GetMapping("AM_member_detail")
 	public String detail(MemberDTO memberDTO, Model model) throws Exception{
 		MemberDTO member = memberService.detail(memberDTO);
 		model.addAttribute("dto", member);
+		
+		MemberCommuteDTO commuteDTO = new MemberCommuteDTO();
+		commuteDTO.setMemberId(member.getMemberId());
+		
+		List<MemberCommuteDTO> attendanceList = commuteService.attendanceList(commuteDTO);
+		model.addAttribute("attendanceList", attendanceList);
 		
 		return "member/AM_member_detail";
 	}
@@ -63,6 +99,26 @@ public class MemberController {
 	}
 	
 	
+	@PostMapping("reset_password")
+	@ResponseBody
+	public String resetPassword(@RequestParam("memberId") int memberId ) throws Exception{
+		MemberDTO memberDTO = new MemberDTO();
+		memberDTO.setMemberId(memberId);
+		memberDTO.setMemPassword("1234");
+		memberService.resetPw(memberDTO);
+		return "success";
+	}
+	
+	@PostMapping("InActive")
+	@ResponseBody
+	public String InActive(@RequestParam("memberId") int memberId) throws Exception{
+		MemberDTO memberDTO = new MemberDTO();
+		memberDTO.setMemberId(memberId);
+		memberDTO.setMemIsActive(false);
+		memberService.InActive(memberDTO);
+		
+		return "success";
+	}
 	
 	
 	
