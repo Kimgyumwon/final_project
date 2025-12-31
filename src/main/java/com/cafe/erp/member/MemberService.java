@@ -13,6 +13,10 @@ public class MemberService {
 	@Autowired
 	private MemberDAO memberDAO;
 	
+	public MemberDTO getMemberId(MemberDTO memberDTO)throws Exception{
+		return memberDAO.findById(memberDTO);
+	}
+	
 	public List<MemberDTO> list(MemberDTO memberDTO) throws Exception {
 		return memberDAO.list(memberDTO);
 	}
@@ -60,6 +64,23 @@ public class MemberService {
 	public int update(MemberDTO memberDTO) throws Exception {
 		return memberDAO.update(memberDTO);
 	}
+
+
+
+
+
+	public int resetPw(MemberDTO memberDTO) throws Exception{
+		return memberDAO.resetPw(memberDTO);
+	}
+
+
+
+
+
+	public int InActive(MemberDTO memberDTO) throws Exception{
+		return memberDAO.InActive(memberDTO);
+	}
+
 	
 	
 	

@@ -64,11 +64,11 @@
                                             	</c:choose>
                                             </div>
 
-                                            <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm" onclick="alert('비밀번호 초기화 메일을 발송했습니다.')">
+                                            <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm" onclick="resetPassword(${dto.memberId})">
 											    <i class="bx bx-reset me-1"></i> 비밀번호 초기화
 											</a>
 											
-											<a href="javascript:void(0);" class="btn btn-danger me-2" onclick="InActive()">
+											<a href="javascript:void(0);" class="btn btn-danger me-2" onclick="InActive(${dto.memberId})">
 											    퇴직
 											</a>
 									
@@ -184,21 +184,21 @@
 									                </div>
 									                <div class="col-md-6">
 									                    <ul class="list-group list-group-flush">
-									                        <li class="list-group-item d-flex px-0 pb-3 border-0">
+									                        <li class="list-group-item d-flex px-0 pb-3 border-0 align-items-center">
 									                            <div class="badge rounded-pill bg-label-secondary me-3 p-2"><i class='bx bx-envelope'></i></div>
 									                            <div>
 									                                <small class="text-muted d-block">이메일</small>
 									                                <span class="fw-semibold text-heading" id="txt-email">${dto.memEmail}</span>
 									                            </div>
 									                        </li>
-									                        <li class="list-group-item d-flex px-0 py-3 border-0">
+									                        <li class="list-group-item d-flex px-0 py-3 border-0 align-items-center">
 									                            <div class="badge rounded-pill bg-label-secondary me-3 p-2"><i class='bx bx-phone'></i></div>
 									                            <div>
 									                                <small class="text-muted d-block">휴대전화</small>
 									                                <span class="fw-semibold text-heading" id="txt-phone">${dto.memPhone}</span>
 									                            </div>
 									                        </li>
-									                        <li class="list-group-item d-flex px-0 py-3 border-0">
+									                        <li class="list-group-item d-flex px-0 py-3 border-0 align-items-center">
 									                            <div class="badge rounded-pill bg-label-secondary me-3 p-2"><i class='bx bx-map'></i></div>
 									                            <div>
 									                                <small class="text-muted d-block">주소</small>
@@ -390,61 +390,46 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr data-date="2024-08-01" data-status="vacation" data-in="" data-out="" data-note="하계 휴가">
-                                                        <td>2024-08-01 (목)</td><td class="in-time">-</td><td class="out-time">-</td>
-                                                        <td><span class="badge bg-label-primary status-badge">여름 휴가</span></td><td class="note-text">하계 휴가</td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="openEditModal(this)">
-                                                                <i class="bx bx-edit-alt"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr data-date="2024-12-16" data-status="vacation" data-in="" data-out="" data-note="개인 사유">
-                                                        <td>2024-12-16 (월)</td><td class="in-time">-</td><td class="out-time">-</td>
-                                                        <td><span class="badge bg-label-primary status-badge">연차</span></td><td class="note-text">개인 사유</td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="openEditModal(this)">
-                                                                <i class="bx bx-edit-alt"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr data-date="2024-12-17" data-status="normal" data-in="08:55:12" data-out="18:05:00" data-note="">
-                                                        <td>2024-12-17 (화)</td><td class="in-time">08:55:12</td><td class="out-time">18:05:00</td>
-                                                        <td><span class="badge bg-label-success status-badge">정상</span></td><td class="note-text"></td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="openEditModal(this)">
-                                                                <i class="bx bx-edit-alt"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr data-date="2024-12-18" data-status="half" data-in="08:55:00" data-out="14:00:00" data-note="병원 진료">
-                                                        <td>2024-12-18 (수)</td><td class="in-time">08:55:00</td><td class="out-time">14:00:00</td>
-                                                        <td><span class="badge bg-label-info status-badge">오후 반차</span></td><td class="note-text">병원 진료</td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="openEditModal(this)">
-                                                                <i class="bx bx-edit-alt"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr data-date="2024-12-22" data-status="late" data-in="09:15:00" data-out="18:05:00" data-note="교통 체증">
-                                                        <td>2024-12-22 (월)</td><td class="in-time">09:15:00</td><td class="out-time">18:05:00</td>
-                                                        <td><span class="badge bg-label-warning status-badge">지각</span></td><td class="note-text">교통 체증</td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="openEditModal(this)">
-                                                                <i class="bx bx-edit-alt"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr data-date="2025-01-02" data-status="normal" data-in="08:40:00" data-out="18:00:00" data-note="">
-                                                        <td>2025-01-02 (목)</td><td class="in-time">08:40:00</td><td class="out-time">18:00:00</td>
-                                                        <td><span class="badge bg-label-success status-badge">정상</span></td><td class="note-text"></td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="openEditModal(this)">
-                                                                <i class="bx bx-edit-alt"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
+												    <c:forEach items="${attendanceList}" var="attendance">
+												        <tr>
+												            <td>${attendance.memCommuteWorkDate}</td>
+												            <td class="in-time">${attendance.formattedInTime}</td>
+												            <td class="out-time">${attendance.formattedOutTime}</td>
+												            <td>
+												                <c:choose>
+												                    <c:when test="${attendance.memCommuteState eq '정상'}">
+												                        <span class="badge bg-label-success status-badge">${attendance.memCommuteState}</span>
+												                    </c:when>
+												                    <c:when test="${attendance.memCommuteState eq '지각'}">
+												                        <span class="badge bg-label-warning status-badge">${attendance.memCommuteState}</span>
+												                    </c:when>
+												                     <c:when test="${attendance.memCommuteState eq '결근'}">
+												                        <span class="badge bg-label-danger status-badge">${attendance.memCommuteState}</span>
+												                    </c:when>
+												                    <c:otherwise>
+												                        <span class="badge bg-label-primary status-badge">${attendance.memCommuteState}</span>
+												                    </c:otherwise>
+												                </c:choose>
+												            </td>
+												            <td></td> 
+												            
+												            <td class="text-center">
+												                <button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="openEditModal(this)">
+												                    <i class="bx bx-edit-alt"></i>
+												                </button>
+												            </td>
+												        </tr>
+												    </c:forEach>
+												    
+												    <c:if test="${empty attendanceList}">
+												        <tr>
+												            <td colspan="6" class="text-center py-4">
+												                <i class="bx bx-calendar-x fs-1 text-muted d-block mb-2"></i>
+												                기록이 없습니다.
+												            </td>
+												        </tr>
+												    </c:if>
+												</tbody>
                                             </table>
                                             <div id="noDataMessage" class="text-center py-5" style="display: none;">
                                                 <div class="mb-2"><i class="bx bx-calendar-x fs-1 text-muted"></i></div>

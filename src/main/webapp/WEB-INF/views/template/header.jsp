@@ -9,8 +9,11 @@
 
    <!-- ⏰ 날짜 / 시간 -->
     <div class="navbar-nav align-items-center header-datetime">
-      <span class="date">9월 24일</span>
-      <span class="time">15:03</span>
+      <span class="date" id="date" ></span>
+      <div style="width: 4px;height: 2px;"></div>
+      <li class="nav-item lh-1 me-3">
+          <span id="headerClock" class="header-clock">Loading...</span>
+      </li>
     </div>
 
     <!-- 🟣 출근 / 퇴근 -->
@@ -54,3 +57,5 @@
     </ul>
   </div>
 </nav>
+
+<script type="text/javascript" src="/js/member/header.js"></script>

@@ -28,5 +28,7 @@ public class MemberDTO {
     
     
     private int idPrefix;
+
+
     
 }

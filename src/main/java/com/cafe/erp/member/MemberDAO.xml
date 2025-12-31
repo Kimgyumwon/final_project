@@ -24,8 +24,15 @@
             M.mem_hire_date ASC
 	</select>
 	
-	
-	
+	<select id="findById" resultType="MemberDTO">
+	    SELECT 
+	        member_id,
+	        mem_name,
+	        mem_password 
+	    FROM member
+	    WHERE member_id = #{memberId}
+	</select>
+		
 	
 	<select id="getMemberId" parameterType="String" resultType="String">
         SELECT MAX(member_id) 
@@ -65,10 +72,29 @@
 		WHERE member_id = #{memberId}
 	</update>
 	
+	<update id="resetPw" parameterType="MEmberDTO">
+		UPDATE member
+		SET
+			mem_password = #{memPassword}
+		WHERE
+			member_id = #{memberId}
+	
+	</update>
+	
+	<update id="InActive" parameterType="MemberDTO">
+		UPDATE member
+		SET
+			mem_is_active = #{memIsActive},
+			mem_left_date = now()
+		WHERE member_id = #{memberId}
+	</update>
+	
+	
 	<select id="searchOwner" parameterType="String" resultType="MemberDTO"> 
 		SELECT m.member_id, m.mem_name 
 		FROM member m LEFT JOIN store s ON m.member_id = s.member_id 
 		WHERE m.mem_name LIKE CONCAT(#{keyword}, '%') AND s.member_id IS NULL AND m.member_id LIKE '2%' 
 	</select>
+	
 	
 </mapper>
