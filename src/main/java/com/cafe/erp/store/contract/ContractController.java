@@ -32,7 +32,8 @@ public class ContractController {
 	
 	@PostMapping("/add") 
 	@ResponseBody
-	public Map<String, Object> addContract(@ModelAttribute ContractDTO contractDTO, @RequestParam(value = "files", required = false) List<MultipartFile> files) throws Exception { 
+	public Map<String, Object> addContract(@ModelAttribute ContractDTO contractDTO, 
+			@RequestParam(value = "files", required = false) List<MultipartFile> files) throws Exception { 
 		int result = contractService.add(contractDTO, files);
 	 
 		Map<String, Object> response = new HashMap<>();
@@ -52,6 +53,26 @@ public class ContractController {
 	@ResponseBody
 	public ContractDTO getDetail(@RequestParam String contractId) throws Exception {
 		return contractService.getDetail(contractId);
+	}
+	
+	@PostMapping("/update")
+	@ResponseBody
+	public Map<String, Object> updateContract(@ModelAttribute ContractDTO contractDTO, 
+		    @RequestParam(value = "newFiles", required = false) List<MultipartFile> newFiles,
+		    @RequestParam(value = "deleteFileIds", required = false) List<Integer> deleteFileIds) throws Exception {
+		int result = contractService.update(contractDTO, newFiles, deleteFileIds);
+		
+		Map<String, Object> response = new HashMap<>();
+		
+		if (result > 0) {  
+			response.put("message", "등록 완료"); 
+			response.put("status", "success");
+		} else {
+			response.put("status", "error");
+			response.put("message", "등록 실패");
+		}
+		
+		return response;
 	}
 
 }

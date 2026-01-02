@@ -14,12 +14,18 @@ public interface ContractDAO {
 
 	public int add(ContractDTO contractDTO);
 
-	public int fileAdd(ContractFileDTO contractFileDTO);
+	public int addFile(ContractFileDTO contractFileDTO);
 
 	public ContractDTO getDetail(String contractId);
 
 	public int updateStatusToActive(LocalDate today);
 
 	public int updateStatusToExpired(LocalDate yesterday);
+
+	public int update(ContractDTO contractDTO);
+
+	public ContractFileDTO selectFile(Integer fileId);
+
+	public int deleteFile(Integer fileId);
 
 }

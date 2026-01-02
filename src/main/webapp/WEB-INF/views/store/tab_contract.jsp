@@ -224,7 +224,7 @@
 	<div class="modal fade" id="detailContractModal" tabindex="-1" aria-hidden="true">
 	    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
 	        <div class="modal-content">
-	            <div class="modal-header border-bottom-0"> <h5 class="modal-title fw-bold">계약 상세 정보</h5>
+	            <div class="modal-header border-bottom-0"> <h5 class="modal-title fw-bold" id="titleArea">가맹 계약 정보</h5>
 	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	            </div>
 
@@ -308,8 +308,24 @@
 	                    <div class="col-12"><hr class="my-1 border-light"></div>
 	                    <div class="col-12">
                             <div class="p-3 bg-white border rounded-3">
-                                <h6 class="fw-bold mb-3"><i class="bx bx-file"></i> 첨부파일 다운로드</h6>
-                                <ul class="list-group" id="detailFileList"></ul>
+                                <h6 class="fw-bold mb-3"><i class="bx bx-file"></i> 첨부파일</h6>
+                                
+                                <ul class="list-group mode-view" id="detailFileList_view"></ul>
+                                
+                                <div id="detailFileList_edit" class="mode-edit d-none">
+							        <ul id="existingFileContainer" class="list-group mb-3"></ul>
+							
+									<div class="border rounded-3 p-3 bg-light">
+								        <div class="d-flex align-items-center justify-content-between mb-3">
+								            <small class="text-muted me-auto">새 파일 추가</small>
+								            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addEditFileField()">
+								                <i class="bx bx-plus"></i> 추가
+								            </button>
+								        </div>
+								        <div id="newFileContainer"></div>
+									</div>
+							    </div>
+							    
                             </div>
 						</div>
 						<div class="col-12"><hr class="my-1 border-light"></div>

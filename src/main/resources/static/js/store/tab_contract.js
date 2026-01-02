@@ -1,4 +1,7 @@
+//전역변수 선언
 var currentContractData = null;
+var deletedFileIds = [];
+var isContractUpdated = false;
 
 // 금액 formatter
 function formatCurrency(amount) {
@@ -212,36 +215,50 @@ async function getContractDetail(contractId) {
             default: badgeHtml = '<span class="badge bg-label-secondary">UNKNOWN</span>';
         }
         statusArea.innerHTML = badgeHtml;
+		
+		const viewContainer = document.getElementById('detailFileList_view');
+	    viewContainer.innerHTML = ""; 
 
-        const fileListEl = document.getElementById('detailFileList');
-        fileListEl.innerHTML = "";
+	    if (data.fileDTOs && data.fileDTOs.length > 0) {
+	        data.fileDTOs.forEach(file => {
+	            const li = document.createElement('li');
+	            li.className = "list-group-item d-flex justify-content-between align-items-center"; 
 
-        if (data.fileDTOs && data.fileDTOs.length > 0) {
-            data.fileDTOs.forEach(file => {
-                const li = document.createElement('li');
-                li.className = "list-group-item d-flex justify-content-between align-items-center";
+	            let iconClass = "bx bxs-file-blank text-secondary";
+	            if (file.fileOriginalName.includes('.pdf')) iconClass = "bx bxs-file-pdf text-danger";
+	            else if (file.fileOriginalName.match(/\.(jpg|jpeg|png)$/i)) iconClass = "bx bxs-file-image text-primary";
 
-                let iconClass = "bx bxs-file-blank text-secondary";
-                if (file.fileOriginalName.includes('.pdf')) iconClass = "bx bxs-file-pdf text-danger";
-                else if (file.fileOriginalName.match(/\.(jpg|jpeg|png)$/i)) iconClass = "bx bxs-file-image text-primary";
-
-                li.innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <i class="${iconClass} me-2 fs-4"></i>
-                        <span>${file.fileOriginalName}</span>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary file-download" onclick="downloadAttachment('${file.fileSavedName}', '${file.fileOriginalName}')">
-                        <i class="bx bx-download"></i> 다운로드
-                    </button>
-                `;
-                fileListEl.appendChild(li);
-            });
-        } else {
-            fileListEl.innerHTML = `<li class="list-group-item text-center text-muted">첨부된 파일이 없습니다.</li>`;
-        }
+	            li.innerHTML = `
+	                <div class="d-flex align-items-center overflow-hidden">
+	                    <i class="${iconClass} fs-4 me-2"></i>
+	                    <span class="text-truncate">${file.fileOriginalName}</span>
+	                </div>
+	                <button class="btn btn-sm btn-outline-primary ms-2" onclick="downloadAttachment('${file.fileSavedName}', '${file.fileOriginalName}')">
+	                    <i class="bx bx-download"></i> 다운로드
+	                </button>
+	            `;
+	            viewContainer.appendChild(li);
+	        });
+	    } else {
+	        viewContainer.innerHTML = `<li class="list-group-item text-muted small text-center bg-light">첨부된 파일이 없습니다.</li>`;
+	    }
 
         const modalEl = document.getElementById('detailContractModal');
-        const modal = new bootstrap.Modal(modalEl);
+		const isAlreadyShown = modalEl.classList.contains('show');
+		
+		if (!isAlreadyShown) {
+			isContractUpdated = false;
+			
+			modalEl.addEventListener('hidden.bs.modal', function () {
+				if (isContractUpdated && typeof loadTab === 'function') loadTab('contract');
+			}, { once: true });
+		}
+		
+		let modal = bootstrap.Modal.getInstance(modalEl);
+		if (!modal) {
+	        modal = new bootstrap.Modal(modalEl);
+		}
+			
         modal.show();
     } catch (error) {
         console.error("계약 상세 조회 오류 : ", error);
@@ -299,28 +316,60 @@ function downloadContractPdf() {
     html2pdf().set(opt).from(element).save();
 }
 
-// ==========================================
-// 8. 수정 모드 관련 로직
-// ==========================================
-
-// 수정 모드 진입
 function enableEditMode() {
     if (!currentContractData) return;
-
-    document.getElementById('editStartDate').value = currentContractData.contractStartDate;
-    document.getElementById('editEndDate').value = currentContractData.contractEndDate;
-    document.getElementById('editRoyalty').value = currentContractData.contractRoyalti;
-    document.getElementById('editDeposit').value = currentContractData.contractDeposit;
+	
+	const pdfBtn = document.getElementById('btnPdfDownload');
+	
+	pdfBtn.style.transition = 'none';
+	pdfBtn.classList.add('invisible');
 
     document.querySelectorAll('.mode-view').forEach(el => el.classList.add('d-none'));
     document.querySelectorAll('.mode-edit').forEach(el => el.classList.remove('d-none'));
 
     document.getElementById('btnEditMode').classList.add('d-none');
     document.getElementById('btnCloseModal').classList.add('d-none');
-	document.getElementById('btnPdfDownload').classList.add('invisible');
     
     document.getElementById('btnSaveContract').classList.remove('d-none');
     document.getElementById('btnCancelEdit').classList.remove('d-none');
+	
+	document.getElementById('titleArea').innerText='가맹 계약 정보 수정';
+	
+	deletedFileIds = [];
+	
+    const existingContainer = document.getElementById('existingFileContainer');
+    existingContainer.innerHTML = "";
+
+    if (currentContractData.fileDTOs && currentContractData.fileDTOs.length > 0) {
+        currentContractData.fileDTOs.forEach(file => {
+            const li = document.createElement('li');
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.id = `file-item-${file.fileId}`;
+			
+			let iconClass = "bx bxs-file-blank text-secondary";
+            if (file.fileOriginalName.includes('.pdf')) iconClass = "bx bxs-file-pdf text-danger";
+            else if (file.fileOriginalName.match(/\.(jpg|jpeg|png)$/i)) iconClass = "bx bxs-file-image text-primary";
+
+            li.innerHTML = `
+                <div class="d-flex align-items-center overflow-hidden">
+                    <i class="${iconClass} fs-4 me-2"></i> <span class="text-truncate text-muted">${file.fileOriginalName}</span>
+                </div>
+                <button class="btn btn-sm btn-outline-danger ms-2" type="button" onclick="markFileAsDeleted(${file.fileId})">
+                    <i class="bx bx-trash"></i> 삭제
+                </button>
+            `;
+            existingContainer.appendChild(li);
+        });
+    }
+	
+    const newContainer = document.getElementById('newFileContainer');
+    newContainer.innerHTML = "";
+	addEditFileField();
+
+    document.getElementById('editStartDate').value = currentContractData.contractStartDate;
+    document.getElementById('editEndDate').value = currentContractData.contractEndDate;
+    document.getElementById('editRoyalty').value = currentContractData.contractRoyalti;
+    document.getElementById('editDeposit').value = currentContractData.contractDeposit;
 }
 
 function cancelEditMode() {
@@ -333,57 +382,89 @@ function cancelEditMode() {
     
     document.getElementById('btnSaveContract').classList.add('d-none');
     document.getElementById('btnCancelEdit').classList.add('d-none');
+	
+	document.getElementById('titleArea').innerText='가맹 계약 정보';
 }
 
-// 수정 사항 저장 (서버 전송)
+function addEditFileField() {
+    const container = document.getElementById('newFileContainer');
+    const div = document.createElement('div');
+    div.className = "input-group mb-2";
+    div.innerHTML = `
+        <input type="file" class="form-control" name="editContractFiles">
+        <button type="button" class="btn btn-outline-danger" onclick="this.parentElement.remove()">
+            <i class="bx bx-minus"></i>
+        </button>
+    `;
+    container.appendChild(div);
+}
+
+function markFileAsDeleted(fileId) {
+    if(confirm("이 파일을 삭제하시겠습니까? (저장 버튼을 눌러야 최종 반영됩니다)")) {
+        deletedFileIds.push(fileId);
+        
+        const fileItem = document.getElementById(`file-item-${fileId}`);
+        if(fileItem) {
+            fileItem.classList.add('d-none');
+        }
+    }
+}
+
 async function updateContract() {
-    // 입력값 가져오기
-    const contractId = currentContractData.contractId; // ID는 불변
+    const contractId = currentContractData.contractId;
     const startDate = document.getElementById('editStartDate').value;
     const endDate = document.getElementById('editEndDate').value;
     const royalty = document.getElementById('editRoyalty').value;
     const deposit = document.getElementById('editDeposit').value;
 
-    // 유효성 검사
-    if(!startDate || !endDate || !royalty || !deposit) {
-        alert("모든 필드를 입력해주세요.");
-        return;
-    }
+	if (!royalty) { alert("로얄티를 입력해주세요."); return; }
+	if (!deposit) { alert("여신(보증금)을 입력해주세요."); return; }
+	if (!startDate || !endDate) { alert("계약기간을 입력해주세요."); return; }
+	
+	const startDateForStatus = new Date(startDate);
+	startDateForStatus.setHours(0, 0, 0, 0);
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
 
-    // 전송할 데이터 구성
-    const updateData = {
-        contractId: contractId,
-        contractStartDate: startDate,
-        contractEndDate: endDate,
-        contractRoyalti: parseInt(royalty),
-        contractDeposit: parseInt(deposit)
-        // 필요한 경우 storeId 등 다른 필드도 포함
-    };
+	var status = 1;
+	if (startDateForStatus > today) status = 0;
+	
+	const formData = new FormData();
+	
+	formData.append("contractId", contractId);
+	formData.append("contractStartDate", startDate);
+	formData.append("contractEndDate", endDate);
+	formData.append("contractRoyalti", parseInt(royalty));
+	formData.append("contractDeposit", parseInt(deposit));
+	formData.append("contractStatus", status);
+	
+	if (deletedFileIds.length > 0) {
+		deletedFileIds.forEach(id => {
+			formData.append("deleteFileIds", id);
+		});
+	}
+	
+	const fileInputs = document.getElementsByName("editContractFiles");
+	for (let input of fileInputs) {
+		if (input.files.length > 0) {
+			formData.append("newFiles", input.files[0]);
+		}
+	}
 
     try {
-        const response = await fetch('/store/tab/contract/update', { // ★ 서버 수정 URL 확인 필요
-            method: 'POST', // or 'PUT'
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updateData),
+        const response = await fetch('/store/tab/contract/update', { 
+            method: 'POST',
+            body: formData,
         });
 
         if (!response.ok) throw new Error(`서버 오류: ${response.status}`);
 
         alert("계약 정보가 수정되었습니다.");
 
-        // 1. 성공 시 데이터 갱신을 위해 상세 조회 다시 실행
-        // (화면 갱신 및 전역 변수 업데이트 효과)
+		isContractUpdated = true;
         await getContractDetail(contractId);
-        
-        // 2. 보기 모드로 복귀 (getContractDetail 안에서 모달을 띄우므로, 
-        //    그냥 두면 되지만 버튼 상태 초기화를 위해 호출)
         cancelEditMode(); 
         
-        // 3. 리스트 목록도 갱신 (선택 사항)
-        if (typeof loadTab === 'function') loadTab('contract');
-
     } catch (error) {
         console.error("수정 실패:", error);
         alert("정보 수정 중 오류가 발생했습니다.");

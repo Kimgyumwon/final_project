@@ -32,7 +32,7 @@
 		INSERT INTO store_contract VALUE(#{contractId}, #{storeId}, #{contractRoyalti}, #{contractDeposit}, #{contractStartDate}, #{contractEndDate}, #{contractStatus}, now(), now())
 	</insert>
 	
-	<insert id="fileAdd" parameterType="ContractFileDTO">
+	<insert id="addFile" parameterType="ContractFileDTO">
 		INSERT INTO store_contract_file	VALUE(null, #{contractId}, #{fileOriginalName}, #{fileSavedName})	
 	</insert>
 	
@@ -88,5 +88,25 @@
 	<update id="updateStatusToExpired" parameterType="java.time.LocalDate">
 		UPDATE store_contract SET contract_status = 2 WHERE contract_end_date = #{yesterday}
 	</update>
+	
+	<update id="update">
+		UPDATE store_contract 
+		SET 
+			contract_royalti = #{contractRoyalti}, 
+			contract_deposit = #{contractDeposit}, 
+			contract_start_date = #{contractStartDate}, 
+			contract_end_date = #{contractEndDate}, 
+			contract_status = #{contractStatus}, 
+			contract_updated_at = now() 
+		WHERE contract_id = #{contractId}
+	</update>
+	
+	<select id="selectFile" parameterType="Integer" resultType="ContractFileDTO">
+		SELECT * FROM store_contract_file WHERE file_id = #{fileId}
+	</select>
+	
+	<delete id="deleteFile" parameterType="Integer">
+		DELETE FROM store_contract_file WHERE file_id = #{fileId}
+	</delete>
 	
 </mapper>
