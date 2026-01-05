@@ -21,9 +21,10 @@ public class VocController {
 	private VocService vocService;
 	
 	@GetMapping("list")
-	public String list(Model model) throws Exception {
-		List<VocDTO> vocList = vocService.list();
+	public String list(VocSearchDTO searchDTO, Model model) throws Exception {
+		List<VocDTO> vocList = vocService.list(searchDTO);
 		model.addAttribute("list", vocList);
+		model.addAttribute("pager", searchDTO);
 		
 		return "voc/list";
 	}
@@ -31,10 +32,28 @@ public class VocController {
 	@PostMapping("add")
 	@ResponseBody
 	public Map<String, Object> addVoc(@RequestBody VocDTO vocDTO) throws Exception { 
-		int result = vocService.add(vocDTO);
-		 
+		return result(vocService.add(vocDTO)); 
+	}
+	
+	@GetMapping("detail")
+	public String detail(Integer vocId, Model model) throws Exception {
+		VocDTO vocDTO = vocService.detail(vocId);
+		List<VocProcessDTO> processList = vocService.processList(vocId);
+		model.addAttribute("dto", vocDTO);
+		model.addAttribute("list", processList);
+		
+		return "voc/detail";
+	}
+	
+	@PostMapping("addProcess")
+	@ResponseBody
+	public Map<String, Object> addVocProcess(@RequestBody VocProcessDTO processDTO) throws Exception { 
+		return result(vocService.addProcess(processDTO));
+	}
+	
+	private Map<String, Object> result(int result) {
 		Map<String, Object> response = new HashMap<>();
-	 
+		 
 		if (result > 0) {  
 			response.put("message", "등록 완료"); 
 			response.put("status", "success");
@@ -44,14 +63,6 @@ public class VocController {
 		}
 		
 		return response; 
-	}
-	
-	@GetMapping("detail")
-	public String detail(Integer vocId, Model model) throws Exception {
-		VocDTO vocDTO = vocService.detail(vocId);
-		model.addAttribute("dto", vocDTO);
-		
-		return "voc/detail";
 	}
 
 }

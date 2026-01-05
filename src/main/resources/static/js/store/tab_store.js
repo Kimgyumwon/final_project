@@ -166,10 +166,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-function searchStores() {
-	
-}
-
 async function submitStoreRegistration() {
     const storeName = document.getElementById('storeName').value;
     const memberId = document.getElementById('memberId').value;

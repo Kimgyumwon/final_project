@@ -32,11 +32,9 @@ public class VocDTO {
 	private String storeAddress;
 	
 	public String getVocCreatedAtStr() {
-        if (this.vocCreatedAt == null) {
-            return "";
-        }
+        if (this.vocCreatedAt == null) return "";
         
-        return this.vocCreatedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        return this.vocCreatedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
 }

@@ -49,6 +49,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
     
     <link rel="stylesheet" href="/css/store/main.css">
+    <link rel="stylesheet" href="/css/store/voc.css">
 
     <!-- Page CSS -->
 
@@ -159,23 +160,19 @@
                               <h5 class="mb-0"><i class="bx bx-chat me-1"></i>처리 내역 및 소통</h5>
                           </div>
                           
-                          <div class="card-body overflow-auto" style="max-height: 500px; background-color: #f8f9fa;" id="replyArea">
-                              <c:forEach var="reply" items="${replyList}">
-						        <div class="card mb-3 shadow-sm">
-						            <div class="card-body p-3">
-						                <div class="d-flex justify-content-between mb-1">
-						                    <strong class="text-primary">${reply.replyWriter}</strong>
-						                    <small class="text-muted">${reply.createdAtStr}</small>
-						                </div>
-						                <p class="mb-1" style="white-space: pre-line;">${reply.replyContent}</p>
+                          <div class="card-body overflow-auto" style="max-height: 500px; background-color: #f8f9fa; padding-bottom: 0;" id="replyArea">
+                              <c:forEach var="process" items="${list}">
+                              	<c:set var="isMe" value="${process.memName == '최영업'}" />
+						        <div class="d-flex w-100 my-3 ${isMe ? 'justify-content-end' : 'justify-content-start'}">
+						            <div style="max-width: 80%;" class="${isMe ? 'text-end' : 'text-start'}">
+						                <small class="d-block mb-1 ${isMe ? 'me-2 text-primary fw-bold' : 'ms-2 text-dark fw-bold'}">
+						                    ${process.memName}
+						                </small>
+						                <div class="chat-bubble ${isMe ? 'chat-right' : 'chat-left'} text-start"><span>${process.processContents}</span></div>
 						
-						                <c:if test="${not empty reply.fileUuidName}">
-						                    <div class="mt-2">
-						                        <a href="/upload/${reply.fileUuidName}" target="_blank">
-						                            <img src="/upload/${reply.fileUuidName}" class="img-thumbnail" style="max-height: 150px;" alt="첨부이미지">
-						                        </a>
-						                    </div>
-						                </c:if>
+						                <div class="chat-time ${isMe ? 'me-1' : 'ms-1'}">
+						                    ${process.processCreatedAtStr}
+						                </div>
 						            </div>
 						        </div>
 						    </c:forEach>
@@ -194,9 +191,10 @@
 						            <i class="bx bx-image-add"></i>
 						        </button>
 						
-						        <textarea class="form-control" id="replyContent" rows="2" placeholder="메시지를 입력하세요..."></textarea>
+								<input type="hidden" id="vocId" value="${dto.vocId}">
+						        <textarea class="form-control" id="processContents" rows="2" placeholder="메시지를 입력하세요..."></textarea>
 						        
-						        <button class="btn btn-primary" type="button" onclick="submitReply()">
+						        <button class="btn btn-primary" type="button" onclick="submitVocProcess()">
 						            <i class="bx bx-send"></i> 등록
 						        </button>
 						    </div>

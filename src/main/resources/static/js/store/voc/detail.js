@@ -83,3 +83,38 @@ async function submitVocRegistration() {
         alert("등록 중 오류가 발생했습니다.");
     }
 }
+
+async function submitVocProcess() {
+    const vocId = document.getElementById('vocId').value;
+    const processContents = document.getElementById('processContents').value;
+    
+    if (!processContents) {
+        alert("내용을 입력해주세요.");
+        return;
+    }
+
+    const formData = {
+        vocId: vocId,
+        processContents: processContents
+    };
+
+    try {
+        const response = await fetch('/store/voc/addProcess', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', 
+				},
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`서버 오류: ${response.status}`);
+        }
+
+        location.reload();
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert("등록 중 오류가 발생했습니다.");
+    }
+}

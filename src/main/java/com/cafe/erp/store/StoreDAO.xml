@@ -26,8 +26,7 @@
 	        <if test="storeCloseTime != null and storeCloseTime != ''">
 	            AND s.store_close_time &lt;= #{storeCloseTime}
 	        </if>
-            
-            </where>
+    	</where>
     </sql>
 
 	<select id="list" parameterType="StoreSearchDTO" resultType="StoreDTO">
@@ -49,9 +48,9 @@
             store s             
             LEFT JOIN member m                
             ON s.member_id = m.member_id 
-       		<include refid="searchCondition" />
-            ORDER BY s.store_id
-            LIMIT #{startNum}, #{perPage}
+      	<include refid="searchCondition" />
+        ORDER BY s.store_id
+        LIMIT #{startNum}, #{perPage}
 	</select>
 
 	<select id="maxStoreId" parameterType="String" resultType="Integer">

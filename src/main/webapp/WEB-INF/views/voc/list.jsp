@@ -51,6 +51,7 @@
     <link rel="stylesheet" href="/css/store/main.css">
 
     <!-- Page CSS -->
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
     <!-- Helpers -->
     <script src="/vendor/js/helpers.js"></script>
@@ -95,43 +96,62 @@
                 </div>
                 <h4 class="fw-bold py-3 mb-3"><span class="text-muted fw-light">VOC /</span> 목록</h4>
                 <div id="tab-content-area">
-                   	<div class="card shadow-none border bg-white mb-2">
+                   	<div class="card shadow-none border bg-white mb-4">
 						<div class="card-body py-3 px-3">
-					    	<form id="storeSearchForm" method="get" action="/store/list">
-					    		<input type="hidden" name="page" id="page" value="1">
-					      		<div class="row g-3">
-					        		<div class="col-12 col-sm-6 col-md-4 col-lg-2">
-					          			<label class="form-label small">운영 상태</label>
-								        	<select class="form-select" id="filterStatus" name="storeStatus">
-								            	<option value="">전체</option>
-								                <option value="오픈 준비" ${pager.storeStatus == '오픈 준비' ? 'selected' : ''}>오픈 준비</option>
-								                <option value="오픈" ${pager.storeStatus == '오픈' ? 'selected' : ''}>오픈</option>
-								                <option value="폐업" ${pager.storeStatus == '폐업' ? 'selected' : ''}>폐업</option>
-								            </select>
-					        		</div>
+							<form id="vocSearchForm" method="get" action="/store/voc/list">
+							    <input type="hidden" name="page" id="page" value="1">
+							    
+							    <div class="row g-3">
 							        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-										<label class="form-label small">오픈 시간</label>
-							            <input type="time" class="form-control" id="filterOpenTime" name="storeStartTime" value="${pager.storeStartTime}" />
+							            <label class="form-label small">불만 유형</label>
+							            <select class="form-select" id="vocType" name="vocType">
+							                <option value="">전체</option>
+							                <option value="HYGIENE" ${pager.vocType eq 'HYGIENE' ? 'selected' : ''}>위생</option>
+							                <option value="TASTE" ${pager.vocType eq 'TASTE' ? 'selected' : ''}>맛</option>
+							                <option value="SERVICE" ${pager.vocType eq 'SERVICE' ? 'selected' : ''}>서비스</option>
+							            </select>
 							        </div>
+							
 							        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-										<label class="form-label small">종료 시간</label>
-							            <input type="time" class="form-control" id="filterCloseTime" name="storeCloseTime" value="${pager.storeCloseTime}" />
+							            <label class="form-label small">진행 상태</label>
+							            <select class="form-select" id="vocStatus" name="vocStatus">
+							                <option value="">전체</option>
+							                <option value="0" ${pager.vocStatus eq 0 ? 'selected' : ''}>처리 대기</option>
+							                <option value="1" ${pager.vocStatus eq 1 ? 'selected' : ''}>처리 중</option>
+							                <option value="2" ${pager.vocStatus eq 2 ? 'selected' : ''}>처리 완료</option>
+							            </select>
 							        </div>
-									<div class="col-12 col-sm-6 col-md-4 col-lg-2">
-										<label class="form-label small">주소 (지역)</label>
-										<input type="text" class="form-control" placeholder="예: 서울 강남구" id="filterAddress" name="storeAddress" value="${pager.storeAddress}" />
+							
+							        <div class="col-12 col-sm-12 col-md-8 col-lg-3">
+									    <label class="form-label small">접수 기간</label>
+									    <div class="input-group">
+									        <span class="input-group-text"><i class="bx bx-calendar"></i></span>
+									        <input type="text" class="form-control" id="daterange" placeholder="기간을 선택하세요" />
+									    </div>
+									    
+									    <input type="hidden" id="searchStartDate" name="searchStartDate" value="${pager.searchStartDate}" />
+									    <input type="hidden" id="searchEndDate" name="searchEndDate" value="${pager.searchEndDate}" />
 									</div>
+							
 							        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
 							            <label class="form-label small">가맹점명</label>
-							            <input type="text" class="form-control" placeholder="가맹점명" id="filterKeyword" name="storeName" value="${pager.storeName}" />
+							            <input type="text" class="form-control" placeholder="가맹점명" id="storeName" name="storeName" value="${pager.storeName}" />
 							        </div>
-							        <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex align-items-end justify-content-end gap-2 ps-md-5">
-										<button class="btn btn-outline-secondary text-nowrap" type="button" onclick="resetSearchForm()"><i class="bx bx-refresh"></i> 초기화</button>
-							            <button class="btn btn-primary text-nowrap" onclick="searchStores()">
-							            	<i class="bx bx-search me-1"></i> 조회
+							
+							        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							            <label class="form-label small">제목</label>
+							            <input type="text" class="form-control" placeholder="제목 검색" id="vocTitle" name="vocTitle" value="${pager.vocTitle}" />
+							        </div>
+							
+							        <div class="col-12 d-flex align-items-end justify-content-end gap-2">
+							            <button class="btn btn-outline-secondary text-nowrap" type="reset"> 
+							                <i class="bx bx-refresh"></i> 초기화
+							            </button>
+							            <button class="btn btn-primary text-nowrap" type="button" onclick="searchVoc()">
+							                <i class="bx bx-search me-1"></i> 조회
 							            </button>
 							        </div>
-					           	</div>
+							    </div>
 							</form>
 						</div>
 					</div>
@@ -196,7 +216,6 @@
 					        <nav aria-label="Page navigation">
 					            <ul class="pagination">
 					                <li class="page-item ${pager.begin == 1 ? 'disabled' : ''}"><a class="page-link" href="javascript:movePage(${pager.begin - 1})"><i class="bx bx-chevron-left"></i></a></li>
-					                <!-- <li class="page-item active"><a class="page-link" href="#">1</a></li> -->
 					                <c:forEach begin="${pager.begin}" end="${pager.end}" var="i">
 									    <li class="page-item ${pager.page == i ? 'active' : ''}"><a class="page-link" href="javascript:movePage(${i})">${i}</a></li>
 							  		</c:forEach>
@@ -331,6 +350,11 @@
 
     <!-- Vendors JS -->
     <script src="/vendor/libs/apex-charts/apexcharts.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    
 
     <!-- Main JS -->
     <script src="/js/main.js"></script>
@@ -342,5 +366,7 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     
     <script type="text/javascript" src="/js/store/voc/voc.js"></script>
+    
+    
   </body>
 </html>

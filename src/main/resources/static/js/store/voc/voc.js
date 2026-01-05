@@ -1,3 +1,77 @@
+$(function() {
+    // 1. JSP에서 값 가져오기
+    let startParam = '${pager.startDate}'.trim(); 
+    let endParam = '${pager.endDate}'.trim();
+
+    // 2. 초기 날짜 설정 로직
+    // 기본값은 '오늘'로 설정 (달력을 열었을 때 보여질 기준 날짜)
+    let startMoment = moment();
+    let endMoment = moment();
+    let hasValidData = false; // 데이터가 실제로 있는지 확인하는 플래그
+
+    // 값이 있고 형식이 올바른지 체크
+    if (startParam && endParam) {
+        let s = moment(startParam, 'YYYY-MM-DD');
+        let e = moment(endParam, 'YYYY-MM-DD');
+        
+        // 두 날짜가 모두 유효한 날짜(Invalid Date가 아님)라면 적용
+        if (s.isValid() && e.isValid()) {
+            startMoment = s;
+            endMoment = e;
+            hasValidData = true;
+        }
+    }
+
+    // 3. DateRangePicker 초기화
+    $('#daterange').daterangepicker({
+        startDate: startMoment, // 데이터가 없으면 '오늘', 있으면 '그 날짜'부터 시작
+        endDate: endMoment,
+        autoUpdateInput: false, // [핵심] 날짜 선택 전까지 input을 자동으로 채우지 않음
+        locale: {
+            format: "YYYY-MM-DD",
+            separator: " ~ ",
+            applyLabel: "확인",
+            cancelLabel: "취소",
+            fromLabel: "부터",
+            toLabel: "까지",
+            customRangeLabel: "직접 선택",
+            daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+            monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+            firstDay: 0
+        }
+    });
+
+    // 4. 화면 초기값 설정 (가장 중요한 부분)
+    if (hasValidData) {
+        // 데이터가 있을 때만 input에 글자를 채워줌
+        $('#daterange').val(startMoment.format('YYYY-MM-DD') + ' ~ ' + endMoment.format('YYYY-MM-DD'));
+    } else {
+        // 데이터가 없으면 빈 값으로 둠 -> HTML의 placeholder="기간을 선택하세요"가 보임
+        $('#daterange').val(''); 
+    }
+
+    // 5. [확인] 버튼 눌렀을 때 이벤트
+    $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+        const sDate = picker.startDate.format('YYYY-MM-DD');
+        const eDate = picker.endDate.format('YYYY-MM-DD');
+
+        // 보이는 input 채우기
+        $(this).val(sDate + ' ~ ' + eDate);
+        
+        // 숨겨진 form input 채우기 (서버 전송용)
+        $('#startDate').val(sDate);
+        $('#endDate').val(eDate);
+    });
+
+    // 6. [취소] 버튼 눌렀을 때 이벤트
+    $('#daterange').on('cancel.daterangepicker', function(ev, picker) {
+        // 값을 싹 비움 -> 다시 placeholder가 보임
+        $(this).val('');
+        $('#startDate').val('');
+        $('#endDate').val('');
+    });
+});
+
 async function fetchJson(url, options = {}) {
     const response = await fetch(url, options);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
@@ -136,15 +210,36 @@ async function submitVocRegistration() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const vocModalEl = document.getElementById('registerVocModal');
+
+    if (vocModalEl) {
+        vocModalEl.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('storeId').value = '';
+            document.getElementById('storeNameInput').value = '';
+            document.getElementById('vocType').selectedIndex = 0;
+            document.getElementById('vocContact').value = '';
+            document.getElementById('vocTitle').value = '';
+            document.getElementById('vocContents').value = '';
+
+            const resultList = document.getElementById('storeResultList');
+            if (resultList) {
+                resultList.style.display = 'none';
+                resultList.innerHTML = '';
+            }
+        });
+    }
+});
+
 function movePage(page) {
     if (page < 1) page = 1;
     document.getElementById("page").value = page;
-    document.getElementById("storeSearchForm").submit();
+    document.getElementById("vocSearchForm").submit();
 }
 
-function searchStores() {
+function searchVoc() {
     document.getElementById("page").value = 1;
-    document.getElementById("storeSearchForm").submit();
+    document.getElementById("vocSearchForm").submit();
 }
 
 function resetSearchForm() {

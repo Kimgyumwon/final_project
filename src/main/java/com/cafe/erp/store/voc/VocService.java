@@ -11,8 +11,12 @@ public class VocService {
 	@Autowired
 	private VocDAO vocDAO;
 	
-	public List<VocDTO> list() throws Exception {
-		return vocDAO.list();
+	public List<VocDTO> list(VocSearchDTO searchDTO) throws Exception {
+		Long totalCount = vocDAO.count(searchDTO);
+		
+		searchDTO.pageing(totalCount);
+		
+		return vocDAO.list(searchDTO);
 	}
 
 	public int add(VocDTO vocDTO) throws Exception {
@@ -22,6 +26,15 @@ public class VocService {
 
 	public VocDTO detail(Integer vocId) throws Exception {
 		return vocDAO.detail(vocId);
+	}
+
+	public List<VocProcessDTO> processList(Integer vocId) throws Exception {
+		return vocDAO.processList(vocId);
+	}
+
+	public int addProcess(VocProcessDTO processDTO) throws Exception {
+		processDTO.setMemberId(121001);
+		return vocDAO.addProcess(processDTO);
 	}
 
 }
