@@ -48,6 +48,8 @@
 				        });
 				    })
 					
+					
+					
 	$(document).ready(function(){
 		$(document).on('click', '#outCommute', function(){
 			if(!confirm("현재 시간으로 퇴근 하시겠습니까?")) return;

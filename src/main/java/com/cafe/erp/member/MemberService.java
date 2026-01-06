@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,9 @@ public class MemberService {
 	
 	@Autowired
 	private FileUtils fileUtils;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
     MemberService(EmailService emailService) {
         this.emailService = emailService;
@@ -86,6 +90,13 @@ public class MemberService {
 
 		memberDTO.setMemberId(Integer.parseInt(finalId));
 		
+		String pw = memberDTO.getMemPassword();		
+		if(pw == null) pw = "1234";
+		
+		String bcpw = passwordEncoder.encode(pw);
+		
+		memberDTO.setMemPassword(bcpw);
+		
 		int result = memberDAO.add(memberDTO);
 		return result;
 	}
@@ -126,6 +137,14 @@ public class MemberService {
 	}
 
 	public int resetPw(MemberDTO memberDTO) throws Exception{
+		
+		String pw = memberDTO.getMemPassword();		
+		
+		String bcpw = passwordEncoder.encode(pw);
+		
+		memberDTO.setMemPassword(bcpw);
+		
+		
 		return memberDAO.resetPw(memberDTO);
 	}
 

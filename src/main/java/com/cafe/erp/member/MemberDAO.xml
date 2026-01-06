@@ -94,7 +94,7 @@
 		INSERT INTO member 
 		(member_id, mem_password, mem_name, mem_zip_code, mem_address, mem_address_detail, mem_email, mem_phone, mem_hire_date, mem_is_active, dept_code, position_code)
 		VALUES
-		(#{memberId}, 1234, #{memName}, #{memZipCode}, #{memAddress}, #{memAddressDetail}, #{memEmail}, #{memPhone},  #{memHireDate}, 1,  #{deptCode}, #{positionCode})
+		(#{memberId}, #{memPassword}, #{memName}, #{memZipCode}, #{memAddress}, #{memAddressDetail}, #{memEmail}, #{memPhone},  #{memHireDate}, 1,  #{deptCode}, #{positionCode})
 	</insert>
 	
 	

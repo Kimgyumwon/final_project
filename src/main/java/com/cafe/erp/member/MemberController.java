@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/member")
 public class MemberController {
+
+    private final PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	private MemberService memberService;
@@ -33,6 +36,11 @@ public class MemberController {
 	
 	@Autowired
 	private EmailService emailService;
+
+
+    MemberController(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 	
 	
 	@GetMapping("login")
@@ -79,6 +87,9 @@ public class MemberController {
 	
 	@PostMapping("admin_member_add")
 	public String add(MemberDTO memberDTO, Model model) throws Exception{
+		String pw = "1234";
+		memberDTO.setMemPassword(pw);
+		
 		int result = memberService.add(memberDTO);
 		
 		String msg = "등록 성공";
@@ -94,7 +105,7 @@ public class MemberController {
 		
 		model.addAttribute("msg", msg);
 		model.addAttribute("url", "./AM_user_detail");
-		emailService.sendPasswordEmail(memberDTO.getMemEmail(), memberDTO.getMemPassword(), memberDTO.getMemName());
+		emailService.sendPasswordEmail(memberDTO.getMemEmail(), pw, memberDTO.getMemName());
 		return "redirect:./AM_member_detail?memberId=" + memid;
 	}
 	
@@ -139,12 +150,15 @@ public class MemberController {
 			return "fail";
 		}
 		
+		String pw ="1234";
+		
 		MemberDTO updateDTO = new MemberDTO();
 		updateDTO.setMemberId(memberId);
 		updateDTO.setMemPassword("1234");
+		
 		memberService.resetPw(updateDTO);
 		
-		emailService.resetPasswordEmail(targetMember.getMemEmail(), "1234", targetMember.getMemName());
+		emailService.resetPasswordEmail(targetMember.getMemEmail(), pw, targetMember.getMemName());
 		
 		return "success";
 	}
