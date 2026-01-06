@@ -108,8 +108,8 @@ function searchPrices(){
 	          /* 사용 여부 뱃지 */
 	          const priceEnableBadge =
 	            itemPrice.itemPriceEnable
-	              ? `<span class="badge bg-label-success">사용</span>`
-	              : `<span class="badge bg-label-danger">미사용</span>`;
+	              ? `<span class="badge bg-label-danger">미사용</span>`
+	              : `<span class="badge bg-label-success">사용</span>`;
 
 	          /* 숫자 포맷 */
 	          const price =
@@ -123,12 +123,15 @@ function searchPrices(){
 			               <td class="text">${categoryBadge}</td>
 			               <td class="text">
 			                 ${priceEnableBadge}
-			                 <button class="btn btn-sm btn-warning btn-update-item"
-			                   data-bs-toggle="modal"
-			                   data-bs-target="#editModal"
-			                   onclick="openPriceModal(${itemPrice.itemPriceId}, ${itemPrice.itemPriceEnable})">
-			                   변경
-			                 </button>
+							 <form action="priceCheck" method="post">
+							  <input type="hidden" name="itemPriceId" value="${itemPrice.itemPriceId}">
+							  <input type="hidden" name="itemPriceEnable" value="${itemPrice.itemPriceEnable}">
+					            <button class="btn btn-sm btn-warning btn-update-item"
+								  data-bs-toggle="modal"
+								  data-bs-target="#editModal">
+								  변경
+								</button>
+							 </form>
 			               </td>
 			               <td class="price">${price}</td>
 			             </tr>`
