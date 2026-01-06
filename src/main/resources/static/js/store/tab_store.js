@@ -166,10 +166,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-function searchStores() {
-	
-}
-
 async function submitStoreRegistration() {
     const storeName = document.getElementById('storeName').value;
     const memberId = document.getElementById('memberId').value;
@@ -202,7 +198,7 @@ async function submitStoreRegistration() {
     };
 
     try {
-        const response = await fetch('/store/tab/store/add', { 
+        const response = await fetch('/store/add', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', 
@@ -224,10 +220,44 @@ async function submitStoreRegistration() {
             modalInstance.hide();
         }
         
-        loadTab('store');
+        location.reload();
 
     } catch (error) {
         console.error('Error:', error);
         alert("등록 중 오류가 발생했습니다.");
     }
+}
+
+function movePage(page) {
+    if (page < 1) page = 1;
+    document.getElementById("page").value = page;
+    document.getElementById("storeSearchForm").submit();
+}
+
+function searchStores() {
+    document.getElementById("page").value = 1;
+    document.getElementById("storeSearchForm").submit();
+}
+
+function resetSearchForm() {
+	const form = document.getElementById('storeSearchForm');
+	
+	const inputs = form.querySelectorAll('input[type="text"], input[type="time"]');
+	    inputs.forEach(input => {
+	        input.value = '';
+	    });
+
+	    const selects = form.querySelectorAll('select');
+	    selects.forEach(select => {
+	        select.value = ''; 
+	    });
+
+	    if(document.getElementById('page')) {
+	        document.getElementById('page').value = 1;
+	    }
+}
+
+function downloadExcel() {
+	var searchParams = $('#storeSearchForm').serialize();
+	location.href='/store/downloadExcel?' + searchParams;
 }

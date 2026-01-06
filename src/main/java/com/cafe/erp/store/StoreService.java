@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cafe.erp.util.Pager;
 
 @Service
 public class StoreService {
@@ -12,10 +15,15 @@ public class StoreService {
 	@Autowired
 	private StoreDAO storeDAO;
 
-	public List<StoreDTO> list() throws Exception {
-		return storeDAO.list(); 
+	public List<StoreDTO> list(StoreSearchDTO searchDTO) throws Exception {
+		Long totalCount = storeDAO.count(searchDTO);
+		
+		searchDTO.pageing(totalCount);
+		
+		return storeDAO.list(searchDTO); 
 	}
 
+	@Transactional
 	public int add(StoreDTO storeDTO) throws Exception {
 		String[] addrs = storeDTO.getStoreAddress().split(" ");
 		
@@ -47,10 +55,15 @@ public class StoreService {
 				regionCode += 15; break;
 		}
 		
-		String id = regionCode + year.substring(2);
-		int count = storeDAO.countStoreId(id) + 1;
-		String num = String.format("%03d", count);
-		int storeId = Integer.parseInt(id + num);
+		String prefix = regionCode + year.substring(2);
+		Integer maxId = storeDAO.maxStoreId(prefix);
+		
+		int nextId = 1;
+		if (maxId != null) nextId = (maxId % 1000) + 1;
+		
+		String num = String.format("%03d", nextId);
+		
+		int storeId = Integer.parseInt(prefix + num);
 		storeDTO.setStoreId(storeId);
 		
 		return storeDAO.add(storeDTO);
@@ -58,6 +71,10 @@ public class StoreService {
 
 	public List<StoreDTO> searchStore(String keyword) throws Exception {
 		return storeDAO.searchStore(keyword);
+	}
+
+	public List<StoreDTO> excelList(StoreSearchDTO searchDTO) throws Exception {
+		return storeDAO.excelList(searchDTO);
 	}
 	
 }

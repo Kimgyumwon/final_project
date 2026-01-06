@@ -5,7 +5,31 @@
     
 <mapper namespace="com.cafe.erp.store.StoreDAO">
 
-	<select id="list" resultType="StoreDTO">
+	<sql id="searchCondition">
+        <where>
+            <if test="storeStatus != null and storeStatus != ''">
+                AND s.store_status = #{storeStatus}
+            </if>
+            
+            <if test="storeAddress != null and storeAddress != ''">
+                AND s.store_address LIKE CONCAT('%', #{storeAddress}, '%')
+            </if>
+            
+            <if test="storeName != null and storeName != ''">
+                AND s.store_name LIKE CONCAT('%', #{storeName}, '%')
+            </if>
+            
+            <if test="storeStartTime != null and storeStartTime != ''">
+            	AND s.store_start_time >= #{storeStartTime}
+	        </if>
+	
+	        <if test="storeCloseTime != null and storeCloseTime != ''">
+	            AND s.store_close_time &lt;= #{storeCloseTime}
+	        </if>
+    	</where>
+    </sql>
+
+	<select id="list" parameterType="StoreSearchDTO" resultType="StoreDTO">
 		SELECT 
             s.store_id,
             s.store_name,          
@@ -24,11 +48,13 @@
             store s             
             LEFT JOIN member m                
             ON s.member_id = m.member_id 
-            ORDER BY s.store_id
+      	<include refid="searchCondition" />
+        ORDER BY s.store_id
+        LIMIT #{startNum}, #{perPage}
 	</select>
 
-	<select id="countStoreId" parameterType="String">
-		SELECT COUNT(store_id) FROM store WHERE store_id LIKE '${id}%'
+	<select id="maxStoreId" parameterType="String" resultType="Integer">
+		SELECT MAX(store_id) FROM store WHERE CAST(store_id AS CHAR) LIKE CONCAT(#{id}, '%') FOR UPDATE
 	</select>
 	
 	<insert id="add" parameterType="storeDTO">
@@ -57,6 +83,29 @@
             ON s.member_id = m.member_id 
             WHERE s.store_name LIKE CONCAT(#{keyword}, '%')
             ORDER BY s.store_name
+	</select>
+	
+	<select id="count" parameterType="StoreSearchDTO" resultType="Long">
+		SELECT COUNT(store_id) FROM store s
+		<include refid="searchCondition" />
+	</select>
+	
+	<select id="excelList" parameterType="StoreSearchDTO" resultType="StoreDTO">
+		SELECT 
+           s.store_id,
+           s.store_name,          
+           s.member_id,
+           m.mem_name,
+           s.store_address,
+           s.store_status,
+           s.store_start_time,
+           s.store_close_time
+       FROM 
+           store s             
+           LEFT JOIN member m                
+           ON s.member_id = m.member_id 
+      		<include refid="searchCondition" />
+           ORDER BY s.store_id
 	</select>
 	
 </mapper>

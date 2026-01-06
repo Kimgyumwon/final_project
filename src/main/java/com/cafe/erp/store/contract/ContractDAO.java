@@ -1,5 +1,6 @@
 package com.cafe.erp.store.contract;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -9,12 +10,22 @@ public interface ContractDAO {
 	
 	public List<ContractDTO> list() throws Exception;
 
-	public int countContractId(String id);
+	public String maxContractId(String id);
 
 	public int add(ContractDTO contractDTO);
 
-	public int fileAdd(ContractFileDTO contractFileDTO);
+	public int addFile(ContractFileDTO contractFileDTO);
 
 	public ContractDTO getDetail(String contractId);
+
+	public int updateStatusToActive(LocalDate today);
+
+	public int updateStatusToExpired(LocalDate yesterday);
+
+	public int update(ContractDTO contractDTO);
+
+	public ContractFileDTO selectFile(Integer fileId);
+
+	public int deleteFile(Integer fileId);
 
 }

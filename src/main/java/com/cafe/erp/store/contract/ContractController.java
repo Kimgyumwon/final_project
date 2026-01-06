@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
-@RequestMapping("/store/tab/contract")
+@RequestMapping("/store/contract/")
 public class ContractController {
 	
 	@Autowired ContractService contractService;
 	
-	@GetMapping("")
+	@GetMapping("list")
 	public String contractList(Model model) throws Exception {
 		List<ContractDTO> contractList = contractService.list();
 		model.addAttribute("list", contractList);
@@ -30,9 +30,10 @@ public class ContractController {
 	}
 	
 	
-	@PostMapping("/add") 
+	@PostMapping("add") 
 	@ResponseBody
-	public Map<String, Object> addContract(@ModelAttribute ContractDTO contractDTO, @RequestParam(value = "files", required = false) List<MultipartFile> files) throws Exception { 
+	public Map<String, Object> addContract(@ModelAttribute ContractDTO contractDTO, 
+			@RequestParam(value = "files", required = false) List<MultipartFile> files) throws Exception { 
 		int result = contractService.add(contractDTO, files);
 	 
 		Map<String, Object> response = new HashMap<>();
@@ -48,10 +49,30 @@ public class ContractController {
 		return response; 
 	}
 	
-	@GetMapping("/detail")
+	@GetMapping("detail")
 	@ResponseBody
 	public ContractDTO getDetail(@RequestParam String contractId) throws Exception {
 		return contractService.getDetail(contractId);
+	}
+	
+	@PostMapping("update")
+	@ResponseBody
+	public Map<String, Object> updateContract(@ModelAttribute ContractDTO contractDTO, 
+		    @RequestParam(value = "newFiles", required = false) List<MultipartFile> newFiles,
+		    @RequestParam(value = "deleteFileIds", required = false) List<Integer> deleteFileIds) throws Exception {
+		int result = contractService.update(contractDTO, newFiles, deleteFileIds);
+		
+		Map<String, Object> response = new HashMap<>();
+		
+		if (result > 0) {  
+			response.put("message", "등록 완료"); 
+			response.put("status", "success");
+		} else {
+			response.put("status", "error");
+			response.put("message", "등록 실패");
+		}
+		
+		return response;
 	}
 
 }

@@ -17,7 +17,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>가맹점 관리</title>
+    <title>VOC 관리</title>
 
     <meta name="description" content="" />
 
@@ -51,6 +51,7 @@
     <link rel="stylesheet" href="/css/store/main.css">
 
     <!-- Page CSS -->
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
     <!-- Helpers -->
     <script src="/vendor/js/helpers.js"></script>
@@ -59,9 +60,6 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="/js/config.js"></script>
     
-    <!-- kakao -->
-	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&libraries=services"></script>
   </head>
 
   <body>
@@ -86,55 +84,74 @@
 			    <div class="col-12 px-0">
                     <ul class="nav nav-pills mb-3" role="tablist">
                         <li class="nav-item">
-                        	<a href="/store/list" class="nav-link active"><i class="bx bx-store me-1"></i> 가맹점 정보</a>
+                        	<a href="/store/voc/list" class="nav-link active"><i class="bx bx-user-voice me-1"></i> VOC </a>
                         </li>
                         <li class="nav-item">
-                        	<a href="/store/contract/list" class="nav-link"><i class="bx bx-file me-1"></i> 계약 기록</a>
+                        	<a href="/store/contract/list" class="nav-link"><i class="bx bx-message-detail me-1"></i> 계약 기록</a>
                         </li>
                         <li class="nav-item">
-                        	<a href="/store/evaluation" class="nav-link"><i class="bx bx-clipboard me-1"></i> 평가 현황</a>
+                        	<a href="/store/evaluation" class="nav-link"><i class="bx bx-conversation me-1"></i> 평가 현황</a>
                         </li>
                     </ul>
                 </div>
-                
+                <h4 class="fw-bold py-3 mb-3"><span class="text-muted fw-light">VOC /</span> 목록</h4>
                 <div id="tab-content-area">
                    	<div class="card shadow-none border bg-white mb-4">
 						<div class="card-body py-3 px-3">
-					    	<form id="storeSearchForm" method="get" action="/store/list">
-					    		<input type="hidden" name="page" id="page" value="1">
-					      		<div class="row g-3">
-					        		<div class="col-12 col-sm-6 col-md-4 col-lg-2">
-					          			<label class="form-label small">운영 상태</label>
-								        	<select class="form-select" id="filterStatus" name="storeStatus">
-								            	<option value="">전체</option>
-								                <option value="오픈 준비" ${pager.storeStatus == '오픈 준비' ? 'selected' : ''}>오픈 준비</option>
-								                <option value="오픈" ${pager.storeStatus == '오픈' ? 'selected' : ''}>오픈</option>
-								                <option value="폐업" ${pager.storeStatus == '폐업' ? 'selected' : ''}>폐업</option>
-								            </select>
-					        		</div>
+							<form id="vocSearchForm" method="get" action="/store/voc/list">
+							    <input type="hidden" name="page" id="page" value="1">
+							    
+							    <div class="row g-3">
 							        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-										<label class="form-label small">오픈 시간</label>
-							            <input type="time" class="form-control" id="filterOpenTime" name="storeStartTime" value="${pager.storeStartTime}" />
+							            <label class="form-label small">불만 유형</label>
+							            <select class="form-select" id="vocType" name="vocType">
+							                <option value="">전체</option>
+							                <option value="HYGIENE" ${pager.vocType eq 'HYGIENE' ? 'selected' : ''}>위생</option>
+							                <option value="TASTE" ${pager.vocType eq 'TASTE' ? 'selected' : ''}>맛</option>
+							                <option value="SERVICE" ${pager.vocType eq 'SERVICE' ? 'selected' : ''}>서비스</option>
+							            </select>
 							        </div>
+							
 							        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-										<label class="form-label small">종료 시간</label>
-							            <input type="time" class="form-control" id="filterCloseTime" name="storeCloseTime" value="${pager.storeCloseTime}" />
+							            <label class="form-label small">진행 상태</label>
+							            <select class="form-select" id="vocStatus" name="vocStatus">
+							                <option value="">전체</option>
+							                <option value="0" ${pager.vocStatus eq 0 ? 'selected' : ''}>처리 대기</option>
+							                <option value="1" ${pager.vocStatus eq 1 ? 'selected' : ''}>처리 중</option>
+							                <option value="2" ${pager.vocStatus eq 2 ? 'selected' : ''}>처리 완료</option>
+							            </select>
 							        </div>
-									<div class="col-12 col-sm-6 col-md-4 col-lg-2">
-										<label class="form-label small">주소 (지역)</label>
-										<input type="text" class="form-control" placeholder="예: 서울 강남구" id="filterAddress" name="storeAddress" value="${pager.storeAddress}" />
+							
+							        <div class="col-12 col-sm-12 col-md-8 col-lg-3">
+									    <label class="form-label small">접수 기간</label>
+									    <div class="input-group">
+									        <span class="input-group-text"><i class="bx bx-calendar"></i></span>
+									        <input type="text" class="form-control" id="daterange" placeholder="기간을 선택하세요" />
+									    </div>
+									    
+									    <input type="hidden" id="searchStartDate" name="searchStartDate" value="${pager.searchStartDate}" />
+									    <input type="hidden" id="searchEndDate" name="searchEndDate" value="${pager.searchEndDate}" />
 									</div>
+							
 							        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
 							            <label class="form-label small">가맹점명</label>
-							            <input type="text" class="form-control" placeholder="가맹점명" id="filterKeyword" name="storeName" value="${pager.storeName}" />
+							            <input type="text" class="form-control" placeholder="가맹점명" id="storeName" name="storeName" value="${pager.storeName}" />
 							        </div>
-							        <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex align-items-end justify-content-end gap-2 ps-md-5">
-										<button class="btn btn-outline-secondary text-nowrap" type="button" onclick="resetSearchForm()"><i class="bx bx-refresh"></i> 초기화</button>
-							            <button class="btn btn-primary text-nowrap" onclick="searchStores()">
-							            	<i class="bx bx-search me-1"></i> 조회
+							
+							        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							            <label class="form-label small">제목</label>
+							            <input type="text" class="form-control" placeholder="제목 검색" id="vocTitle" name="vocTitle" value="${pager.vocTitle}" />
+							        </div>
+							
+							        <div class="col-12 d-flex align-items-end justify-content-end gap-2">
+							            <button class="btn btn-outline-secondary text-nowrap" type="reset"> 
+							                <i class="bx bx-refresh"></i> 초기화
+							            </button>
+							            <button class="btn btn-primary text-nowrap" type="button" onclick="searchVoc()">
+							                <i class="bx bx-search me-1"></i> 조회
 							            </button>
 							        </div>
-					           	</div>
+							    </div>
 							</form>
 						</div>
 					</div>
@@ -142,13 +159,13 @@
 					<div class="card shadow-none border bg-white">
 					     	
 						<div class="card-header d-flex justify-content-between align-items-center">
-					    	<h5 class="mb-0">가맹점 목록</h5>
+					    	<h5 class="mb-0">VOC 목록</h5>
 					        <div>
 					       		<button type="button" class="btn btn-outline-success me-2" onclick="downloadExcel()">
 					            	<i class='bx bx-download me-1'></i> 엑셀 다운로드
 					            </button>
-					          	<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerStoreModal">
-					                <i class="bx bx-plus me-1"></i> 가맹점 등록
+					          	<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerVocModal">
+					                <i class="bx bx-plus me-1"></i> VOC 등록
 					          	</button>
 					     	</div>
 						</div>
@@ -160,29 +177,35 @@
 					            	<tr>
 					              		<th width="5%">ID</th>
 					              		<th>가맹점명</th>
-					              		<th>가맹점주</th>
-						                <th>주소</th>
-						              	<th>운영상태</th>
-						              	<th>운영시간</th>
-						                <th>관리</th>
+						                <th>유형</th>
+					              		<th>제목</th>
+						              	<th>작성자</th>
+						              	<th>진행상태</th>
+						              	<th>접수일시</th>
 						            </tr>
 					          	</thead>
 					            
 					          	<tbody>
 					            	<c:forEach items="${list}" var="dto">
 					       				<tr>
-					         				<td class="fw-bold">${dto.storeId}</td>
-								            <td><span class="fw-bold text-primary">${dto.storeName}</span></td>
-								            <td>${dto.memName}</td>
-								            <td>${dto.storeAddress}</td>
+					         				<td class="fw-bold">${dto.vocId}</td>
 								            <td>
-								            	<c:if test="${dto.storeStatus eq '오픈'}"><span class="badge bg-label-info">${dto.storeStatus}</span></c:if>
-								            	<c:if test="${dto.storeStatus eq '오픈 준비'}"><span class="badge bg-label-warning">${dto.storeStatus}</span></c:if>
+												<a href="/store/voc/detail?vocId=${dto.vocId}"
+								            	   class="fw-bold text-primary">${dto.storeName}</a>
+											</td>
+								            <td>
+								            	<c:if test="${dto.vocType eq 'HYGIENE'}"><span class="badge bg-label-primary">위생</span></c:if>
+								            	<c:if test="${dto.vocType eq 'SERVICE'}"><span class="badge bg-label-secondary">서비스</span></c:if>
+								            	<c:if test="${dto.vocType eq 'TASTE'}"><span class="badge bg-label-danger">맛</span></c:if>
 								            </td>
-								            <td>${dto.storeStartTime} ~ ${dto.storeCloseTime}</td>
-					                        <td>
-					                        	<button class="btn btn-sm btn-icon btn-outline-secondary"><i class="bx bx-edit"></i></button>
-					                     	</td>
+								            <td>${dto.vocTitle}</td>
+								            <td>${dto.memName}</td>
+								            <td>
+								            	<c:if test="${dto.vocStatus eq 0}"><span class="badge bg-label-warning">처리 대기</span></c:if>
+								            	<c:if test="${dto.vocStatus eq 1}"><span class="badge bg-label-info">처리 중</span></c:if>
+								            	<c:if test="${dto.vocStatus eq 2}"><span class="badge bg-label-success">처리 완료</span></c:if>
+								            </td>
+								            <td>${dto.vocCreatedAtStr}</td>
 					                    </tr>
 					                </c:forEach>
 					            </tbody>
@@ -193,7 +216,6 @@
 					        <nav aria-label="Page navigation">
 					            <ul class="pagination">
 					                <li class="page-item ${pager.begin == 1 ? 'disabled' : ''}"><a class="page-link" href="javascript:movePage(${pager.begin - 1})"><i class="bx bx-chevron-left"></i></a></li>
-					                <!-- <li class="page-item active"><a class="page-link" href="#">1</a></li> -->
 					                <c:forEach begin="${pager.begin}" end="${pager.end}" var="i">
 									    <li class="page-item ${pager.page == i ? 'active' : ''}"><a class="page-link" href="javascript:movePage(${i})">${i}</a></li>
 							  		</c:forEach>
@@ -206,74 +228,69 @@
 			  	
 	          </div>
 	          
-          	<div class="modal fade" id="registerStoreModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+          	<div class="modal fade" id="registerVocModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
 		        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
 		            <div class="modal-content">
 		            
 		                <div class="modal-header">
-		                    <h5 class="modal-title">신규 가맹점 등록</h5>
+		                    <h5 class="modal-title">신규 VOC 등록</h5>
 		                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		                </div>
 		                
 		                <div class="modal-body">
 		                    <form id="registerStoreForm">
 		                        <div class="row g-3">
-		                            <div class="col-md-6">
-		                                <label class="form-label" for="storeName">가맹점명 <span class="text-danger">*</span></label>
+		                            <div class="col-md-12">
+		                                <label class="form-label" for="storeNameInput">가맹점명 검색 <span class="text-danger">*</span></label>
 		                                <div class="input-group input-group-merge">
 		                                    <span class="input-group-text"><i class="bx bx-store"></i></span>
-		                                    <input type="text" id="storeName" name="storeName" class="form-control" placeholder="가맹점 이름 입력" required />
-		                                </div>
-		                            </div>
-		
-		                            <div class="col-md-6 position-relative">
-		                                <label class="form-label" for="ownerNameInput">점주 검색 <span class="text-danger">*</span></label>
-		                                <div class="input-group">
-		                                    <input type="text" id="ownerNameInput" class="form-control" placeholder="점주명 입력" onkeyup="if(window.event.keyCode==13){searchOwner()}" required />
-		                                    <input type="hidden" id="memberId" name="memberId" />
-		                                    <button class="btn btn-primary" type="button" onclick="searchOwner()">
+		                                    <input type="text" id="storeNameInput" name="storeName" class="form-control" placeholder="가맹점명 입력" onkeyup="if(window.event.keyCode==13){searchStore()}" required />
+											<input type="hidden" id="storeId" name="storeId" />
+		                                    <button class="btn btn-primary" type="button" onclick="searchStore()">
 		                                        <i class="bx bx-search"></i>
 		                                    </button>
 		                                </div>
-		                                
-		                                <ul id="ownerResultList" class="list-group position-absolute overflow-auto" 
+
+										<ul id="storeResultList" class="list-group position-absolute overflow-auto" 
 								        	style="max-height: 200px; width: 90%; z-index: 1050; display: none; margin-top: 5px; box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.15); background-color: rgba(255, 255, 255, 0.9);">
 								        </ul>
 		                            </div>
-		                            
-		                            <hr class="my-4" />
+
+									<div class="col-12"><hr class="my-2"></div>
 		
-		                            <div class="col-md-12">
-		                                <label class="form-label" for="storeAddress">가맹점 주소 <span class="text-danger">*</span></label>
-		                                <div class="input-group">
-		                                    <input type="text" id="storeAddress" name="storeAddress" class="form-control" placeholder="주소 검색 버튼을 클릭하세요" readonly required />
-		                                    <button class="btn btn-outline-primary" type="button" onclick="searchAddress()">
-		                                        <i class="bx bx-map me-1"></i> 주소 검색
-		                                    </button>
-		                                </div>
-		                            </div>
-		                            
 		                            <div class="col-md-6">
-		                                <label class="form-label" for="storeDetailAddress">상세 주소</label>
+		                                <label class="form-label" for="vocType">불만 유형 <span class="text-danger">*</span></label>
 		                                <div class="input-group">
-		                                    <input type="text" id="storeDetailAddress" name="storeDetailAddress" class="form-control" required />
+											<select class="form-select" id="vocType">
+												<option value="HYGIENE" selected>위생</option>
+												<option value="TASTE">맛</option>
+												<option value="SERVICE">서비스</option>
+											</select>
 		                                </div>
 		                            </div>
-		                            
-		                            <div class="col-md-6">
-		                                <label class="form-label" for="storeZonecode">우편번호 <span class="text-danger">*</span></label>
+
+									<div class="col-md-6 position-relative">
+		                                <label class="form-label" for="vocContact">고객 연락처 <span class="text-danger">*</span></label>
 		                                <div class="input-group">
-		                                    <input type="text" id="storeZonecode" name="storeZonecode" class="form-control" readonly="readonly" required />
+		                                    <input type="text" id="vocContact" class="form-control" placeholder="연락처 입력" required />
 		                                </div>
 		                            </div>
-		                            
-		                            <input type="hidden" id="storeLatitude" />
-		                            <input type="hidden" id="storeLongitude" />
+
+									<div class="col-12"><hr class="my-2"></div>
 		                            
 		                            <div class="col-md-12">
-			                            <div id="map" style="width:100%; height:300px; margin-top:25px; border-radius: 0.375rem;"></div>
+		                                <label class="form-label" for="vocTitle">제목 <span class="text-danger">*</span></label>
+		                                <div class="input-group">
+		                                    <input type="text" id="vocTitle" name="vocTitle" class="form-control" placeholder="위생관련 컴플레인" required />
+		                                </div>
 		                            </div>
-		                            
+
+		                            <div class="col-md-12">
+		                                <label class="form-label" for="vocContents">상세 내용</label>
+		                                <div class="input-group">
+											<textarea class="form-control" rows="3" id="vocContents"></textarea>
+		                                </div>
+		                            </div>
 		                            
 		                        </div>
 		                    </form>
@@ -281,7 +298,7 @@
 		                
 		                <div class="modal-footer">
 		                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
-		                    <button type="button" class="btn btn-primary" onclick="submitStoreRegistration()">저장</button>
+		                    <button type="button" class="btn btn-primary" onclick="submitVocRegistration()">저장</button>
 		                </div>
 		                
 		            </div>
@@ -333,6 +350,11 @@
 
     <!-- Vendors JS -->
     <script src="/vendor/libs/apex-charts/apexcharts.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    
 
     <!-- Main JS -->
     <script src="/js/main.js"></script>
@@ -343,10 +365,8 @@
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+    <script type="text/javascript" src="/js/store/voc/voc.js"></script>
     
-    <script type="text/javascript" src="/js/store/tab_store.js"></script>
+    
   </body>
 </html>
