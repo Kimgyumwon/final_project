@@ -83,45 +83,92 @@
 				      <div class="row">
 				
 				        <div class="col-md-12 mb-3">
-				          <label class="form-label">사업자번호</label>
-				          <input type="text" class="form-control" name="vendorBusinessNumber" required>
+				          <label class="form-label">사업자 번호</label>
+
+						  <div class="d-flex gap-2">
+						    <input type="text"
+						           class="form-control"
+						           name="vendorBusinessNumber1"
+						           maxlength="3"
+						           placeholder="123"
+						           required>
+						
+						    <span class="align-self-center">-</span>
+						
+						    <input type="text"
+						           class="form-control"
+						           name="vendorBusinessNumber2"
+						           maxlength="2"
+						           placeholder="45"
+						           required>
+						
+						    <span class="align-self-center">-</span>
+						
+						    <input type="text"
+						           class="form-control"
+						           name="vendorBusinessNumber3"
+						           maxlength="5"
+						           placeholder="67890"
+						           required>
+						  </div>
 				        </div>
 						
+				        <div class="col-md-12 mb-3">
+				          <label class="form-label">사업자 이름</label>
+				          <input type="text" class="form-control" name="vendorName" required>
+				        </div>
+				        
 						<!-- 주소 API 연동 -->
 				        <div class="col-md-12 mb-3">
-				          <label class="form-label">사업자 주소</label>
-				          <input type="text" class="form-control" name="address" required>
-				        </div>
+						  <label class="form-label">사업자 주소</label>
+						
+						  <div class="input-group mb-2">
+						    <input type="text"
+						           class="form-control"
+						           id="vendorAddress"
+						           name="vendorAddress"
+						           placeholder="주소 검색 버튼을 눌러주세요"
+						           readonly
+						           required>
+						    <button type="button"
+						            class="btn btn-outline-secondary"
+						            onclick="execDaumPostcode()">
+						      주소 검색
+						    </button>
+						  </div>
+						
+						  <input type="text"
+						         class="form-control"
+						         id="vendorAddressDetail"
+						         name="vendorAddressDetail"
+						         placeholder="상세주소 입력">
+						</div>
 				        
 				        <div class="col-md-6 mb-3">
 				          <label class="form-label">대표자명</label>
-				          <input type="text" class="form-control" name="ceoName" required>
-				        </div>
-				
-				        <div class="col-md-6 mb-3">
-				          <label class="form-label">업체명</label>
-				          <input type="text" class="form-control" name="vendorName" required>
+				          <input type="text" class="form-control" name="vendorCeoName" required>
 				        </div>
 						
 				        <div class="col-md-6 mb-3">
 				          <label class="form-label">업태명</label>
-				          <input type="text" class="form-control" name="bizType">
+				          <input type="text" class="form-control" name="vendorBusinessType">
 				        </div>
 				
 				        <div class="col-md-6 mb-3">
-				          <label class="form-label">전화번호</label>
-				          <input type="text" class="form-control" name="vendorTel">
+				          <label class="form-label">담당자명</label>
+				          <input type="text" class="form-control" name="vendorManagerName">
 				        </div>
 				
 				        <div class="col-md-6 mb-3">
 				          <label class="form-label">담당자 번호</label>
-				          <input type="text" class="form-control" name="managerTel">
+				          <input type="text" class="form-control" name="vendorManagerTel">
 				        </div>
 				
 				        <div class="col-md-6 mb-3">
 				          <label class="form-label">담당자 이메일</label>
-				          <input type="email" class="form-control" name="managerEmail">
+				          <input type="email" class="form-control" name="vendorManagerEmail">
 				        </div>
+				        
 				      </div>
 				
 				      <button type="submit" class="btn btn-primary">등록</button>
@@ -164,13 +211,21 @@
     <script src="/vendor/libs/apex-charts/apexcharts.js"></script>
 
     <!-- Main JS -->
-    <script src="/js/main.js"></script>
+    <script
+    
+    
+    
+     src="/js/main.js"></script>
 
     <!-- Page JS -->
     <script src="/js/dashboards-analytics.js"></script>
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    
+    <!-- 카카오 API -->
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="/js/vendor/main.js"></script>
   </body>
 </html>
 

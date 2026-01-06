@@ -4,11 +4,45 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
     <mapper namespace="com.cafe.erp.vendor.VendorDAO">
     	<insert id="add" parameterType="VendorDTO">
-    		insert into vendor(vendor_code, vendor_business_number, vendor_name, vendor_created_at, member_id)
-    		values (#{vendorCode}, #{vendorBusinessNumber}, #{vendorName}, now(), #{memberId})
+    		insert into vendor
+    		(vendor_code, vendor_name, vendor_business_number, vendor_address, vendor_ceo_name, 
+    		 vendor_business_type, vendor_manager_tel, vendor_manager_name, vendor_manager_email,
+    		 vendor_created_at, member_id)
+    		values (#{vendorCode}, #{vendorName}, #{vendorBusinessNumber}, #{vendorAddress}, #{vendorCeoName},
+    		 #{vendorBusinessType}, #{vendorManagerTel}, #{vendorManagerName}, #{vendorManagerEmail},
+    		  now(), #{memberId})
     	</insert>
+    	
+    	<!-- 거래처코드 max값 가져오기 / 거래처코드 생성시 필요 -->
+    	<select id="selectMaxVendorCodeByRegion" parameterType="String" resultType="int">
+    		select IFNULL(MAX(vendor_code), 0) from vendor where vendor_code Like CONCAT(#{regionCode}, '%')
+    	</select>
     	
     	<select id="findAll" resultType="VendorDTO">
     		select * from vendor
     	</select>
+    	
+    	<update id="update" parameterType="VendorDTO">
+    		update vendor 
+    		set vendor_manager_name = #{vendorManagerName},
+    			vendor_manager_tel = #{vendorManagerTel},
+				vendor_manager_email = #{vendorManagerEmail}
+			where vendor_id = #{vendorId}
+    	</update>
+    	
+    	<!-- 거래처 검색 -->
+    	<select id="search" resultType="VendorDTO">
+    		select * from vendor
+    		where 1 = 1
+    		<if test="vendorCode != null and vendorCode != ''">
+    			and vendor_code LIKE CONCAT('%', #{vendorCode}, '%')
+    		</if>
+    		<if test="vendorBusinessNumber != null and vendorBusinessNumber != ''">
+    			and vendor_business_number LIKE CONCAT('%', #{vendorBusinessNumber}, '%')
+    		</if>
+    		<if test="vendorName != null and vendorName != ''">
+    			and vendor_name LIKE CONCAT('%', #{vendorName}, '%')
+    		</if>
+    	</select>
+    	
     </mapper>

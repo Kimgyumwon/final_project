@@ -10,4 +10,10 @@ public interface VendorDAO {
 	public void add(VendorDTO vendorDTO);
 	
 	public List<VendorDTO> findAll();
+
+	public int selectMaxVendorCodeByRegion(String regionCode);
+	
+	public void update(VendorDTO vendorDTO);
+	
+	public List<VendorDTO> search(VendorDTO vendorDTO);
 }

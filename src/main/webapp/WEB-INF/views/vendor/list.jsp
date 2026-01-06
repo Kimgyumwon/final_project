@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 
 <html
@@ -79,46 +80,41 @@
 				  <div class="card-body">
 				      <div class="row g-3 align-items-end">
 				
-				        <!-- 품명 -->
-				        <div class="col-md-4">
-				          <label class="form-label">품명</label>
-				          <input
-				            type="text"
-				            class="form-control"
-				            id="searchItemName"
-				            placeholder="원재료명 입력"
-				            value="${param.itemName}"
-				          />
-				        </div>
-				
-				        <!-- 카테고리 -->
-				        <div class="col-md-3">
-				          <label class="form-label">카테고리</label>
-				          <select class="form-select" id="searchCategory">
-				            <option value="">전체</option>
-				            <option value="FD" ${param.category == 'FD' ? 'selected' : ''}>식품</option>
-				            <option value="NF" ${param.category == 'NF' ? 'selected' : ''}>비식품</option>
-				          </select>
-				        </div>
-				
-				        <!-- 거래처 코드 -->
-				        <div class="col-md-3">
-				          <label class="form-label">거래처 코드</label>
-				          <input
-				            type="text"
-				            class="form-control"
-				            id="searchVendorCode"
-				            placeholder="거래처 코드"
-				            value="${param.vendorCode}"
-				          />
-				        </div>
-				
-				        <!-- 검색 버튼 -->
-				        <div class="col-md-2 d-grid">
-				          <button type="button" class="btn btn-primary" onclick="searchItems()">
-				            <i class="bx bx-search"></i> 검색
-				          </button>
-				        </div>
+				        <form method="get" action="/vendor/list">
+						  <div class="row g-3 align-items-end">
+						
+						    <div class="col-md-4">
+						      <label class="form-label">거래처명</label>
+						      <input type="text"
+						             class="form-control"
+						             name="vendorName"
+						             value="${vendorDTO.vendorName}">
+						    </div>
+						
+						    <div class="col-md-3">
+						      <label class="form-label">사업자 번호</label>
+						      <input type="text"
+						             class="form-control"
+						             name="vendorBusinessNumber"
+						             value="${vendorDTO.vendorBusinessNumber}">
+						    </div>
+						
+						    <div class="col-md-3">
+						      <label class="form-label">거래처 코드</label>
+						      <input type="text"
+						             class="form-control"
+						             name="vendorCode"
+						             value="${vendorDTO.vendorCode}">
+						    </div>
+						
+						    <div class="col-md-2 d-grid">
+						      <button type="submit" class="btn btn-primary">
+						        <i class="bx bx-search"></i> 검색
+						      </button>
+						    </div>
+						
+						  </div>
+						</form>
 				
 				      </div>
 				  </div>
@@ -130,10 +126,10 @@
 				      <thead>
 				        <tr>
 				          <th>거래처코드</th>
-				          <th>업체명</th>
+				          <th>거래처명</th>
 				          <th>사업자번호</th>
+				          <th>사업자주소</th>
 				          <th>대표자명</th>
-				          <th>사용여부</th>
 				          <th>생성일자</th>
 				          <th>담당자명</th>
 				          <th>전화번호</th>
@@ -146,16 +142,17 @@
 				            <td>${v.vendorCode}</td>
 				            <td>${v.vendorName}</td>
 				            <td>${v.vendorBusinessNumber}</td>
-				            <td></td>
-				            <td>${v.vendorEnable}</td>
-				            <td>${v.vendorCreatedAt}</td>
-				            <td></td>
-				            <td></td>
-				            <td></td>
+				            <td>${v.vendorAddress}</td>
+				            <td  class="text">${v.vendorCeoName}</td>
+				            <td><fmt:formatDate value="${v.vendorCreatedAt}" pattern="yyyy-MM-dd"/> </td>
+				            <td>${v.vendorManagerName}</td>
+				            <td>${v.vendorManagerTel}</td>
+				            <td>${v.vendorManagerEmail}</td>
 				            <td>
 				              <button class="btn btn-sm btn-warning"
 				                data-bs-toggle="modal"
-				                data-bs-target="#editModal">
+				                data-bs-target="#editModal"
+				                onclick="update(${v.vendorId})">
 				                수정
 				              </button>
 				            </td>
@@ -196,21 +193,21 @@
 	      </div>
 	
 	      <div class="modal-body">
-	        <input type="hidden" name="id" id="editId">
-	
-	        <div class="mb-3">
-	          <label class="form-label">전화번호</label>
-	          <input type="text" class="form-control" name="tel" id="editTel">
-	        </div>
+	        <input type="hidden" name="vendorId" id="vendorId">
 	
 	        <div class="mb-3">
 	          <label class="form-label">담당자 번호</label>
-	          <input type="text" class="form-control" name="managerTel" id="editManagerTel">
+	          <input type="text" class="form-control" name="vendorManagerTel" id="vendorManagerTel">
+	        </div>
+	
+	        <div class="mb-3">
+	          <label class="form-label">담당자 이름</label>
+	          <input type="text" class="form-control" name="vendorManagerName" id="vendorManagerName">
 	        </div>
 	
 	        <div class="mb-3">
 	          <label class="form-label">담당자 이메일</label>
-	          <input type="email" class="form-control" name="managerEmail" id="editManagerEmail">
+	          <input type="email" class="form-control" name="vendorManagerEmail" id="vendorManagerEmail">
 	        </div>
 	      </div>
 	
@@ -246,5 +243,10 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    
+    
+    <!-- js -->
+    <script src="/js/vendor/main.js"></script>
+    <script src="/js/vendor/search.js"></script>
   </body>
 </html>
