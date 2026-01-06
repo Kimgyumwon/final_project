@@ -262,12 +262,12 @@
     <li class="menu-item">
       <a href="javascript:void(0)" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-collection"></i>
-        <div data-i18n="Basic">Cards</div>
+        <div data-i18n="Basic">Receivable</div>
       </a>
       <ul class="menu-sub">
        <li class="menu-item">
-         <a href="extended-ui-perfect-scrollbar.html" class="menu-link">
-           <div data-i18n="Perfect Scrollbar">Perfect scrollbar</div>
+         <a href="/receivable/receivable" class="menu-link">
+           <div data-i18n="Perfect Scrollbar">Receivable List</div>
          </a>
        </li>
        <li class="menu-item">

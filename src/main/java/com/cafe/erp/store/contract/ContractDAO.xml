@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.cafe.erp.store.contract.ContractDAO">
+
+	<select id="list" resultType="ContractDTO">
+		SELECT 
+            sc.contract_id,
+            sc.store_id,          
+            sc.contract_royalti,
+            sc.contract_deposit,
+            sc.contract_start_date,
+            sc.contract_end_date,
+            sc.contract_status,
+            sc.contract_created_at,
+            sc.contract_updated_at,
+            s.store_name
+        FROM 
+            store_contract sc             
+            INNER JOIN store s                
+            ON sc.store_id = s.store_id 
+            ORDER BY sc.contract_id DESC
+	</select>
+	
+	<select id="maxContractId" parameterType="String" resultType="String">
+		SELECT MAX(contract_id) FROM store_contract WHERE contract_id LIKE CONCAT(#{prefix}, '%') FOR UPDATE
+	</select>
+
+	<insert id="add" parameterType="ContractDTO">
+		INSERT INTO store_contract VALUE(#{contractId}, #{storeId}, #{contractRoyalti}, #{contractDeposit}, #{contractStartDate}, #{contractEndDate}, #{contractStatus}, now(), now())
+	</insert>
+	
+	<insert id="addFile" parameterType="ContractFileDTO">
+		INSERT INTO store_contract_file	VALUE(null, #{contractId}, #{fileOriginalName}, #{fileSavedName})	
+	</insert>
+	
+	<select id="getDetail" parameterType="String" resultMap="detailResult">
+		SELECT 
+			sc.contract_id,
+            sc.store_id,          
+            sc.contract_royalti,
+            sc.contract_deposit,
+            sc.contract_start_date,
+            sc.contract_end_date,
+            sc.contract_status,
+            sc.contract_created_at,
+            sc.contract_updated_at,
+            s.store_name,
+            s.store_address,
+            m.mem_name,
+            scf.file_id,
+            scf.file_original_name,
+            scf.file_saved_name
+		FROM store_contract sc
+		INNER JOIN store s ON sc.store_id = s.store_id 
+		INNER JOIN member m ON s.member_id = m.member_id
+		LEFT JOIN  store_contract_file scf ON sc.contract_id=scf.contract_id
+		WHERE sc.contract_id = #{contractId};
+	</select>
+	
+	<resultMap type="ContractDTO" id="detailResult">
+		<id column="contract_id" property="contractId"/>
+		<result column="store_id" property="storeId"/>
+		<result column="contract_royalti" property="contractRoyalti"/>
+		<result column="contract_deposit" property="contractDeposit"/>
+		<result column="contract_start_date" property="contractStartDate"/>
+		<result column="contract_end_date" property="contractEndDate"/>
+		<result column="contract_status" property="contractStatus"/>
+		<result column="contract_created_at" property="contractCreatedAt"/>
+		<result column="contract_updated_at" property="contractUpdatedAt"/>
+		<result column="store_name" property="storeName"/>
+		<result column="store_address" property="storeAddress"/>
+		<result column="mem_name" property="memName"/>
+		
+		<collection property="fileDTOs" ofType="ContractFileDTO">
+			<id column="file_id" property="fileId"/>
+			<result column="file_original_name" property="fileOriginalName"/>
+			<result column="file_saved_name" property="fileSavedName"/>
+		</collection>
+	</resultMap>
+	
+	<update id="updateStatusToActive" parameterType="java.time.LocalDate">
+		UPDATE store_contract SET contract_status = 1 WHERE contract_start_date = #{today}
+	</update>
+	
+	<update id="updateStatusToExpired" parameterType="java.time.LocalDate">
+		UPDATE store_contract SET contract_status = 2 WHERE contract_end_date = #{yesterday}
+	</update>
+	
+	<update id="update">
+		UPDATE store_contract 
+		SET 
+			contract_royalti = #{contractRoyalti}, 
+			contract_deposit = #{contractDeposit}, 
+			contract_start_date = #{contractStartDate}, 
+			contract_end_date = #{contractEndDate}, 
+			contract_status = #{contractStatus}, 
+			contract_updated_at = now() 
+		WHERE contract_id = #{contractId}
+	</update>
+	
+	<select id="selectFile" parameterType="Integer" resultType="ContractFileDTO">
+		SELECT * FROM store_contract_file WHERE file_id = #{fileId}
+	</select>
+	
+	<delete id="deleteFile" parameterType="Integer">
+		DELETE FROM store_contract_file WHERE file_id = #{fileId}
+	</delete>
+	
+</mapper>

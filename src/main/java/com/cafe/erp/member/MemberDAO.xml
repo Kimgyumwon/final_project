@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.cafe.erp.member.MemberDAO">
+    
+    <select id="login" parameterType="int" resultType="MemberDTO">
+	    SELECT 
+	        m.*, 
+	        mp.mem_profile_saved_name, 
+	        mp.mem_profile_original_name
+	    FROM member m
+	    LEFT JOIN member_profile mp ON m.member_id = mp.member_id
+	    WHERE m.member_id = #{memberId}
+	</select>
+
+        <select id="list" resultType="MemberDTO">
+		SELECT 
+            M.member_id, M.mem_password, M.mem_name, M.mem_zip_code, 
+            M.mem_address_detail, M.mem_email, M.mem_phone, 
+            M.mem_hire_date, M.mem_left_date, M.mem_is_active, 
+            M.dept_code, M.position_code, P.mem_position_sequence
+        FROM 
+            member M  
+            LEFT JOIN member_dept D ON M.dept_code = D.member_dept_code
+            LEFT JOIN member_position P ON M.position_code = P.member_position_code 
+            ORDER BY
+            	mem_is_active DESC,
+            CASE	
+                WHEN M.member_id = 999999 OR M.position_code = 99 THEN 0  
+                WHEN M.position_code = 17 THEN 999                        
+                ELSE P.mem_position_sequence END ASC,
+            M.mem_hire_date ASC
+	</select>
+	
+	<select id="countAllMember" resultType="int">
+	    SELECT COUNT(*) FROM member
+	</select>
+	
+	<select id="countActiveMember" resultType="int">
+	    SELECT COUNT(*) FROM member WHERE mem_is_active = 1
+	</select>
+	
+	
+	
+	<select id="chatList" resultType="MemberDTO">
+		SELECT 
+            M.member_id, M.mem_password, M.mem_name, M.mem_zip_code, M.mem_address_detail, M.mem_email, M.mem_phone, M.mem_hire_date, M.mem_left_date, M.mem_is_active, 
+            M.dept_code, M.position_code, P.mem_position_sequence, D.mem_dept_name, P.mem_position_name
+        FROM 
+            member M  
+            LEFT JOIN member_dept D ON M.dept_code = D.member_dept_code
+            LEFT JOIN member_position P ON M.position_code = P.member_position_code
+            
+            <where>
+            	<if test="deptCode != 0">
+		            AND M.dept_code = #{deptCode}
+		        </if>
+		
+		        <if test="check != true">
+		            AND M.mem_is_active = 'Y' OR M.mem_is_active = '1' </if>
+            </where>
+            
+            ORDER BY
+            	mem_is_active DESC,
+            CASE	
+                WHEN M.member_id = 999999 OR M.position_code = 99 THEN 0  
+                WHEN M.position_code = 17 THEN 999                        
+                ELSE P.mem_position_sequence END ASC,
+            M.mem_hire_date ASC
+	</select>
+	
+	<select id="deptMemberCount" resultType="map">
+		SELECT dept_code, COUNT(*) as count
+		 FROM member
+		 WHERE mem_is_active = true
+		 GROUP BY dept_code
+	</select>
+	
+	<select id="totalMemberCount" resultType="int">
+		SELECT COUNT(*) as count
+		FROM member 
+		WHERE mem_is_active = true
+	</select>
+	
+	<select id="getMemberId" parameterType="String" resultType="String">
+        SELECT MAX(member_id) 
+        FROM member 
+        WHERE member_id LIKE CONCAT(#{prefix}, '%')
+    </select>
+	
+	<insert id="add" parameterType="MemberDTO">
+		INSERT INTO member 
+		(member_id, mem_password, mem_name, mem_zip_code, mem_address, mem_address_detail, mem_email, mem_phone, mem_hire_date, mem_is_active, dept_code, position_code)
+		VALUES
+		(#{memberId}, 1234, #{memName}, #{memZipCode}, #{memAddress}, #{memAddressDetail}, #{memEmail}, #{memPhone},  #{memHireDate}, 1,  #{deptCode}, #{positionCode})
+	</insert>
+	
+	
+	
+	
+	
+	<select id="detail" parameterType="MemberDTO" resultType="MemberDTO">
+    SELECT 
+        m.*, 
+        (
+            SELECT mem_profile_saved_name 
+            FROM member_profile 
+            WHERE member_id = m.member_id 
+            AND mem_profile_is_active = true
+            LIMIT 1
+        ) AS memProfileSavedName
+    FROM 
+        member m
+    WHERE 
+        m.member_id = #{memberId}
+</select>
+
+
+	<select id="findProfileSavedName" resultType="String">
+	        SELECT mem_profile_saved_name
+	        FROM member_profile
+	        WHERE member_id = #{memberId}
+	    </select>
+	
+	    <select id="checkProfileExist" resultType="int">
+	        SELECT COUNT(*)
+	        FROM member_profile
+	        WHERE member_id = #{memberId}
+	    </select>
+		
+	
+	
+	<update id="update" parameterType="MemberDTO">
+        UPDATE member
+        SET
+            mem_zip_code = #{memZipCode},
+            mem_address = #{memAddress},
+            mem_address_detail = #{memAddressDetail},
+            mem_email = #{memEmail},
+            mem_phone = #{memPhone},
+            dept_code = #{deptCode},
+            position_code = #{positionCode}
+        WHERE member_id = #{memberId}
+    </update>    
+    
+    <update id="updateProfile">
+        UPDATE member_profile
+        SET 
+            mem_profile_original_name = #{originalName},
+            mem_profile_saved_name = #{savedName},
+            mem_profile_created_at = NOW(),
+            mem_profile_is_active = 1
+        WHERE 
+            member_id = #{memberId}
+    </update>
+    
+    <insert id="insertProfile">
+        INSERT INTO member_profile (
+            mem_profile_original_name,
+            mem_profile_saved_name, 
+            mem_profile_created_at,
+            mem_profile_is_active,
+            member_id
+        ) VALUES (
+            #{originalName},
+            #{savedName},
+            NOW(),
+            1,
+            #{memberId}
+        )
+    </insert>
+	
+	<update id="resetPw" parameterType="MEmberDTO">
+		UPDATE member
+		SET
+			mem_password = #{memPassword}
+		WHERE
+			member_id = #{memberId}
+	
+	</update>
+	
+	<update id="InActive" parameterType="MemberDTO">
+		UPDATE member
+		SET
+			mem_is_active = #{memIsActive},
+			mem_left_date = now()
+		WHERE member_id = #{memberId}
+	</update>
+	
+	
+	<select id="searchOwner" parameterType="String" resultType="MemberDTO"> 
+		SELECT m.member_id, m.mem_name 
+		FROM member m LEFT JOIN store s ON m.member_id = s.member_id 
+		WHERE m.mem_name LIKE CONCAT(#{keyword}, '%') AND s.member_id IS NULL AND m.member_id LIKE '2%' 
+	</select>
+	
+	
+</mapper>

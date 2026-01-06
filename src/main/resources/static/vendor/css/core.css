@@ -2218,7 +2218,6 @@ progress {
   opacity: 1;
 }
 .form-control:disabled, .form-control[readonly] {
-  background-color: #eceef1;
   opacity: 1;
 }
 .form-control::file-selector-button {
@@ -4119,6 +4118,13 @@ textarea.form-control-lg {
   display: flex;
   padding-left: 0;
   list-style: none;
+  gap: 4px;
+  margin-top: 30px;
+}
+
+.pagination .page-link {
+  min-width: 36px;
+  text-align: center;
 }
 
 .page-link {
@@ -15287,6 +15293,7 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 }
 .layout-navbar.navbar-detached {
   padding: 0 1.5rem;
+  background-color: #fff;
 }
 .layout-navbar-fixed .layout-navbar.navbar-detached {
   width: calc(100% - calc(1.625rem * 2) - 16.25rem);
@@ -15444,7 +15451,6 @@ html:not(.layout-footer-fixed) .content-wrapper {
 @media (max-width: 1199.98px) {
   .layout-menu {
     width: 80px !important;
-    position: fixed !important;
     top: 0 !important;
     bottom: 0 !important;
     left: 0 !important;
@@ -16691,6 +16697,14 @@ html:not(.layout-footer-fixed) .content-wrapper {
 
 #layout-navbar .navbar-nav-right {
   justify-content: flex-end;
+}
+
+.flatpickr-monthSelect-month {
+  border-radius: 8px;
+}
+
+.flatpickr-monthSelect-month.selected {
+  background: #696cff;
 }
 
 

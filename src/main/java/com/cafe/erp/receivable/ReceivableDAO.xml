@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  
+<mapper namespace="com.cafe.erp.receivable.ReceivableDAO">
+  	
+  	<sql id="receivableSearchBase">
+  		FROM receivable r
+  		
+  		LEFT JOIN store_contract c
+  			ON r.contract_id = c.contract_id
+  		LEFT JOIN order_store so
+  			ON r.store_order_id = so.store_order_id
+ 		JOIN store s 
+  			ON s.store_id = COALESCE(c.store_id, so.store_id)
+  		
+  		WHERE r.receivable_type = 'R'
+  		
+  		<if test="baseMonth != null and baseMonth != ''">
+  			AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
+  		</if>
+  		
+  		<if test="storeName != null and storeName != ''">
+  			AND s.store_name LIKE CONCAT('%',#{storeName},'%')
+  		</if>
+  	</sql>
+  	
+  	<sql id="receivableSourceTypeFilter">
+	  <where>
+	    <if test="sourceType == 'CONTRACT'">
+	      EXISTS (
+	        SELECT 1
+	        FROM receivable r2
+	        JOIN store_contract c2
+	          ON r2.contract_id = c2.contract_id
+	        WHERE r2.receivable_type = 'R'
+	          AND r2.contract_id IS NOT NULL
+	          AND c2.store_id = t.store_id
+	          AND DATE_FORMAT(r2.receivable_date, '%Y-%m') = t.base_month
+	      )
+	    </if>
+	
+	    <if test="sourceType == 'ORDER'">
+	      EXISTS (
+	        SELECT 1
+	        FROM receivable r2
+	        JOIN order_store so2
+	          ON r2.store_order_id = so2.store_order_id
+	        WHERE r2.receivable_type = 'R'
+	          AND r2.store_order_id IS NOT NULL
+	          AND so2.store_id = t.store_id
+	          AND DATE_FORMAT(r2.receivable_date, '%Y-%m') = t.base_month
+	      )
+	    </if>
+	  </where>
+	</sql>
+  	
+  	
+  	
+  	
+  	
+  	<!-- 가맹 미수금 조회 SQL -->
+  	<select 
+  		id="receivableSearchList" 
+  		parameterType="ReceivableSearchDTO"
+  		resultType="ReceivableSummaryDTO">
+		  SELECT
+		    t.store_id,
+		    t.store_name,
+		    t.base_month,
+		    t.total_amount
+		  FROM (
+		    SELECT
+		      s.store_id,
+		      s.store_name,
+		      DATE_FORMAT(r.receivable_date, '%Y-%m') AS base_month,
+		      SUM(r.receivable_total_amount) AS total_amount
+		    <include refid="receivableSearchBase"/>
+		    GROUP BY
+		      s.store_id,
+		      s.store_name,
+		      base_month
+		  ) t
+		  <include refid="receivableSourceTypeFilter"/>
+		
+		  LIMIT #{pager.perPage}
+		  OFFSET #{pager.startNum}
+  	</select>
+  	
+  	<!-- 페이지네이션 갯수 -->
+  	<select 
+  		id="receivableSearchCount"
+  		parameterType="ReceivableSearchDTO"
+  		resultType="Long">
+  	
+	  SELECT COUNT(*)
+	  FROM (
+	    SELECT
+	      t.store_id,
+	      t.base_month
+	    FROM (
+	      SELECT
+	        s.store_id,
+	        DATE_FORMAT(r.receivable_date, '%Y-%m') AS base_month
+	      <include refid="receivableSearchBase"/>
+	      GROUP BY
+	        s.store_id,
+	        base_month
+	    ) t
+	
+	    <include refid="receivableSourceTypeFilter"/>
+	
+	  ) cnt
+  	</select>
+  	
+  	<!-- 물품대금 미수 내역 -->
+  	<select id="orderSummary" parameterType="ReceivableSummaryDTO" resultType="com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO">
+	  	SELECT
+			r.receivable_id,
+		    os.store_order_created_at  AS orderDate,
+		    COUNT(*)         AS itemCount,
+		    SUM(osd.store_order_amount)     AS supplyAmount,
+		    SUM(floor(osd.store_order_amount*0.1)) AS taxAmount,
+		    SUM(osd.store_order_amount+floor(osd.store_order_amount*0.1)) AS totalAmount
+		FROM receivable r
+		JOIN order_store os
+			ON r.store_order_id = os.store_order_id
+		JOIN order_store_detail osd
+			ON os.store_order_id = osd.store_order_id
+		JOIN vendor_item vi
+			ON osd.item_id = vi.item_id
+		LEFT JOIN vendor_item_price vip
+			ON vip.item_id = vi.item_id
+		WHERE r.receivable_type = 'R'
+			AND os.store_id = #{storeId}
+			AND DATE_FORMAT(os.store_order_created_at, '%Y-%m') = #{baseMonth}
+			AND vip.item_price_enable = 0
+		GROUP BY
+		    r.receivable_id,
+		    os.store_order_created_at
+		ORDER BY os.store_order_created_at DESC;
+  	</select>
+  	
+  	<!-- 상세 물품 대금 리스트 SQL -->
+  	<select id="receivableItemList" parameterType="String" resultType="com.cafe.erp.receivable.detail.ReceivableItemDTO">
+	  	SELECT
+			os.store_order_created_at AS orderDate,
+	    	vi.item_name AS itemName,
+	    	osd.store_order_qty AS quantity,
+	    	vip.item_supply_price AS unitPrice,
+	    	osd.store_order_amount AS supplyAmount,
+	    	FLOOR(osd.store_order_amount * 0.1) AS taxAmount,
+	    	osd.store_order_amount + FLOOR(osd.store_order_amount * 0.1) AS totalAmount
+		FROM
+			receivable r
+		JOIN order_store os
+			ON r.store_order_id=os.store_order_id
+		JOIN order_store_detail osd
+			ON os.store_order_id = osd.store_order_id
+		JOIN vendor_item vi
+			ON osd.item_id = vi.item_id
+		JOIN vendor_item_price vip
+			ON vi.item_id = vip.item_id
+		WHERE r.receivable_id = #{receivableId}
+			AND vip.item_price_enable = 0
+		ORDER BY vip.item_supply_price DESC
+  	</select>
+  	
+  	<select id="receivableRoyalty" parameterType="ReceivableSummaryDTO" resultType="com.cafe.erp.receivable.detail.ReceivableRoyaltyDTO">
+	  	<!-- 상세 가맹비 미수 내역 -->
+	  	SELECT
+		    r.receivable_id               AS receivableId,
+		    sc.contract_start_date        AS contractDate,
+		    r.receivable_supply_amount    AS supplyAmount,
+		    r.receivable_tax_amount       AS taxAmount,
+		    r.receivable_total_amount     AS totalAmount,
+		    r.receivable_status           AS status
+		FROM receivable r
+		JOIN store_contract sc
+		  ON r.contract_id = sc.contract_id
+		WHERE sc.store_id = #{storeId}
+		  AND r.receivable_type = 'R'
+		  AND r.receivable_status IN ('O','P')
+		  AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
+		ORDER BY r.receivable_date DESC
+  	</select>
+  	
+  	
+</mapper>

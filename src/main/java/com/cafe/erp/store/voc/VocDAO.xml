@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cafe.erp.store.voc.VocDAO">
+
+	<sql id="searchCondition">
+        <where>
+            <if test="vocType != null and vocType != ''">
+                AND v.voc_type = #{vocType}
+            </if>
+            
+            <if test="vocStatus != null">
+                AND v.voc_status = #{vocStatus}
+            </if>
+            
+            <if test="searchStartDate != null and searchStartDate != ''">
+            	AND v.voc_created_at >= #{searchStartDate}
+	        </if>
+	        
+	        <if test="searchEndDate != null and searchEndDate != ''">
+	            AND v.voc_created_at &lt;= #{searchEndDate}
+	        </if>
+	        
+	        <if test="storeName != null and storeName != ''">
+                AND s.store_name LIKE CONCAT('%', #{storeName}, '%')
+            </if>
+	
+	        <if test="vocTitle != null and vocTitle != ''">
+                AND v.voc_title LIKE CONCAT('%', #{vocTitle}, '%')
+            </if>
+    	</where>
+    </sql>
+
+	<select id="list" resultType="VocDTO">
+		SELECT 
+			v.voc_id,
+			v.member_id,
+			m.mem_name,
+			v.store_id,
+			s.store_name,
+			v.voc_title,
+			v.voc_type,
+			v.voc_status,
+			v.voc_created_at
+		FROM voc v
+			LEFT JOIN member m ON v.member_id = m.member_id
+			LEFT JOIN store s ON v.store_id = s.store_id
+		<include refid="searchCondition" />
+		ORDER BY voc_id DESC
+		LIMIT #{startNum}, #{perPage}
+	</select>
+	
+	<insert id="add" parameterType="VocDTO">
+		INSERT INTO voc(member_id, store_id, voc_title , voc_type, voc_contact, voc_contents, voc_status, voc_created_at, voc_updated_at) 
+		VALUES (#{memberId}, #{storeId}, #{vocTitle}, #{vocType}, #{vocContact}, #{vocContents}, 0, now(), now())
+	</insert>
+	
+	<select id="detail" parameterType="Integer" resultType="VocDTO">
+		SELECT 
+		    v.voc_id,
+		    v.member_id,
+		    m.mem_name,
+		    v.store_id,
+		    s.store_name,
+		    o.mem_name AS owner_name,  
+		    s.store_address,
+		    v.voc_title,
+		    v.voc_contact,
+		    v.voc_contents,
+		    v.voc_type,
+		    v.voc_status,
+		    v.voc_created_at,
+		    v.voc_updated_at
+		FROM voc v
+		    LEFT JOIN member m ON v.member_id = m.member_id  
+		    LEFT JOIN store s ON v.store_id = s.store_id       
+		    LEFT JOIN member o ON s.member_id = o.member_id    
+		WHERE v.voc_id = #{vocId}
+	</select>
+	
+	<select id="processList" parameterType="Integer" resultType="VocProcessDTO">
+		SELECT 
+			vp.process_id,
+			vp.member_id,
+			m.mem_name,
+		    vp.process_contents,
+		    vp.process_created_at,
+		    vp.process_is_deleted
+		FROM voc_process vp
+		LEFT JOIN member m ON vp.member_id = m.member_id
+		WHERE voc_id = #{vocId}
+		ORDER BY process_created_at
+	</select>
+	
+	<insert id="addProcess" parameterType="VocProcessDTO">
+		INSERT INTO voc_process(voc_id, member_id, process_contents, process_created_at, process_is_deleted) 
+		VALUES (#{vocId}, #{memberId}, #{processContents}, now(), 0)
+	</insert>
+	
+	<select id="count" parameterType="VocSearchDTO" resultType="Long">
+		SELECT COUNT(voc_id) FROM voc v LEFT JOIN store s ON v.store_id = s.store_id
+		<include refid="searchCondition" />
+	</select>
+	
+</mapper>
