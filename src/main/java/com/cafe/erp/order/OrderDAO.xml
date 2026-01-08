@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.cafe.erp.order.OrderDAO">
+    	<select id="selectMaxOrderId" resultType="String">
+			select MAX(hq_order_id)
+			from order_hq
+			where hq_order_id LIKE CONCAT(#{prefix}, #{orderDate}, '%')    	
+    	</select>
+    	
+    	<!-- 발주 추가 -->
+    	<insert id="insertOrder" parameterType="OrderDTO">
+    		insert into order_hq values(#{hqOrderId}, now(), null, 100, 118001);
+    	</insert>
+    	
+    	<!-- 발주 상세 추가 -->
+    	<insert id="insertOrderDetail" parameterType="OrderDetailDTO">
+    		insert into order_hq_detail 
+    		(
+    			hq_order_detail_id,
+    			hq_order_qty,
+    			hq_order_price,
+    			hq_order_amount,
+    			hq_order_created_at,
+    			vendor_code,
+    			hq_order_id,
+    			item_id,
+    			hq_order_item_code,
+    			hq_order_item_name
+    		)
+    		values(null, #{hqOrderQty}, #{hqOrderPrice}, #{hqOrderAmount}, now(), #{vendorCode}, #{hqOrderId}, #{itemId}, #{hqOrderItemCode}, #{hqOrderItemName});
+    	</insert>
+    	
+    	<!-- 발주 목록 요청 -->
+    	<select id="listRequest" resultType="OrderDTO">
+    		select * from order_hq
+    	</select>
+    </mapper>
