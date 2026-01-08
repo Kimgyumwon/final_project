@@ -36,21 +36,84 @@
     
     <!-- 오른쪽 영역 -->
     <ul class="navbar-nav flex-row align-items-center">
-      <!-- 🔔 알림 -->
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle hide-arrow" href="#" data-bs-toggle="dropdown">
-          <i class="bx bx-bell bx-sm"></i>
-          <c:if test="${notificationCount > 0}">
-            <span class="badge bg-danger rounded-pill badge-notifications">
-              ${notificationCount}
-            </span>
-          </c:if>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li class="dropdown-item">미지급 결재 요청</li>
-          <li class="dropdown-item">발주 승인 대기</li>
-        </ul>
-      </li>
+	<!-- 🔔 알림 -->
+	<li class="nav-item dropdown">
+	  <a class="nav-link dropdown-toggle hide-arrow position-relative"
+	     href="#"
+	     data-bs-toggle="dropdown">
+	
+	    <i class="bx bx-bell bx-sm"></i>
+	
+	    <!-- 안읽은 알림 개수 -->
+	    <span class="badge bg-danger rounded-pill position-absolute"
+	          style="top: 0; right: 0; font-size: 0.65rem;">
+	      3
+	    </span>
+	  </a>
+	
+	  <!-- 알림 드롭다운 -->
+	  <ul class="dropdown-menu dropdown-menu-end p-2"
+	      style="width: 380px;">
+	
+	    <!-- 헤더 -->
+	    <li class="dropdown-header fw-bold mb-2">
+	      알림
+	    </li>
+	
+	    <!-- 알림 1 : 안읽음 -->
+	    <li>
+	      <a href="#"
+	         class="dropdown-item p-2 rounded border border-primary mb-2"
+	         style="background-color:#f8f9ff;">
+	
+	        <div class="d-flex align-items-start">
+	          <span class="badge bg-label-primary p-2 me-2">
+	            <i class="bx bx-file"></i>
+	          </span>
+	
+	          <div>
+	            <div class="fw-bold">결재 요청이 도착했습니다</div>
+	            <small class="text-muted">
+	              결재 문서 A-1023 승인 요청
+	            </small>
+	          </div>
+	        </div>
+	      </a>
+	    </li>
+	
+	    <!-- 알림 2 -->
+	    <li>
+	      <a href="#"
+	         class="dropdown-item p-2 rounded mb-2">
+	
+	        <div class="d-flex align-items-start">
+	          <span class="badge bg-label-success p-2 me-2">
+	            <i class="bx bx-package"></i>
+	          </span>
+	
+	          <div>
+	            <div class="fw-bold">발주 승인 대기 중입니다</div>
+	            <small class="text-muted">
+	              발주 번호 B-5581
+	            </small>
+	          </div>
+	        </div>
+	      </a>
+	    </li>
+	
+	    <li><hr class="dropdown-divider"></li>
+	
+	    <!-- 전체 알림 보기 → 모달 -->
+	    <li>
+	      <button class="dropdown-item text-center fw-bold text-primary"
+	              data-bs-toggle="modal"
+	              data-bs-target="#notificationModal">
+	        전체 알림 보기
+	      </button>
+	    </li>
+	
+	  </ul>
+	</li>
 
       <!-- 👤 사용자 -->
       
@@ -95,4 +158,87 @@
 </nav>
 <script src="/vendor/libs/jquery/jquery.js"></script>
 <script type="text/javascript" src="/js/member/header.js"></script>
+<!-- 🔔 전체 알림 모달 -->
+<div class="modal fade" id="notificationModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+
+      <!-- 모달 헤더 -->
+      <div class="modal-header">
+        <h5 class="modal-title d-flex align-items-center">
+          <i class="bx bx-bell me-2"></i> 알림 센터
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- 모달 바디 -->
+      <div class="modal-body">
+
+        <!-- 필터 -->
+        <div class="btn-group mb-3" role="group">
+          <button type="button" class="btn btn-outline-primary active">
+            전체
+          </button>
+          <button type="button" class="btn btn-outline-primary">
+            안읽음
+          </button>
+          <button type="button" class="btn btn-outline-primary">
+            읽음
+          </button>
+        </div>
+
+        <!-- 알림 리스트 -->
+        <div class="list-group">
+
+          <!-- 안읽음 -->
+          <a href="#"
+             class="list-group-item list-group-item-action fw-bold border-start border-4 border-primary"
+             style="background-color:#f8f9ff;">
+            <div class="d-flex justify-content-between">
+              <div>
+                결재 요청이 도착했습니다
+                <div class="small text-muted">
+                  결재 문서 A-1023 · 5분 전
+                </div>
+              </div>
+              <span class="badge bg-primary">NEW</span>
+            </div>
+          </a>
+
+          <!-- 읽음 -->
+          <a href="#"
+             class="list-group-item list-group-item-action">
+            <div>
+              발주가 승인되었습니다
+              <div class="small text-muted">
+                발주 번호 B-5581 · 어제
+              </div>
+            </div>
+          </a>
+
+          <a href="#"
+             class="list-group-item list-group-item-action">
+            <div>
+              교육 수료 기한이 임박했습니다
+              <div class="small text-muted">
+                필수 교육 · 2026-01-01
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- 모달 푸터 -->
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal">
+          닫기
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
