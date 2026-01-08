@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cafe.erp.receivable.detail.ReceivableAmountSummaryDTO;
+import com.cafe.erp.receivable.detail.ReceivableAvailableDTO;
+import com.cafe.erp.receivable.detail.ReceivableCollectionRequestDTO;
 import com.cafe.erp.receivable.detail.ReceivableItemDTO;
 import com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO;
 import com.cafe.erp.receivable.detail.ReceivableRoyaltyDTO;
@@ -18,6 +21,51 @@ public class ReceivableService {
 	
 	@Autowired
 	private ReceivableDAO dao;
+	
+	
+	@Transactional
+	public void collectReceivable(ReceivableCollectionRequestDTO receivableCollectionRequestDTO , Integer memberId) {
+		
+		receivableCollectionRequestDTO.setMemberId(memberId);
+		
+		
+		// 지급 내역 DB반영
+		dao.insertCollection(receivableCollectionRequestDTO);
+		// 채권 남은 금액
+		Integer remainAmount = dao.selectRemainAmount(receivableCollectionRequestDTO.getReceivableId());
+		// 채권 총 금액
+		Integer totalAmount = dao.selectTotalAmount(receivableCollectionRequestDTO.getReceivableId());
+		
+		String status;
+		
+		if (remainAmount.equals(totalAmount)) {
+			// 남은 금액이랑 총 금액이랑 같으면 상태 미지급
+			status = "O";
+		} else if (remainAmount == 0) {
+			// 남은 금액이 0원이면 상태 완납 P
+			status = "C";
+		} else {
+			// 나머지 상태 부분지급
+			status = "P";
+		}
+		receivableCollectionRequestDTO.setStatus(status);
+		dao.updateReceivableStatus(receivableCollectionRequestDTO);
+		
+	}
+	
+	// 가맹비 채권 자동 생성
+	@Transactional
+	public void createMonlyRoyaltyReceivable() {
+		
+		int insertCount = dao.insertMonthlyRoyaltyReceivable();
+
+	    if (insertCount == 0) {
+	        System.out.println("[ReceivableService] 생성된 채권 없음 (이미 생성됨)");
+	    } else {
+	        System.out.println("[ReceivableService] 월초 가맹비 채권 생성 완료: " + insertCount + "건");
+	    }
+		
+	}
 	
 	
 	public List<ReceivableSummaryDTO> receivableSearchList(
@@ -34,7 +82,19 @@ public class ReceivableService {
 	}
 	
 	public List<ReceivableOrderSummaryDTO> orderSummary(ReceivableSummaryDTO receivableSummaryDTO) {
-		return dao.orderSummary(receivableSummaryDTO);
+		
+		List<ReceivableOrderSummaryDTO> list = dao.orderSummary(receivableSummaryDTO);
+		
+		Iterator<ReceivableOrderSummaryDTO> iterator = list.iterator();
+		
+		while (iterator.hasNext()) {
+			ReceivableOrderSummaryDTO dto = iterator.next();
+			String receivableId = dto.getReceivableId();
+			Integer remainAmount = dao.selectRemainAmount(receivableId);
+			dto.setRemainAmount(remainAmount);
+		}
+		
+		return list;
 	}
 	
 	
@@ -88,6 +148,13 @@ public class ReceivableService {
 	public List<ReceivableTransactionDTO> paidAmount(ReceivableSummaryDTO receivableSummaryDTO) {
 		return dao.paidAmount(receivableSummaryDTO);
 	}
+	
+	// detail page 지급 버튼 클릭 시 채권목록
+	public List<ReceivableAvailableDTO> getAvailableReceivables(ReceivableSummaryDTO receivableSummaryDTO) {
+		return dao.getAvailableReceivables(receivableSummaryDTO);
+	}
+	
+	
 	
 	
 	

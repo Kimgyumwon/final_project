@@ -100,6 +100,7 @@
 					        <col class="col-amount">
 					        <col class="col-tax">
 					        <col class="col-total">
+					        <col class="col-remain">
 					        <col style="width:120px;">
 					      </colgroup>
 					
@@ -111,6 +112,7 @@
 					          <th class="text-end">공급가액</th>
 					          <th class="text-end">세액</th>
 					          <th class="text-end">합계</th>
+					          <th class="text-end">남은 금액</th>
 					          <th class="text-center">상세</th>
 					        </tr>
 					      </thead>
@@ -120,7 +122,7 @@
 					
 					          <c:when test="${empty receivableOrderSummaryDTO}">
 					            <tr>
-					              <td colspan="7" class="text-center text-muted">
+					              <td colspan="8" class="text-center text-muted">
 					                데이터가 없습니다.
 					              </td>
 					            </tr>
@@ -152,7 +154,10 @@
 					                <td class="text-end fw-bold">
 					                  <fmt:formatNumber value="${row.totalAmount}" />
 					                </td>
-					
+									<td class="text-end fw-bold
+									  ${row.remainAmount == 0 ? 'text-success' : 'text-danger'}">
+									  <fmt:formatNumber value="${row.remainAmount}" />
+									</td>
 					                <td class="text-center">
 										<button
 										  class="btn btn-sm btn-outline-primary"
@@ -210,13 +215,20 @@
 						            <fmt:formatNumber value="${receivableRoyaltyDTO.totalAmount}" type="number"/>
 						          </td>
 						
-						          <td class="text-center">
-						            <c:choose>
-						              <c:when test="${receivableRoyaltyDTO.status eq 'O'}">미지급</c:when>
-						              <c:when test="${receivableRoyaltyDTO.status eq 'P'}">부분지급</c:when>
-						              <c:when test="${receivableRoyaltyDTO.status eq 'C'}">완납</c:when>
-						            </c:choose>
-						          </td>
+								  <td class="text-center">
+								   <c:choose>
+								     <c:when test="${receivableRoyaltyDTO.status eq 'O'}">
+								       <span class="badge bg-danger">미지급</span>
+								     </c:when>
+								     <c:when test="${receivableRoyaltyDTO.status eq 'P'}">
+								       <span class="badge bg-warning text-dark">부분지급</span>
+								     </c:when>
+								     <c:when test="${receivableRoyaltyDTO.status eq 'C'}">
+								       <span class="badge bg-success">완납</span>
+								     </c:when>
+								   </c:choose>
+								 </td>
+								 
 						        </tr>
 						    </c:when>
 						
@@ -251,6 +263,7 @@
 				        <thead>
 				          <tr>
 				            <th class="text-first">지급일</th>
+				            <th class="text-first">담당자명</th>
 				            <th class="text-center">지급 금액</th>
 				            <th class="text-center">지급 구분</th>
 				            <th class="text-center">비고</th>
@@ -260,7 +273,7 @@
 							  <c:choose>
 							    <c:when test="${empty receivableTransactionDTO}">
 							      <tr>
-							        <td colspan="4" class="text-center text-muted">
+							        <td colspan="5" class="text-center text-muted">
 							          데이터가 없습니다.
 							        </td>
 							      </tr>
@@ -272,6 +285,13 @@
 							          <td class="text-first">
 							            <fmt:formatDate value="${paid.transactionDate}" pattern="yyyy-MM-dd" />
 							          </td>
+							          <!-- 담당자명 -->
+									  <td class="text-first">
+										<span class="badge bg-label-primary">
+										  <i class="bx bx-user me-1"></i>
+										  ${paid.memberName}
+										</span>
+									  </td>
 							          <td class="text-center">
 							            <fmt:formatNumber value="${paid.transactionAmount}" pattern="#,###" />
 							          </td>
@@ -418,9 +438,121 @@
 	  </div>
 	</div>
 	<!-- ================= 모달 끝 ================= -->
+	
+	<!-- ================= 지급 등록 모달 ================= -->
+	<div
+	  class="modal fade"
+	  id="paymentModal"
+	  tabindex="-1"
+	  aria-labelledby="paymentModalLabel"
+	  aria-hidden="true"
+	>
+	  <div class="modal-dialog modal-md modal-dialog-centered">
+	    <div class="modal-content">
+	
+	      <!-- 모달 헤더 -->
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="paymentModalLabel">지급 등록</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+	      </div>
+	
+	      <!-- 모달 바디 -->
+	      <div class="modal-body">
+			<form id="paymentForm">
+			  <input type="hidden" id="storeId" value="${receivableSummaryDTO.storeId}" />
+			  <input type="hidden" id="baseMonth" value="${receivableSummaryDTO.baseMonth}" />
+			  <!-- 채권 선택 -->
+			  <div class="mb-3">
+			    <label class="form-label">채권 선택</label>
+			    <select class="form-select" id="receivableSelect" required>
+			      <option value="">채권 선택</option>
+			    </select>
+			  </div>
+			
+			  <!-- 지급 구분 (자동) -->
+			  <div class="mb-3">
+			    <label class="form-label">지급 구분</label>
+			    <input
+			      type="text"
+			      class="form-control"
+			      id="sourceTypeText"
+			      readonly
+			    />
+			    <input type="hidden" name="sourceType" id="sourceType" />
+			  </div>
+			
+			  <!-- 금액 영역 -->
+			  <div class="row mb-2">
+			    <div class="col-6">
+			      <label class="form-label">남은 금액</label>
+			      <input
+			        type="text"
+			        class="form-control text-end"
+			        id="remainAmount"
+			        readonly
+			      />
+			    </div>
+			    <div class="col-6">
+			      <label class="form-label">지급 금액</label>
+			      <input
+			        type="text"
+			        class="form-control text-end"
+			        id="payAmount"
+			        name="transactionAmount"
+			        value="0"
+			      />
+			    </div>
+			  </div>
+			
+			  <!-- 빠른 금액 버튼 -->
+			  <div class="mb-3 d-flex gap-2">
+			    <button type="button" class="btn btn-outline-secondary btn-sm quick-pay" data-amount="10000">1만</button>
+			    <button type="button" class="btn btn-outline-secondary btn-sm quick-pay" data-amount="50000">5만</button>
+			    <button type="button" class="btn btn-outline-secondary btn-sm quick-pay" data-amount="100000">10만</button>
+			    <button type="button" class="btn btn-outline-primary btn-sm" id="payAllBtn">완납</button>
+			    <button type="button" class="btn btn-outline-danger btn-sm" id="resetAmountBtn">
+			      금액 초기화
+			    </button>
+						    
+			  </div>
+			
+			  <!-- 비고 -->
+			  <div class="mb-3">
+			    <label class="form-label">비고</label>
+			    <textarea class="form-control" name="transactionMemo" rows="3"></textarea>
+			  </div>
+			
+			</form>
 
+	      </div>
+	
+	      <!-- 모달 푸터 -->
+	      <div class="modal-footer">
+	        <button
+	          type="button"
+	          class="btn btn-secondary"
+	          data-bs-dismiss="modal"
+	        >
+	          취소
+	        </button>
+	        <button
+	          type="button"
+	          class="btn btn-primary"
+	          id="paymentSaveBtn"
+	        >
+	          지급
+	        </button>
+	      </div>
+	
+	    </div>
+	  </div>
+	</div>
+	
+	
+	
 	
 	<script type="text/javascript" src="/js/receivable/receivableDetail.js"></script>
+	<script type="text/javascript" src="/js/receivable/receivable-payment.js"></script>
 	
 	
     <!-- Core JS -->

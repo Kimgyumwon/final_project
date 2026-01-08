@@ -72,13 +72,7 @@ public class ReceivableController {
 		
 	}
 	
-	@GetMapping("items")
-	@ResponseBody
-	public List<ReceivableItemDTO> receivableItemList(
-			@RequestParam("receivableId")String receivableId
-			) {
-		return service.receivableItem(receivableId);
-	}
+
 	
 	
 	

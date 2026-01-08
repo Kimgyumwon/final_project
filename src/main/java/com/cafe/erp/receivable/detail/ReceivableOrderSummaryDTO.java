@@ -17,4 +17,8 @@ public class ReceivableOrderSummaryDTO {
 	private Integer supplyAmount;
 	private Integer taxAmount;
 	private Integer totalAmount;
+	private Integer remainAmount;
+	
+	
+	
 }

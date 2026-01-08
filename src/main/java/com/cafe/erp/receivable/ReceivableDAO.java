@@ -6,6 +6,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.cafe.erp.receivable.detail.ReceivableAmountSummaryDTO;
+import com.cafe.erp.receivable.detail.ReceivableAvailableDTO;
+import com.cafe.erp.receivable.detail.ReceivableCollectionRequestDTO;
 import com.cafe.erp.receivable.detail.ReceivableItemDTO;
 import com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO;
 import com.cafe.erp.receivable.detail.ReceivableRoyaltyDTO;
@@ -36,4 +38,20 @@ public interface ReceivableDAO {
 	public ReceivableAmountSummaryDTO selectAmountSummary(ReceivableSummaryDTO receivableSummaryDTO);
 	// detail page 지급 내역
 	public List<ReceivableTransactionDTO> paidAmount(ReceivableSummaryDTO receivableSummaryDTO);
+	
+	//detail page 지급 버튼 클릭 시 채권 목록
+	public List<ReceivableAvailableDTO> getAvailableReceivables(ReceivableSummaryDTO receivableSummaryDTO);
+	
+	// 지급 이력 DB에 삽입
+	public void insertCollection(ReceivableCollectionRequestDTO receivableCollectionRequestDTO);
+	// 지급 후 채권의 남은 금액
+    public Integer selectRemainAmount(String receivableId);
+    // 채권의 총 금액
+    public Integer selectTotalAmount(String receivableId);
+    // 채권의 status 업데이트
+    public void updateReceivableStatus(ReceivableCollectionRequestDTO receivableCollectionRequestDTO);
+    
+    
+    // 채권 매월 1일에 자동 생성
+    public int insertMonthlyRoyaltyReceivable();
 }
