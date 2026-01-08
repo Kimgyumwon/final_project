@@ -31,7 +31,7 @@ function renderItemResult(list) {
         <td class="text-end">${item.itemSupplyPrice.toLocaleString()}</td>
         <td>
           <button class="btn btn-sm btn-primary"
-                  onclick="selectItem('${item.itemCode}','${item.itemName}',${item.itemSupplyPrice})">
+                  onclick="selectItem('${item.itemId}','${item.itemCode}','${item.itemName}','${item.itemSupplyPrice}','${item.vendorCode}')">
             선택
           </button>
         </td>

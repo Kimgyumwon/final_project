@@ -16,7 +16,7 @@ function removeSelectedItems() {
   updateGrandTotal();
 }
 
-function checkAll(){
+function toggleAllCheckboxes(){
 	const isChecked = document.getElementById("checkAll").checked;
 	const items = document.querySelectorAll(".order-check");
 
@@ -25,3 +25,14 @@ function checkAll(){
 	});
 	
 }
+
+/* 목록 중 하나라도 체크해제 시 ALL체크도 해제 */
+document.addEventListener("change", function (e) {
+  if (e.target.classList.contains("order-check")) {
+    const all = document.querySelectorAll(".order-check");
+    const checked = document.querySelectorAll(".order-check:checked");
+
+    document.getElementById("checkAll").checked =
+      all.length > 0 && all.length === checked.length;
+  }
+});

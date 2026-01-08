@@ -1,4 +1,4 @@
-function selectItem(itemCode, itemName, itemSupplyPrice) {
+function selectItem(itemId, itemCode, itemName, itemSupplyPrice, vendorCode) {
   
   let check = confirm("물품을 선택하시겠습니까?");
   if (!check){
@@ -12,8 +12,11 @@ function selectItem(itemCode, itemName, itemSupplyPrice) {
     alert("이미 선택된 물품입니다.");
     return;
   }
+  
+  /* 2️ index 계산 (중요) */
+  const index = tbody.querySelectorAll("tr").length;
 
-  /* 2️ row 생성 */
+  /* 3️ row 생성 */
   const tr = document.createElement("tr");
   tr.classList.add("item-row");
   tr.setAttribute("data-item-code", itemCode);
@@ -24,18 +27,22 @@ function selectItem(itemCode, itemName, itemSupplyPrice) {
       <input type="checkbox" class="order-check">
     </td>
     <td>
+		<input type="hidden" name="items[${index}].itemId" value="${itemId}">
 		${itemCode}
-		<input type="hidden" name="items[0].itemCode" value="am0012">
+		<input type="hidden" name="items[${index}].itemCode" value="${itemCode}">
+		<input type="hidden" name="items[${index}].itemName" value="${itemName}">
+		<input type="hidden" name="items[${index}].vendorCode" value="${vendorCode}">
 	</td>
     <td>${itemName}</td>
-    <td class="text-end">${itemSupplyPrice.toLocaleString()}</td>
+    <td class="text-end">
+		${itemSupplyPrice.toLocaleString()}
+		<input type="hidden" name="items[${index}].itemSupplyPrice" value="${itemSupplyPrice}">	
+	</td>
     <td>
-      <input type="number"
+      <input type="text"
              class="form-control text-end qty"
-             min="0"
-             value="0"
+			 name="items[${index}].ItemQuantity"
              oninput="updateRowTotal(this)">
-	  <input type="hidden" name="items[0].quantity" value="3">
     </td>
     <td class="row-total text-end">0</td>
   `;

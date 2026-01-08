@@ -72,6 +72,7 @@
             
             <!-- Content -->	
             <div class="container-xxl flex-grow-1 container-p-y">
+              <!-- form 시작 -->
               <form action="/order/request" method="post" id="orderForm">
 	              <div class="row">
 				  	<div class="row mb-4">
@@ -169,7 +170,7 @@
 						      <thead class="table-light">
 						        <tr>
 						          <th style="width:40px;">
-								      <input type="checkbox" id="checkAll" onclick="checkAll()">
+								      <input type="checkbox" id="checkAll" onclick="toggleAllCheckboxes()">
 								  </th>
 						          <th>물품코드</th>
 						          <th>물품명</th>
@@ -195,6 +196,7 @@
 					  </div>
 					</div>
 				</form>
+				<!-- form 끝 -->
 			</div>
 			
 			<!-- 모달창 -->
