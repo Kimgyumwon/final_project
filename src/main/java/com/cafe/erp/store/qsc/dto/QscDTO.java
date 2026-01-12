@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -28,5 +29,11 @@ public class QscDTO {
 
     // member table column
     private String memName;
+
+    public String getQscDateStr() {
+        if (this.qscDate == null) return "";
+
+        return this.qscDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
 
 }

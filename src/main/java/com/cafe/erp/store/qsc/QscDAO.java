@@ -1,9 +1,6 @@
 package com.cafe.erp.store.qsc;
 
-import com.cafe.erp.store.qsc.dto.QscDTO;
-import com.cafe.erp.store.qsc.dto.QscQuestionDTO;
-import com.cafe.erp.store.qsc.dto.QscQuestionSearchDTO;
-import com.cafe.erp.store.qsc.dto.QscSearchDTO;
+import com.cafe.erp.store.qsc.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -21,4 +18,10 @@ public interface QscDAO {
     public Long qscCount(QscSearchDTO searchDTO) throws Exception;
 
     public List<QscDTO> qscList(QscSearchDTO searchDTO) throws Exception;
+
+    public  List<QscQuestionDTO> questionListById(List<Integer> questionIds) throws Exception;
+
+    public int addQsc(QscDTO qscDTO) throws Exception;
+
+    public int addDetail(QscDetailDTO detail) throws Exception;
 }

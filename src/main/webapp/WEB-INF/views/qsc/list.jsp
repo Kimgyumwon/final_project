@@ -161,14 +161,14 @@
 					         				<td class="fw-bold">${dto.qscId}</td>
 											<td>${dto.memName}</td>
 											<td>${dto.storeName}</td>
-											<td>${dto.qscTitle}</td>
+											<td><a href="/store/qsc/detail?qscId=${qscId}" class="text-primary">${dto.qscTitle}</a></td>
 								            <td>
 												<c:if test="${dto.qscGrade eq 'A'}"><span class="badge bg-label-primary">A</span></c:if>
 												<c:if test="${dto.qscGrade eq 'B'}"><span class="badge bg-label-success">B</span></c:if>
 												<c:if test="${dto.qscGrade eq 'C'}"><span class="badge bg-label-warning">C</span></c:if>
 												<c:if test="${dto.qscGrade eq 'D'}"><span class="badge bg-label-danger">D</span></c:if>
 											</td>
-								            <td>${dto.qscDate}</td>
+								            <td>${dto.qscDateStr}</td>
 					                    </tr>
 					                </c:forEach>
 					            </tbody>

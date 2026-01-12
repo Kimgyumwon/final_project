@@ -8,6 +8,7 @@ import com.cafe.erp.util.ExcelUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +44,15 @@ public class QscController {
         return "qsc/add";
     }
 
+    @PostMapping("add")
+    @ResponseBody
+    public Map<String, Object> qscAdd(@RequestBody QscDTO qscDTO, Authentication authentication) throws Exception {
+        Integer memberId = Integer.parseInt(authentication.getName());
+        qscDTO.setMemberId(memberId);
+
+        return result(qscService.addQsc(qscDTO));
+    }
+
     @GetMapping("admin/question")
     public String questionList(QscQuestionSearchDTO searchDTO, Authentication authentication, Model model) throws Exception {
         String memberId = authentication.getName();
@@ -57,7 +67,7 @@ public class QscController {
 
     @PostMapping("admin/question/add")
     @ResponseBody
-    Map<String, Object> addQuestion(@RequestBody QscQuestionDTO questionDTO) throws Exception {
+    public Map<String, Object> addQuestion(@RequestBody QscQuestionDTO questionDTO) throws Exception {
         return result(qscService.addQuestion(questionDTO));
     }
 

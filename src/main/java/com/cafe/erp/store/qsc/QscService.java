@@ -1,13 +1,14 @@
 package com.cafe.erp.store.qsc;
 
-import com.cafe.erp.store.qsc.dto.QscDTO;
-import com.cafe.erp.store.qsc.dto.QscQuestionDTO;
-import com.cafe.erp.store.qsc.dto.QscQuestionSearchDTO;
-import com.cafe.erp.store.qsc.dto.QscSearchDTO;
+import com.cafe.erp.store.qsc.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class QscService {
@@ -35,4 +36,44 @@ public class QscService {
         return qscDAO.qscList(searchDTO);
     }
 
+    @Transactional
+    public int addQsc(QscDTO qscDTO) throws Exception {
+        QscDetailDTO[] qscDetailDTOS = qscDTO.getQscDetailDTOS();
+        List<Integer> questionIds = Arrays.stream(qscDetailDTOS)
+                .map(QscDetailDTO::getListId)
+                .collect(Collectors.toList());
+        List<QscQuestionDTO> questionList = qscDAO.questionListById(questionIds);
+        Map<Integer, Integer> maxScoreMap = questionList.stream()
+                .collect(Collectors.toMap(QscQuestionDTO::getListId, QscQuestionDTO::getListMaxScore));
+
+        int totalScore = 0;
+        int maxScore = 0;
+        for (QscDetailDTO detail: qscDetailDTOS) {
+            totalScore += detail.getDetailScore();
+            maxScore += maxScoreMap.getOrDefault(detail.getListId(), 0);
+        }
+
+        String grade = "D";
+        double percent = 0.0;
+        if (maxScore > 0) {
+            percent = (double) totalScore / maxScore * 100;
+
+            if (percent >= 90) grade = "A";
+            else if (percent >= 80) grade = "B";
+            else if (percent >= 70) grade = "C";
+        }
+
+        qscDTO.setQscQuestionTotalScore(maxScore);
+        qscDTO.setQscTotalScore(totalScore);
+        qscDTO.setQscGrade(grade);
+
+        int result = qscDAO.addQsc(qscDTO);
+
+        for (QscDetailDTO detail : qscDetailDTOS) {
+            detail.setQscId(qscDTO.getQscId());
+            qscDAO.addDetail(detail);
+        }
+
+        return result;
+    }
 }

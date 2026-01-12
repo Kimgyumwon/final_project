@@ -100,5 +100,24 @@
 		LIMIT #{startNum}, #{perPage}
 	</select>
 
+    <select id="questionListById" parameterType="List" resultType="QscQuestionDTO">
+		SELECT list_id, list_max_score
+		FROM qsc_list
+		WHERE list_id IN
+		<foreach item="id" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+
+	<insert id="addQsc" parameterType="QscDTO" useGeneratedKeys="true" keyProperty="qscId">
+		INSERT INTO qsc
+		VALUE (null, #{storeId}, #{memberId}, #{qscTitle}, now(), #{qscQuestionTotalScore}, #{qscTotalScore}, #{qscGrade}, #{qscOpinion})
+	</insert>
+
+	<insert id="addDetail" parameterType="QscDetailDTO">
+		INSERT INTO qsc_detail
+		VALUE (null, #{qscId}, #{listId}, #{detailScore})
+	</insert>
+
 
 </mapper>

@@ -78,47 +78,89 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <div class="row">
-              
-			    <div class="col-12 px-0">
-                    <ul class="nav nav-pills mb-3" role="tablist">
-						<li class="nav-item">
-							<a href="/store/qsc/list" class="nav-link active"><i class="bx bx-store me-1"></i> QSC 목록</a>
-						</li>
-                        <li class="nav-item">
-                        	<a href="/store/qsc/admin/question" class="nav-link active"><i class="bx bx-store me-1"></i> QSC 질문목록</a>
-                        </li>
-                    </ul>
-                </div>
                 <h4 class="fw-bold py-3 mb-3"><span class="text-muted fw-normal">QSC /</span> 등록</h4>
                 <div id="tab-content-area">
 					<div class="card shadow-none border bg-white">
-					    <div class="table-responsive">
-					    	<table class="table table-hover table-striped">
-					        	<thead>
-					            	<tr>
-										<th>No</th>
-										<th>카테고리</th>
-										<th>질문</th>
-										<th>배점</th>
-										<th>점수</th>
-						            </tr>
-					          	</thead>
-					            
-					          	<tbody>
-					            	<c:forEach items="${list}" var="dto">
-					       				<tr>
-											<td></td>
-											<td>${dto.listCategory}</td>
-											<td>${dto.listQuestion}</td>
-											<td>${dto.listMaxScore}</td>
-								            <td>
-												<input type="text">
-											</td>
-					                    </tr>
-					                </c:forEach>
-					            </tbody>
-					        </table>
-					    </div>
+                        <form method="post" id="qscForm" action="/store/qsc/add" onsubmit="return false;">
+                            <div class="row g-3 p-4">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label small">제목</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-detail'></i></span>
+                                        <input type="text" class="form-control" placeholder="제목" id="qscTitle" name="qscTitle"/>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="storeNameInput">가맹점명 검색 <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bx bx-store"></i></span>
+                                        <input type="text" id="storeNameInput" class="form-control" placeholder="가맹점명 입력" onkeyup="if(window.event.keyCode==13){searchStore()}" required />
+                                        <input type="hidden" id="storeId" name="storeId" />
+                                        <button class="btn btn-primary" type="button" onclick="searchStore()">
+                                            <i class="bx bx-search"></i>
+                                        </button>
+                                    </div>
+
+                                    <ul id="storeResultList" class="list-group position-absolute overflow-auto"
+                                        style="max-height: 200px; width: 40%; z-index: 1050; display: none; margin-top: 5px; box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.15); background-color: rgba(255, 255, 255, 0.9);">
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%;">No</th>
+                                            <th style="width: 10%;">카테고리</th>
+                                            <th>질문</th>
+                                            <th style="width: 8%;">배점</th>
+                                            <th style="width: 8%;">점수</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <c:forEach items="${list}" var="dto" varStatus="status">
+                                            <c:set var="totalMax" value="${totalMax + dto.listMaxScore}" />
+                                            <tr>
+                                                <td class="text-primary">${status.count}</td>
+                                                <td>${dto.listCategory}</td>
+                                                <td>${dto.listQuestion}</td>
+                                                <td>${dto.listMaxScore}</td>
+                                                <td>
+                                                    <input type="text" class="form-control score-input" id="detailScore" name="detailScore"
+                                                           data-list-id="${dto.listId}" data-max-score="${dto.listMaxScore}" oninput="handleMaxScore(this); calculateTotal();"
+                                                           style="line-height: 1;" >
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                        <tr class="fw-bold">
+                                            <td class="text-primary" colspan="3">총점</td>
+                                            <td>${totalMax}</td>
+                                            <td><span id="displayTotalScore" class="text-primary">0</span></td>
+                                        </tr>
+                                        <tr class="fw-bold">
+                                            <input type="hidden" id="hiddenTotalMax" value="${totalMax}">
+                                            <td class="text-primary" colspan="3">예상 등급</td>
+                                            <td><span id="displayGrade"></span></td>
+                                            <td><span id="displayTotalScoreTo" class="text-primary">0</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row g-3 p-4">
+                                <div class="col-md-12">
+                                    <label class="form-label" for="qscOpinion">종합 의견</label>
+                                    <div class="input-group">
+                                        <textarea class="form-control" rows="3" id="qscOpinion"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2 p-4">
+                                <a href="/store/qsc/list" class="btn btn-outline-secondary" onclick="return confirm('현재 작성된 내용은 저장되지 않습니다.\n정말 목록으로 돌아가시겠습니까?');">취소</a>
+                                <button type="button" class="btn btn-primary" onclick="submitQscForm()">저장</button>
+                            </div>
+                        </form>
 					</div>
                 </div>
 			  	
@@ -142,19 +184,6 @@
       <div class="layout-overlay layout-menu-toggle"></div>
     </div>
     <!-- / Layout wrapper -->
-    
-    <script>
-	    const currentPath = window.location.pathname;
-	
-	    document.querySelectorAll('.nav-pills .nav-link').forEach(link => {
-	        if (link.getAttribute('href') === currentPath) {
-	            link.classList.add('active');
-	        } else {
-	            link.classList.remove('active');
-	        }
-	    });
-	</script>
-    
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
@@ -182,6 +211,6 @@
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     
-    <script type="text/javascript" src="/js/store/qsc/question.js"></script>
+    <script type="text/javascript" src="/js/store/qsc/add.js"></script>
   </body>
 </html>
