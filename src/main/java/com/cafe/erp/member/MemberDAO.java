@@ -9,28 +9,41 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface MemberDAO {
 	
+	// 로그인
 	public MemberDTO login(int memberId)throws Exception;
 	
+	// 관리자 전체 사원 리스트
 	public List<MemberDTO> list(MemberDTO memberDTO) throws Exception;
 	
+	// 사원 추가
 	public int add(MemberDTO memberDTO) throws Exception;
 	
 	public List<MemberDTO> searchOwner(String keyword);
 	
+	// 사원 상세정보
 	public MemberDTO detail(MemberDTO memberDTO) throws Exception;
 	
+	// 사원 업데이트
 	public int update(MemberDTO memberDTO) throws Exception;
 	
+	// 비밀번호 초기화
 	public int resetPw(MemberDTO memberDTO) throws Exception;
 	
+	// 사원 재직 여부
 	public int InActive(MemberDTO memberDTO) throws Exception;
 	
-
+	// 조직도 리스트
 	public List<MemberDTO> chatList(Map<String, Object> val);
 	
+	// 부서별 인원 수
 	public List<Map<String, Object>> deptMemberCount();
 	
-	public int totalMemberCount();
+	// DB에 있는 전체 사원 수
+	public int countAllMember(MemberDTO memberDTO) throws Exception;
+	
+	// 전체 활성 사원 수
+	public int countActiveMember(MemberDTO memberDTO) throws Exception;
+	
 
 	public String getMemberId(String id);
 	public MemberDTO getMemberId(MemberDTO memberDTO);
@@ -41,9 +54,6 @@ public interface MemberDAO {
 	int updateProfile(@Param("originalName") String originalName, @Param("savedName") String savedName, @Param("memberId") int memberId);
 	int insertProfile(@Param("originalName") String originalName, @Param("savedName") String savedName, @Param("memberId") int memberId);
 
-	public int countAllMember(MemberDTO memberDTO) throws Exception;
-
-	public int countActiveMember(MemberDTO memberDTO) throws Exception;
 
 	
 	public int changePassword(MemberChangePasswordDTO changePasswordDTO) throws Exception;

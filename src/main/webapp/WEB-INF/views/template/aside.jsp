@@ -201,12 +201,12 @@
     <li class="menu-item">
       <a href="javascript:void(0)" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-collection"></i>
-        <div data-i18n="Basic">Cards</div>
+        <div data-i18n="Basic">사원</div>
       </a>
       <ul class="menu-sub">
        <li class="menu-item">
-         <a href="extended-ui-perfect-scrollbar.html" class="menu-link">
-           <div data-i18n="Perfect Scrollbar">Perfect scrollbar</div>
+         <a href="/member/admin_member_list" class="menu-link">
+           <div data-i18n="Perfect Scrollbar">사원 목록</div>
          </a>
        </li>
        <li class="menu-item">

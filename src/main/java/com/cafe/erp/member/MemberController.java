@@ -32,207 +32,207 @@ import jakarta.validation.Valid;
 @RequestMapping("/member")
 public class MemberController {
 
-    private final PasswordEncoder passwordEncoder;
-	
+	private final PasswordEncoder passwordEncoder;
+
 	@Autowired
 	private MemberService memberService;
-	
+
 	@Autowired
-	private MemberCommuteService commuteService; 
-	
+	private MemberCommuteService commuteService;
+
 	@Autowired
 	private EmailService emailService;
 
+	MemberController(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
 
-    MemberController(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-	
-	
 	@GetMapping("login")
-	public void login()throws Exception{
-		
+	public void login() throws Exception {
+
 	}
-	
-	
-	@GetMapping("AM_group_chat")
-	public String chatList(Model model, @AuthenticationPrincipal UserDTO userDTO)throws Exception{
+
+	@GetMapping("AM_group_chart")
+	public String chatList(Model model, @AuthenticationPrincipal UserDTO userDTO, MemberDTO memberDTO)
+			throws Exception {
+		// 로그인 한 유저 확인
 		int memberId = userDTO.getMember().getMemberId();
-		Map<String, Object> count = memberService.deptMemberCount();
-		boolean pwPass = memberService.pwPass(memberId);
-		model.addAttribute("count", count);
-		model.addAttribute("pwPass", pwPass);
-		return "member/AM_group_chat";
+
+		// 부서별 활성 인원 수
+		List<Map<String, Object>> deptCount = memberService.deptMemberCount();
+
+		// 전체 활성 사원 수
+		int totalCount = memberService.countActiveMember(memberDTO);
+
+		// 초기 조직도 목록
+		Map<String, Object> startChart = new HashMap<>();
+		startChart.put("deptCode", 0); // 전체 부서
+		startChart.put("check", false); // 활성 사원만
+
+		List<MemberDTO> startViewChart = memberService.chatList(startChart);
+
+		model.addAttribute("deptCount", deptCount);
+		model.addAttribute("totalCount", totalCount);
+		model.addAttribute("startViewChart", startViewChart);
+
+		return "member/AM_group_chart";
 	}
-	
-	
-	@GetMapping("member/checkCount")
+
+	@GetMapping("checkCount")
 	@ResponseBody
-	public List<MemberDTO> checkMemberCount(@RequestParam(name = "deptCode", defaultValue = "0")int deptCode, @RequestParam(name = "check", defaultValue = "false") boolean check) throws Exception{
+	public List<MemberDTO> checkMemberCount(@RequestParam(name = "deptCode", defaultValue = "0") int deptCode,
+			@RequestParam(name = "check", defaultValue = "false") boolean check,
+			@RequestParam(defaultValue = "") String keyword) throws Exception {
 
 		Map<String, Object> checkMem = new HashMap<>();
 		checkMem.put("deptCode", deptCode);
 		checkMem.put("check", check);
+
+		if (!keyword.isEmpty()) {
+			checkMem.put("keyword", keyword);
+		}
 		return memberService.chatList(checkMem);
 	}
-	
-	
 
 	@GetMapping("admin_member_list")
-	public String list(MemberDTO memberDTO, Model model)throws Exception{
+	public String list(MemberDTO memberDTO, Model model) throws Exception {
 		List<MemberDTO> list = memberService.list(memberDTO);
 		model.addAttribute("list", list);
-		
-		int totalCount = memberService.countAllMember(memberDTO);   // 전체(퇴사 포함)
-	    int activeCount = memberService.countActiveMember(memberDTO); // 재직자만
 
-	    model.addAttribute("totalCount", totalCount);
-	    model.addAttribute("activeCount", activeCount);
-	    
+		int totalCount = memberService.countAllMember(memberDTO); // 전체(퇴사 포함)
+		int activeCount = memberService.countActiveMember(memberDTO); // 재직자만
+
+		model.addAttribute("totalCount", totalCount);
+		model.addAttribute("activeCount", activeCount);
+
 		return "member/admin_member_list";
 	}
-	
+
 	@PostMapping("admin_member_add")
-	public String add(MemberDTO memberDTO, Model model) throws Exception{
+	public String add(MemberDTO memberDTO, Model model) throws Exception {
 		String pw = "1234";
 		memberDTO.setMemPassword(pw);
-		
+
 		int result = memberService.add(memberDTO);
-		
+
 		String msg = "등록 성공";
-		
+
 		int memid = memberDTO.getMemberId();
-		
-		if(result == 0) {
+
+		if (result == 0) {
 			msg = "등록 실패";
 			model.addAttribute("msg", msg);
 			model.addAttribute("url", "./admin_member_list");
 			return "redirect:./admin_member_list";
 		}
-		
+
 		model.addAttribute("msg", msg);
 		model.addAttribute("url", "./AM_user_detail");
 		emailService.sendPasswordEmail(memberDTO.getMemEmail(), pw, memberDTO.getMemName());
 		return "redirect:./AM_member_detail?memberId=" + memid;
 	}
-	
+
 	@GetMapping("AM_member_detail")
-	public String detail(MemberDTO memberDTO, Model model) throws Exception{
+	public String detail(MemberDTO memberDTO, Model model) throws Exception {
 		MemberDTO member = memberService.detail(memberDTO);
 		model.addAttribute("dto", member);
-		
-		
-		
+
 		MemberCommuteDTO commuteDTO = new MemberCommuteDTO();
 		commuteDTO.setMemberId(member.getMemberId());
-		
+
 		List<MemberCommuteDTO> attendanceList = commuteService.attendanceList(commuteDTO);
 		model.addAttribute("attendanceList", attendanceList);
-		
-		
+
 		return "member/AM_member_detail";
 	}
-	
-	
+
 	@PostMapping("member_info_update")
 	@ResponseBody
-	public String update(MemberDTO memberDTO, @RequestParam(value = "profileImage", required = false)MultipartFile file)throws Exception{
+	public String update(MemberDTO memberDTO,
+			@RequestParam(value = "profileImage", required = false) MultipartFile file) throws Exception {
 		String newFileName = memberService.update(memberDTO, file);
-		
-		if(newFileName != null) {
+		if (newFileName != null) {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			UserDTO userDTO = (UserDTO) authentication.getPrincipal();
 			userDTO.getMember().setMemProfileSavedName(newFileName);
 		}
-	    
-	    return "success";
+
+		return "success";
 	}
-	
-	
+
 	@PostMapping("reset_password")
 	@ResponseBody
 	public String resetPassword(@RequestParam("memberId") int memberId) throws Exception {
-		
+
 		MemberDTO searchDTO = new MemberDTO();
 		searchDTO.setMemberId(memberId);
 		MemberDTO targetMember = memberService.detail(searchDTO);
-		
+
 		if (targetMember == null) {
 			return "fail";
 		}
-		
-		String pw ="1234";
-		
+
+		String pw = "1234";
+
 		MemberDTO updateDTO = new MemberDTO();
 		updateDTO.setMemberId(memberId);
 		updateDTO.setMemPassword("1234");
-		
+
 		memberService.resetPw(updateDTO);
-		
+
 		emailService.resetPasswordEmail(targetMember.getMemEmail(), pw, targetMember.getMemName());
-		
+
 		return "success";
 	}
-	
-	
+
 	@PostMapping("changePassword")
 	@ResponseBody
-	public String changePassword(@Valid MemberChangePasswordDTO changePasswordDTO, BindingResult bindingResult, @AuthenticationPrincipal UserDTO userDTO) throws Exception{
-		
-		if(bindingResult.hasErrors()) {
+	public String changePassword(@Valid MemberChangePasswordDTO changePasswordDTO, BindingResult bindingResult,
+			@AuthenticationPrincipal UserDTO userDTO) throws Exception {
+
+		if (bindingResult.hasErrors()) {
 			return bindingResult.getFieldError().getDefaultMessage();
 		}
-		
+
 		changePasswordDTO.setMemberId(userDTO.getMember().getMemberId());
-		
+
 		int result = memberService.changePassword(userDTO.getMember().getMemberId(), changePasswordDTO);
-		
-		if(result == -1) {
+
+		if (result == -1) {
 			return "현재 비밀번호가 일치하지 않습니다.";
-		} else if(result == 2) {
+		} else if (result == 2) {
 			return "현재 비밀번호와 일치합니다.";
 		}
 		return result > 0 ? "success" : "fail";
 	}
-	
-	
-	
-	
-	
+
 	@PostMapping("InActive")
 	@ResponseBody
-	public String InActive(@RequestParam("memberId") int memberId) throws Exception{
+	public String InActive(@RequestParam("memberId") int memberId) throws Exception {
 		MemberDTO memberDTO = new MemberDTO();
 		memberDTO.setMemberId(memberId);
 		memberDTO.setMemIsActive(false);
 		memberService.InActive(memberDTO);
-		
+
 		return "success";
 	}
-	
+
 	@GetMapping("sessionCheck")
 	@ResponseBody
 	public String sessionCheck() {
 		return "active";
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 	@GetMapping("/search/owner")
 	@ResponseBody
 	public List<MemberDTO> searchOwner(@RequestParam String keyword) throws Exception {
 		return memberService.searchOwner(keyword);
 	}
-	
+
 	@GetMapping("/search/manager")
 	@ResponseBody
 	public List<MemberDTO> searchManager(@RequestParam String keyword) throws Exception {
 		return memberService.searchManager(keyword);
 	}
-	
+
 }

@@ -121,6 +121,13 @@ let menu, animate;
 
 
 
+
+
+
+
+
+
+
 /* 로그인 확인 */
 	setInterval(function(){
 		fetch('/member/sessionCheck',{

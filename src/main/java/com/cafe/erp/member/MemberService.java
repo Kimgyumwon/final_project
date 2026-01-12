@@ -42,41 +42,33 @@ public class MemberService {
 		return memberDAO.login(memberId);
 	}
 	
-	
+	// 조직도(사원 목록)
 	public List<MemberDTO> chatList(Map<String, Object> val) throws Exception{
 		return memberDAO.chatList(val);
 	}
 	
-	
-	public Map<String, Object> deptMemberCount(){
-		List<Map<String, Object>> list = memberDAO.deptMemberCount();
-		int total = memberDAO.totalMemberCount();
-		
-		Map<String, Object> count = new HashMap<>();
-		for (Map<String, Object> map : list) {
-	        count.put((String) map.get("deptCode"), map.get("count"));
-	    }
-	    
-	    count.put("total", total); 
-	    return count;
+	// 부서별 사원 수 조회
+	public List<Map<String, Object>> deptMemberCount(){
+	    return memberDAO.deptMemberCount();
 	}
 	
-	public List<MemberDTO> list(MemberDTO memberDTO) throws Exception {
-		return memberDAO.list(memberDTO);
-	}
-	
+	// 전체 사원 수
 	public int countAllMember(MemberDTO memberDTO )throws Exception {
 		return memberDAO.countAllMember(memberDTO);
 	}
-
 	
+	// 전체 활성화 사원 수
 	public int countActiveMember(MemberDTO memberDTO) throws Exception{
 		return memberDAO.countActiveMember(memberDTO);
 	}
 	
+	// 관리자 전체 사원 목록
+	public List<MemberDTO> list(MemberDTO memberDTO) throws Exception {
+		return memberDAO.list(memberDTO);
+	}
 	
 	
-	
+	// 사원 추가
 	public int add(MemberDTO memberDTO) throws Exception{
 		String year = LocalDate.now().format(DateTimeFormatter.ofPattern("yy"));
 		String id = memberDTO.getIdPrefix() + year;
@@ -191,6 +183,7 @@ public class MemberService {
 	public List<MemberDTO> searchManager(String keyword) throws Exception {
 		return memberDAO.searchManager(keyword);
 	}
+
 	
 	
 

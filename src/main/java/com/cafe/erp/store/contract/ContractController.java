@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cafe.erp.security.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,18 +26,34 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ContractController {
 	
 	@Autowired ContractService contractService;
-	
-	@GetMapping("list")
-	public String contractList(ContractSearchDTO searchDTO, Model model) throws Exception {
-		List<ContractDTO> contractList = contractService.list(searchDTO);
-		model.addAttribute("list", contractList);
-		model.addAttribute("pager", searchDTO);
 
-		return "store/tab_contract";
+	@GetMapping("list")
+	public String List(ContractSearchDTO searchDTO, Model model, Authentication authentication) throws Exception {
+		UserDTO user = (UserDTO) authentication.getPrincipal();
+		String memberId = user.getUsername();
+
+		if (memberId.startsWith("2")) {
+			if (user.getStore() != null) {
+				searchDTO.setSearchStoreId(user.getStore().getStoreId());
+			} else {
+				searchDTO.setSearchStoreId(-1);
+			}
+
+			List<ContractDTO> contractList = contractService.list(searchDTO);
+			model.addAttribute("list", contractList);
+			model.addAttribute("pager", searchDTO);
+
+			return "view_store/store/contract";
+		} else {
+			List<ContractDTO> contractList = contractService.list(searchDTO);
+			model.addAttribute("list", contractList);
+			model.addAttribute("pager", searchDTO);
+
+			return "store/tab_contract";
+		}
 	}
 	
-	
-	@PostMapping("add") 
+	@PostMapping("add")
 	@ResponseBody
 	public Map<String, Object> addContract(@ModelAttribute ContractDTO contractDTO, 
 			@RequestParam(value = "files", required = false) List<MultipartFile> files) throws Exception { 
@@ -81,7 +99,18 @@ public class ContractController {
 	}
 	
 	@GetMapping("downloadExcel")
-	public void downloadExcel(ContractSearchDTO searchDTO, HttpServletResponse response) throws Exception {
+	public void downloadExcel(ContractSearchDTO searchDTO, HttpServletResponse response, Authentication authentication) throws Exception {
+		UserDTO user = (UserDTO) authentication.getPrincipal();
+		String memberId = user.getUsername();
+
+		if (memberId.startsWith("2")) {
+			if (user.getStore() != null) {
+				searchDTO.setSearchStoreId(user.getStore().getStoreId());
+			} else {
+				searchDTO.setSearchStoreId(-1);
+			}
+		}
+
 		List<ContractDTO> list = contractService.excelList(searchDTO);
 		String[] headers = {"ID", "가맹점ID", "가맹점명", "점주ID", "점주명", "주소", 
 				            "로얄티", "여신(보증금)", "계약시작일", "계약종료일", "계약상태", "생성일시", "수정일시"};

@@ -29,31 +29,56 @@
   	
   	<sql id="receivableSourceTypeFilter">
 	  <where>
-	    <if test="sourceType == 'CONTRACT'">
-	      EXISTS (
-	        SELECT 1
-	        FROM receivable r2
-	        JOIN store_contract c2
-	          ON r2.contract_id = c2.contract_id
-	        WHERE r2.receivable_type = 'R'
-	          AND r2.contract_id IS NOT NULL
-	          AND c2.store_id = t.store_id
-	          AND DATE_FORMAT(r2.receivable_date, '%Y-%m') = t.base_month
-	      )
-	    </if>
-	
-	    <if test="sourceType == 'ORDER'">
-	      EXISTS (
-	        SELECT 1
-	        FROM receivable r2
-	        JOIN order_store so2
-	          ON r2.store_order_id = so2.store_order_id
-	        WHERE r2.receivable_type = 'R'
-	          AND r2.store_order_id IS NOT NULL
-	          AND so2.store_id = t.store_id
-	          AND DATE_FORMAT(r2.receivable_date, '%Y-%m') = t.base_month
-	      )
-	    </if>
+		<if test="sourceType == 'CONTRACT'">
+		  EXISTS (
+		    SELECT 1
+		    FROM receivable r2
+		    LEFT JOIN (
+		      SELECT
+		        r3.receivable_id,
+		        r3.receivable_total_amount
+		        - IFNULL(SUM(rt.transaction_amount), 0) AS remain_amount
+		      FROM receivable r3
+		      LEFT JOIN receivable_transaction rt
+		        ON r3.receivable_id = rt.receivable_id
+		       AND rt.transaction_type = 'C'
+		      WHERE r3.receivable_type = 'R'
+		      GROUP BY r3.receivable_id, r3.receivable_total_amount
+		    ) rb2
+		      ON r2.receivable_id = rb2.receivable_id
+		    JOIN store_contract c2
+		      ON r2.contract_id = c2.contract_id
+		    WHERE
+		      c2.store_id = t.store_id
+		      AND DATE_FORMAT(r2.receivable_date, '%Y-%m') = t.base_month
+		      AND rb2.remain_amount > 0
+		  )
+		</if>
+		<if test="sourceType == 'ORDER'">
+		  EXISTS (
+		    SELECT 1
+		    FROM receivable r2
+		    LEFT JOIN (
+		      SELECT
+		        r3.receivable_id,
+		        r3.receivable_total_amount
+		        - IFNULL(SUM(rt.transaction_amount), 0) AS remain_amount
+		      FROM receivable r3
+		      LEFT JOIN receivable_transaction rt
+		        ON r3.receivable_id = rt.receivable_id
+		       AND rt.transaction_type = 'C'
+		      WHERE r3.receivable_type = 'R'
+		      GROUP BY r3.receivable_id, r3.receivable_total_amount
+		    ) rb2
+		      ON r2.receivable_id = rb2.receivable_id
+		    JOIN order_store so2
+		      ON r2.store_order_id = so2.store_order_id
+		    WHERE
+		      so2.store_id = t.store_id
+		      AND DATE_FORMAT(r2.receivable_date, '%Y-%m') = t.base_month
+		      AND rb2.remain_amount > 0   <!-- 🔥 이게 핵심 -->
+		  )
+		</if>
 	  </where>
 	</sql>
   	
@@ -178,8 +203,58 @@
 	  ) t
 	
 	  <include refid="receivableSourceTypeFilter"/>
+	</select>
+	
+	<select id="getSummary"
+	        parameterType="ReceivableSearchDTO"
+	        resultType="ReceivableSummaryDTO">
+	
+	  SELECT
+	    COALESCE(SUM(remain_amount), 0) AS totalUnpaidAmount,
+	    COUNT(*) AS receivableCount
+	
+	  FROM (
+	    SELECT
+	      r.receivable_id,
+	
+	      (
+	        r.receivable_total_amount
+	        - COALESCE(SUM(rt.transaction_amount), 0)
+	      ) AS remain_amount
+	
+	    FROM receivable r
+	
+	    LEFT JOIN receivable_transaction rt
+	      ON r.receivable_id = rt.receivable_id
+	     AND rt.transaction_type = 'C'
+	
+	    WHERE
+	      r.receivable_type = 'R'
+	
+	      <if test="baseMonth != null and baseMonth != ''">
+	        AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
+	      </if>
+	
+	      <if test="sourceType == 'CONTRACT'">
+	        AND r.contract_id IS NOT NULL
+	      </if>
+	
+	      <if test="sourceType == 'ORDER'">
+	        AND (
+	          r.hq_order_id IS NOT NULL
+	          OR r.store_order_id IS NOT NULL
+	        )
+	      </if>
+	
+	    GROUP BY r.receivable_id, r.receivable_total_amount
+	  ) x
+	
+	  WHERE remain_amount > 0
 	
 	</select>
+
+
+  	
   	
   	<!-- 물품대금 미수 내역 -->
   	<select id="orderSummary" parameterType="ReceivableSummaryDTO" resultType="com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO">

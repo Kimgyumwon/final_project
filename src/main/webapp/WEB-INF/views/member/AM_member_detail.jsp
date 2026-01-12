@@ -233,6 +233,13 @@
 									                                </div>
 									                            </div>
 									                        </li>
+									                        <li class="list-group-item d-flex px-0 py-3 border-0 align-items-center">
+													            <div class="badge rounded-pill bg-label-secondary me-3 p-2"><i class='bx bx-user'></i></div>
+													            <div>
+													                <small class="text-muted d-block">이름</small>
+													                <span class="fw-semibold text-heading" id="txt-name">${dto.memName}</span>
+													            </div>
+													        </li>
 									                    </ul>
 									                </div>
 									                <div class="col-md-6">
@@ -322,6 +329,13 @@
 									                            <label class="form-label">사원 번호</label>
 									                            <input type="text" class="form-control bg-light" id="memberId" name="memberId" value="${dto.memberId}" readonly>
 									                        </div>
+									                        <div class="mb-3">
+													            <label class="form-label">이름</label>
+													            <div class="input-group input-group-merge">
+													                <span class="input-group-text"><i class='bx bx-user'></i></span>
+													                <input type="text" class="form-control" id="memName" name="memName" value="${dto.memName}" placeholder="이름을 입력하세요">
+													            </div>
+													        </div>
 									                    </div>
 									
 									                    <div class="col-md-6">

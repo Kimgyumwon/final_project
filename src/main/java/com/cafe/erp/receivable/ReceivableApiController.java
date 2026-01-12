@@ -48,5 +48,14 @@ public class ReceivableApiController {
 		service.collectReceivable(dto,userDTO.getMember().getMemberId());
 	}
 	
+	// 채권 리스트 페이지 조회 시 요약 목록
+	@PostMapping("summary")
+	@ResponseBody
+	public ReceivableSummaryDTO getSummary(ReceivableSearchDTO receivableSearchDTO) {
+		return service.getSummary(receivableSearchDTO);
+	}
+	
+	
+	
 	
 }

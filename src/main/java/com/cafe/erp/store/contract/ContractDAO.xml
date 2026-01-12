@@ -7,6 +7,10 @@
 
 	<sql id="searchCondition">
         <where>
+			<if test="searchStoreId != null">
+				AND sc.store_id = #{searchStoreId}
+			</if>
+
             <if test="searchContractStatus != null">
                 AND sc.contract_status = #{searchContractStatus}
             </if>

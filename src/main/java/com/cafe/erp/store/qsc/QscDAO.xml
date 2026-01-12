@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.cafe.erp.store.qsc.QscDAO">
+
+	<sql id="searchQuestionCondition">
+		<where>
+			<if test="searchCategory != null and searchCategory != ''">
+				AND list_category = #{searchCategory}
+			</if>
+
+			<if test="searchIsUse != null">
+				AND list_is_use = #{searchIsUse}
+			</if>
+
+			<if test="searchQuestion != null and searchQuestion != ''">
+				AND list_question LIKE CONCAT('%', #{searchQuestion}, '%')
+			</if>
+		</where>
+	</sql>
+
+	<select id="questionList" parameterType="QscQuestionSearchDTO" resultType="QscQuestionDTO">
+		SELECT * FROM qsc_list
+		<include refid="searchQuestionCondition" />
+		ORDER BY list_id
+		LIMIT #{startNum}, #{perPage}
+	</select>
+
+	<select id="questionCount" parameterType="QscQuestionSearchDTO" resultType="Long">
+		SELECT COUNT(list_id)
+		FROM qsc_list
+		<include refid="searchQuestionCondition" />
+	</select>
+
+	<insert id="addQuestion" parameterType="QscQuestionDTO">
+		INSERT INTO qsc_list VALUE (null, #{listCategory}, #{listQuestion}, #{listMaxScore}, 1)
+	</insert>
+
+	<select id="excelQuestionList" parameterType="QscQuestionSearchDTO" resultType="QscQuestionDTO">
+		SELECT * FROM qsc_list
+		<include refid="searchQuestionCondition" />
+		ORDER BY list_id
+	</select>
+
+	<sql id="searchQscCondition">
+		<where>
+			<if test="searchStoreId != null">
+				AND q.store_id = #{searchStoreId}
+			</if>
+
+			<if test="searchStoreName != null and searchStoreName != ''">
+				AND s.store_name = #{searchStoreName}
+			</if>
+
+			<if test="searchMemberId != null">
+				AND q.member_id = #{searchMemberId}
+			</if>
+
+			<if test="searchQscTitle != null and searchQscTitle != ''">
+				AND q.qsc_title LIKE CONCAT('%', #{searchQscTitle}, '%')
+			</if>
+
+			<if test="searchStartDate != null">
+				AND q.qsc_date >= CONCAT(#{searchStartDate}, ' 00:00:00')
+			</if>
+
+			<if test="searchEndDate != null">
+				AND q.qsc_date &lt;= CONCAT(#{searchEndDate}, ' 23:59:59')
+			</if>
+
+			<if test="searchQscGrade != null and searchQscGrade != ''">
+				AND q.qsc_grade = #{searchQscGrade}
+			</if>
+		</where>
+	</sql>
+
+	<select id="qscCount" parameterType="QscSearchDTO" resultType="Long">
+		SELECT COUNT(q.qsc_id)
+		FROM qsc q LEFT JOIN store s ON q.store_id = s.store_id
+		<include refid="searchQscCondition" />
+	</select>
+
+	<select id="qscList" parameterType="QscSearchDTO" resultType="QscDTO">
+		SELECT
+			q.qsc_id,
+			q.store_id,
+			q.member_id,
+			q.qsc_title,
+			q.qsc_date,
+			q.qsc_grade,
+			s.store_name,
+			m.mem_name
+		FROM qsc q
+		LEFT JOIN store s ON q.store_id = s.store_id
+		LEFT JOIN member m ON q.member_id = m.member_id
+		<include refid="searchQscCondition" />
+		ORDER BY q.qsc_id DESC
+		LIMIT #{startNum}, #{perPage}
+	</select>
+
+
+</mapper>

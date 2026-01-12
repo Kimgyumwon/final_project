@@ -1,5 +1,6 @@
 let currentDeptFilter = 0; 
 let currentDeptName = "전체 사원";
+let searchTimer = null; // 검색어 입력 딜레이를 위한 타이머 변수
 
 $(document).ready(function() {
     renderTable(0);
@@ -14,20 +15,26 @@ $(document).ready(function() {
         if(deptName.startsWith("└")) deptName = deptName.substring(1).trim();
         currentDeptName = deptName;
 
+        $("#searchMember").val(''); 
+
         renderTable(currentDeptFilter, currentDeptName);
     });
 
     $("#searchMember").on("keyup", function() {
-        renderTable(currentDeptFilter, currentDeptName);
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            renderTable(currentDeptFilter, currentDeptName);
+        }, 300);
     });
+
     $("#checkRetired").change(function() {
         renderTable(currentDeptFilter, currentDeptName);
     });
 });
 
 function renderTable(deptCode, deptName = currentDeptName) {
-    let isRetiredIncluded = $("#checkRetired").is(":checked"); 
     let searchKeyword = $("#searchMember").val();
+    let isRetiredIncluded = $("#checkRetired").is(":checked"); 
 
     if (deptCode == 0) {
         $("#selectedDeptTitle").text("전체 사원");
@@ -36,11 +43,11 @@ function renderTable(deptCode, deptName = currentDeptName) {
     }
 
     $.ajax({
-        url: "/member/checkCount",
+        url: "/member/checkCount", 
         type: "GET",
         data: { 
             deptCode: deptCode, 
-            includeRetired: isRetiredIncluded,
+            includeRetired: isRetiredIncluded, 
             keyword: searchKeyword
         },
         success: function(data) {
@@ -56,7 +63,7 @@ function drawTable(memberList) {
     const tbody = $("#memberTableBody");
     tbody.empty();
 
-    $("#selectedDeptCount").text(`총 ${memberList.length}명`);
+    $("#selectedDeptCount").text(`(총 ${memberList.length}명)`);
 
     if (memberList.length === 0) {
         $("#noDataMessage").show();
@@ -65,32 +72,40 @@ function drawTable(memberList) {
     }
 
     memberList.forEach(member => {
+        let profileImg = member.memProfileSavedName 
+            ? `/fileDownload/profile?fileSavedName=${member.memProfileSavedName}` 
+            : '/fileDownload/profile/default_img.jpg'; 
+
         let statusBadge = '';
-		if(member.memIsActive == 'Y' || member.memIsActive == 1 || member.memIsActive == true) {
-		        statusBadge = '<span class="badge bg-label-success">재직</span>';
-		    } else {
-		        statusBadge = '<span class="badge bg-label-danger">퇴사</span>';
-		    }
+        if(member.memIsActive == 'Y' || member.memIsActive == 1 || member.memIsActive === true) {
+            statusBadge = '<span class="badge bg-label-success">재직</span>';
+        } else {
+            statusBadge = '<span class="badge bg-label-secondary">퇴사</span>';
+        }
 
         const row = `
             <tr>
                 <td>
-                    <div class="d-flex align-items-center">
-                        <div class="avatar avatar-sm me-2">
-                            <img src="/fileDownload/profile?fileSavedName=${member.memProfileSavedName}" ... >
-                        </div>
-                        <div>
-                            <h6 class="mb-0 text-truncate">${member.memName}</h6>
-                            <small class="text-muted">${member.memberId}</small>
+                    <div class="user-wrapper">
+                        <img src="${profileImg}" alt="Avatar" class="user-avatar">
+                        <div class="user-info">
+                            <h6>${member.memName}</h6>
+                            <small>${member.memberId}</small>
                         </div>
                     </div>
                 </td>
-                <td>${member.memDeptName || '-'}</td>
-                <td><span class="fw-semibold">${member.memPositionName || '-'}</span></td>
-                <td>${statusBadge}</td>
-                <td>${member.memPhone || ''}</td>
+                <td>
+                    <span class="text-body fw-medium">${member.memDeptName || '-'}</span>
+                </td>
+                <td>
+                    <span class="position-badge">${member.memPositionName || '-'}</span>
+                </td>
+                <td class="text-center">${statusBadge}</td>
+                <td>
+                    <span class="text-muted" style="font-family:inherit;">${member.memPhone || ''}</span>
+                </td>
                 <td class="text-center">
-                    <button onclick="openMemberDetail('${member.memberId}')" class="btn btn-sm btn-icon btn-outline-secondary" title="상세 정보">
+                    <button onclick="openMemberDetail('${member.memberId}')" class="btn btn-icon btn-sm btn-label-secondary" title="상세 정보">
                         <i class="bx bx-show"></i>
                     </button>
                 </td>
@@ -102,8 +117,8 @@ function drawTable(memberList) {
 
 
 function openMemberDetail(id) {
-    console.log("상세보기 클릭:", id);
     const myModal = new bootstrap.Modal(document.getElementById('modalMemberDetail'));
+    $("#modalId").val(id);
     myModal.show();
 }
 
@@ -116,20 +131,6 @@ function openDeptEdit(event, deptId, deptName) {
     $("#editDeptId").val(deptId);
     $("#editDeptName").val(deptName);
     new bootstrap.Modal(document.getElementById('modalDeptEdit')).show();
-}
-
-function deleteDept(event, deptId) {
-    event.stopPropagation();
-    if(confirm("정말 이 부서를 삭제하시겠습니까?")) {
-        alert("삭제 요청: " + deptId);
-    }
-}
-
-function openAuthModal(event, deptId, deptName) {
-    event.stopPropagation();
-    $("#authTargetDept").text(deptName);
-    $("#authTargetDeptId").val(deptId);
-    new bootstrap.Modal(document.getElementById('modalAuth')).show();
 }
 
 function saveAuth() {

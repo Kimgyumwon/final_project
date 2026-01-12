@@ -97,6 +97,11 @@ public class ReceivableService {
 		return list;
 	}
 	
+	// 채권 리스트 페이지 조회 시 금액 요약
+	public ReceivableSummaryDTO getSummary(ReceivableSearchDTO receivableSearchDTO) {
+		return dao.getSummary(receivableSearchDTO);
+	}
+	
 	
 	// detail page 물품대금 미수 내역 리스트
 	public List<ReceivableItemDTO > receivableItem(String receivableId) {
@@ -153,9 +158,5 @@ public class ReceivableService {
 	public List<ReceivableAvailableDTO> getAvailableReceivables(ReceivableSummaryDTO receivableSummaryDTO) {
 		return dao.getAvailableReceivables(receivableSummaryDTO);
 	}
-	
-	
-	
-	
 	
 }

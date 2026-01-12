@@ -21,17 +21,8 @@
 
     <style>
         /* 헤더(Navbar) 스타일 보정 */
-        .layout-navbar {
-            height: 4rem; /* 헤더 높이 살짝 조정 */
-            z-index: 1000; /* 항상 위에 */
-        }
-        .header-clock {
-            font-size: 0.85rem;
-            color: #697a8d;
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
-            margin-right: 15px;
-        }
+        .layout-navbar { height: 4rem;  z-index: 1000; }
+        .header-clock { font-size: 0.85rem; color: #697a8d; font-family: 'Courier New', monospace; font-weight: 600; margin-right: 15px;}
         
         /* 본문 스타일 */
         body { font-size: 0.9rem; }

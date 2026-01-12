@@ -137,6 +137,39 @@
 				</div>
 				<!-- 조회 조건 끝 -->
 				
+				<!-- ================= 전체 미수금 요약 ================= -->
+				<div id="summaryArea" class="row mb-4 d-none">
+				
+				  <div class="col-md-4">
+				    <div class="card h-100">
+				      <div class="card-body">
+				        <div class="text-muted small">총 미수금</div>
+				        <h4 class="fw-bold text-danger mb-0" id="totalUnpaidAmount">0</h4>
+				      </div>
+				    </div>
+				  </div>
+				
+				  <div class="col-md-4">
+				    <div class="card h-100">
+				      <div class="card-body">
+				        <div class="text-muted small">미수 채권 수</div>
+				        <h4 class="fw-bold mb-0" id="receivableCount">0</h4>
+				      </div>
+				    </div>
+				  </div>
+				
+				  <div class="col-md-4">
+				    <div class="card h-100">
+				      <div class="card-body">
+				        <div class="text-muted small">기준 월</div>
+				        <h4 class="fw-bold mb-0" id="summaryBaseMonth">-</h4>
+				      </div>
+				    </div>
+				  </div>
+				
+				</div>
+
+				
 				<div class="card">
 				  <div class="card-header d-flex justify-content-between align-items-center">
 				    <h5 class="mb-0">채권 목록 (미수금)</h5>
@@ -184,6 +217,26 @@
     <script src="/vendor/js/bootstrap.js"></script>
     <script src="/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
     <script src="/vendor/js/menu.js"></script>
+    
+    
+    <!-- 웹 소켓 테스트 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+	
+	<script>
+	  const socket = new SockJS("/ws");
+	  const stompClient = Stomp.over(socket);
+	
+	  stompClient.connect({}, () => {
+	    console.log("웹소켓 연결 성공");
+	
+	    stompClient.subscribe("/sub/notifications/1", (message) => {
+	      console.log("알람 수신:", message.body);
+	    });
+	  });
+	</script>
+    <!-- 웹 소켓 테스트 -->
+    
     
     
     

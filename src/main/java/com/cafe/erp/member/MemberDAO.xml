@@ -34,56 +34,78 @@
             M.mem_hire_date ASC
 	</select>
 	
+	
+	
+	
 	<select id="countAllMember" resultType="int">
 	    SELECT COUNT(*) FROM member
 	</select>
 	
 	<select id="countActiveMember" resultType="int">
-	    SELECT COUNT(*) FROM member WHERE mem_is_active = 1
+	    SELECT COUNT(*) FROM member WHERE mem_is_active = '1'
 	</select>
 	
 	
 	
 	<select id="chatList" resultType="MemberDTO">
 		SELECT 
-            M.member_id, M.mem_password, M.mem_name, M.mem_zip_code, M.mem_address_detail, M.mem_email, M.mem_phone, M.mem_hire_date, M.mem_left_date, M.mem_is_active, 
-            M.dept_code, M.position_code, P.mem_position_sequence, D.mem_dept_name, P.mem_position_name
+            M.member_id, M.mem_password, M.mem_name, M.mem_zip_code, M.mem_address_detail, M.mem_email, 
+            M.mem_phone, M.mem_hire_date, M.mem_left_date, M.mem_is_active, M.dept_code, M.position_code, 
+            P.mem_position_sequence, D.mem_dept_name, P.mem_position_name, MP.mem_profile_saved_name
         FROM 
             member M  
-            LEFT JOIN member_dept D ON M.dept_code = D.member_dept_code
-            LEFT JOIN member_position P ON M.position_code = P.member_position_code
+        LEFT JOIN 
+        	member_dept D ON M.dept_code = D.member_dept_code
+        LEFT JOIN 
+        	member_position P ON M.position_code = P.member_position_code
+        LEFT JOIN
+        	member_profile MP ON M.member_id = MP.member_id
             
-            <where>
-            	<if test="deptCode != 0">
-		            AND M.dept_code = #{deptCode}
-		        </if>
-		
-		        <if test="check != true">
-		            AND M.mem_is_active = 'Y' OR M.mem_is_active = '1' </if>
-            </where>
-            
-            ORDER BY
-            	mem_is_active DESC,
-            CASE	
-                WHEN M.member_id = 999999 OR M.position_code = 99 THEN 0  
-                WHEN M.position_code = 17 THEN 999                        
-                ELSE P.mem_position_sequence END ASC,
-            M.mem_hire_date ASC
+        <where>
+        	<if test="deptCode != 0">
+        		AND M.dept_code = #{deptCode}
+    	    </if>
+
+	        <if test="check != true">
+	       		AND  M.mem_is_active = '1' 
+	       	</if>
+	       	
+	       	<if test="keyword != null and keyword != ''">
+	       		AND(
+	       			M.mem_name LIKE CONCAT ('%', #{keyword}, '%') OR
+	       			M.member_id LIKE CONCAT ('%', #{keyword}, '%')
+	       		)
+	       	</if>
+        </where>
+        
+        ORDER BY
+        	mem_is_active DESC,
+        CASE	
+            WHEN M.member_id = 999999 OR M.position_code = 99 THEN 0  
+            WHEN M.position_code = 17 THEN 999                        
+            ELSE P.mem_position_sequence END ASC,
+        M.mem_hire_date ASC
 	</select>
 	
-	<select id="deptMemberCount" resultType="map">
-		SELECT dept_code, COUNT(*) as count
-		 FROM member
-		 WHERE mem_is_active = true
-		 GROUP BY dept_code
+	<select id="deptMemberCount" resultType="DeptCountDTO">
+		SELECT
+			 M.dept_code, 
+			 D.mem_dept_name, 
+			 COUNT(M.member_id) as count
+		 FROM
+			 member M
+		 JOIN 
+			 member_dept D ON M.dept_code = D.member_dept_code
+		 WHERE
+			mem_is_active = '1'
+		 GROUP BY 
+		 	dept_code, D.mem_dept_name
+		 ORDER BY
+		 	M.dept_code ASC
 	</select>
 	
-	<select id="totalMemberCount" resultType="int">
-		SELECT COUNT(*) as count
-		FROM member 
-		WHERE mem_is_active = true
-	</select>
 	
+	<!-- 사원 추가 시 자동 증가 -->
 	<select id="getMemberId" parameterType="String" resultType="String">
         SELECT MAX(member_id) 
         FROM member 
@@ -135,6 +157,7 @@
 	<update id="update" parameterType="MemberDTO">
         UPDATE member
         SET
+        	mem_name = #{memName},
             mem_zip_code = #{memZipCode},
             mem_address = #{memAddress},
             mem_address_detail = #{memAddressDetail},

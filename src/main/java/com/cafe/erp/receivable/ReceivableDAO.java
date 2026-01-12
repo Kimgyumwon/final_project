@@ -20,6 +20,9 @@ public interface ReceivableDAO {
 	public List<ReceivableSummaryDTO> receivableSearchList(
 			ReceivableSearchDTO receivableSearchDTO
 			);
+	// 조회된 리스트 금액 요약
+	public ReceivableSummaryDTO getSummary(ReceivableSearchDTO receivableSearchDTO);
+	
 	// 페이지 네이션 총 페이지 수
 	public Long receivableSearchCount(
 			ReceivableSearchDTO receivableSearchDTO

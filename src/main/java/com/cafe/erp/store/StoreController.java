@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,13 +83,16 @@ public class StoreController {
 	}
 	
 	@GetMapping("detail")
-	public String detail(StoreDTO storeDTO, Model model) throws Exception {
+	public String detail(StoreDTO storeDTO, Model model, Authentication authentication) throws Exception {
 		storeDTO = storeService.detail(storeDTO);
 		List<StoreManageDTO> manageList = storeService.manageList(storeDTO);
 		
 		model.addAttribute("store", storeDTO);
 		model.addAttribute("kakaoKey", kakaoKey);
 		model.addAttribute("manageList", manageList);
+
+		String memberId = authentication.getName();
+		if (memberId.startsWith("2")) return "view_store/store/info";
 		
 		return "store/detail";
 	}
@@ -117,6 +121,11 @@ public class StoreController {
 	@ResponseBody
 	public List<StoreDTO> searchStore(@RequestParam String keyword) throws Exception {
 		return storeService.searchStore(keyword);
+	}
+
+	@GetMapping("notFound")
+	public String notFound() {
+		return "error/store_not_found";
 	}
 
 }

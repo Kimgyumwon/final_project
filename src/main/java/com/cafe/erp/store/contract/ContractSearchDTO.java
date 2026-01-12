@@ -25,5 +25,8 @@ public class ContractSearchDTO extends Pager {
 	private Integer searchRoyaltyMax;
 	private Integer searchDepositMin;
 	private Integer searchDepositMax;
+
+	// 분기용
+	private Integer searchStoreId;
 	
 }

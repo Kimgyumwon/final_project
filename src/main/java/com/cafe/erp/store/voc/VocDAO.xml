@@ -6,12 +6,16 @@
 
 	<sql id="searchCondition">
         <where>
-            <if test="vocType != null and vocType != ''">
-                AND v.voc_type = #{vocType}
+			<if test="searchStoreId != null">
+				AND v.store_id = #{searchStoreId}
+			</if>
+
+            <if test="searchVocType != null and searchVocType != ''">
+                AND v.voc_type = #{searchVocType}
             </if>
             
-            <if test="vocStatus != null">
-                AND v.voc_status = #{vocStatus}
+            <if test="searchVocStatus != null">
+                AND v.voc_status = #{searchVocStatus}
             </if>
             
             <if test="searchStartDate != null">
@@ -22,12 +26,12 @@
 	            AND v.voc_created_at &lt;= CONCAT(#{searchEndDate}, ' 23:59:59')
 	        </if>
 	        
-	        <if test="storeName != null and storeName != ''">
-                AND s.store_name LIKE CONCAT('%', #{storeName}, '%')
+	        <if test="searchStoreName != null and searchStoreName != ''">
+                AND s.store_name LIKE CONCAT('%', #{searchStoreName}, '%')
             </if>
 	
-	        <if test="vocTitle != null and vocTitle != ''">
-                AND v.voc_title LIKE CONCAT('%', #{vocTitle}, '%')
+	        <if test="searchVocTitle != null and searchVocTitle != ''">
+                AND v.voc_title LIKE CONCAT('%', #{searchVocTitle}, '%')
             </if>
     	</where>
     </sql>
@@ -51,10 +55,26 @@
 		LIMIT #{startNum}, #{perPage}
 	</select>
 	
-	<insert id="add" parameterType="VocDTO">
+	<insert id="add" parameterType="VocDTO" useGeneratedKeys="true" keyProperty="vocId">
 		INSERT INTO voc(member_id, store_id, voc_title , voc_type, voc_contact, voc_contents, voc_status, voc_created_at, voc_updated_at) 
 		VALUES (#{memberId}, #{storeId}, #{vocTitle}, #{vocType}, #{vocContact}, #{vocContents}, 0, now(), now())
 	</insert>
+	<!-- 알림 용 가맹점주 정보 -->
+	<select id="vocOnwerInfo" parameterType="VocDTO" resultType="VocDTO">
+	    SELECT
+	        m.member_id AS ownerId,
+	        m.mem_name  AS ownerName
+	    FROM store s
+	    JOIN member m
+	        ON m.member_id = s.member_id
+	    WHERE s.store_id = #{storeId}
+	</select>
+	<!-- 알림 용 voc 작성자 조회 -->
+	<select id="findWriterName" parameterType="int" resultType="string">
+	    SELECT mem_name
+	    FROM member
+	    WHERE member_id = #{memberId}
+	</select>
 	
 	<select id="detail" parameterType="Integer" resultType="VocDTO">
 		SELECT 

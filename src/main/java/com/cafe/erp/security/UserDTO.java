@@ -3,6 +3,7 @@ package com.cafe.erp.security;
 import java.util.Collection;
 import java.util.Objects;
 
+import com.cafe.erp.store.StoreDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,14 +14,22 @@ public class UserDTO implements UserDetails{
 
 	@Autowired
 	private MemberDTO member;
+	@Autowired
+	private StoreDTO store;
 	
 	public UserDTO(MemberDTO memberDTO) {
+		this(memberDTO, null);
+	}
+
+	public UserDTO(MemberDTO memberDTO, StoreDTO storeDTO) {
 		this.member = memberDTO;
-	} 
+		this.store = storeDTO;
+	}
 	
 	public MemberDTO getMember() {
 		return member;
 	}
+	public StoreDTO getStore() { return store; }
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

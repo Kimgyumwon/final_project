@@ -36,7 +36,9 @@ function searchReceivables() {
   // 조회 전 안내 숨기기
   document.getElementById('emptyMessage').classList.add('d-none');
   document.getElementById('receivableTableArea').classList.remove('d-none');
-
+	
+  
+  
   fetch('/receivable/search', {
     method: 'POST',
     body: formData
@@ -50,6 +52,7 @@ function searchReceivables() {
   .catch(err => {
     alert('시스템 오류가 발생했습니다.');
   });
+  fetchSummary(formData);
 }
 
 
@@ -60,4 +63,41 @@ function onSearchClick() {
   searchReceivables();
 }
 
+
+/* ================================
+ * 요약 조회
+ * ================================ */
+function fetchSummary(formData) {
+  fetch('/receivable/summary', {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.json())
+    .then(summary => {
+      renderSummary(summary);
+    })
+    .catch(err => {
+      console.error('summary 조회 실패', err);
+    });
+}
+
+/* ================================
+ * 요약 렌더링
+ * ================================ */
+function renderSummary(summary) {
+  // 총 미수금
+  document.getElementById('totalUnpaidAmount').innerText =
+    Number(summary.totalUnpaidAmount || 0).toLocaleString();
+
+  // 미수 채권 수
+  document.getElementById('receivableCount').innerText =
+    (summary.receivableCount || 0) + '건';
+
+  // 기준 월 (입력값 그대로 표시)
+  document.getElementById('summaryBaseMonth').innerText =
+    document.getElementById('baseMonth').value || '-';
+
+  // 영역 표시
+  document.getElementById('summaryArea').classList.remove('d-none');
+}
 

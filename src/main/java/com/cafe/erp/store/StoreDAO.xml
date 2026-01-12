@@ -152,5 +152,9 @@
 		INSERT INTO store_manager_history
 		VALUE (null, #{storeId}, #{memberId}, #{manageStartDate}, null)
 	</insert>
+
+	<select id="findByMemberId" parameterType="int" resultType="StoreDTO">
+		SELECT * FROM store WHERE member_id = #{memberId}
+	</select>
 	
 </mapper>

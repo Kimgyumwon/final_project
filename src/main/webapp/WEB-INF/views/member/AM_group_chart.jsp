@@ -15,40 +15,10 @@
     <link rel="stylesheet" href="/vendor/css/theme-default.css" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="/css/demo.css" />
     <link rel="stylesheet" href="/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    
     <script src="/vendor/js/helpers.js"></script>
     <script src="/js/config.js"></script>
 
-    <style>
-        .dept-item { cursor: pointer; transition: all 0.2s; }
-        .dept-item:hover { background-color: #f5f5f9; }
-        .dept-item.active { background-color: #696cff !important; color: white !important; border-color: #696cff; }
-        .sub-dept { padding-left: 2rem !important; font-size: 0.95rem; }
-	    .dept-right-group {
-	        display: flex;
-	        align-items: center;
-	        gap: 8px; 
-	    }
-	
-	    .dept-actions { 
-	        display: none; 
-	    }
-	    
-	    .dept-item:hover .dept-actions { 
-	        display: flex; 
-	        align-items: center;
-	    }
-        .btn-action-icon { padding: 0 5px; color: #8592a3; transition: color 0.2s; }
-        .btn-action-icon:hover { color: #696cff; transform: scale(1.1); }
-        .btn-action-icon.delete:hover { color: #ff3e1d; }
-        .dept-item.active .btn-action-icon { color: #e0e0e0; }
-        .dept-item.active .btn-action-icon:hover { color: #fff; }
-        
-        /* 상세 모달 스타일 커스텀 */
-        .modal-header-tabs .nav-link { color: #697a8d; font-weight: 500; }
-        .modal-header-tabs .nav-link.active { background-color: #696cff; color: #fff; }
-        .form-label { font-weight: 600; color: #566a7f; font-size: 0.85rem; }
-        .readonly-input { background-color: #f5f5f9 !important; cursor: not-allowed; }
-    </style>
 </head>
 
 <body>
@@ -68,167 +38,119 @@
 
                     <div class="row">
                         <div class="col-md-4 col-lg-3 mb-4">
-                            <div class="card h-100">
-								<div class="card-header d-flex justify-content-between align-items-center">
-								    <h5 class="mb-0 fw-bold"><i class='bx bx-buildings me-2'></i>부서 목록</h5>
-								
-								    <div class="d-flex align-items-center gap-2">
-								        <div class="form-check form-switch mb-0"> <input class="form-check-input" type="checkbox" id="checkRetired">
-								            <label class="form-check-label" for="checkRetired">퇴사</label>
-								        </div>
-								
-								        <button type="button" class="btn btn-sm btn-icon btn-outline-primary" 
-								                data-bs-toggle="modal" data-bs-target="#modalDeptAdd" title="부서 추가">
-								            <i class='bx bx-plus'></i>
-								        </button>
-								    </div>
-								</div>
-                                <div class="card-body p-0">
-	                                    <div class="list-group list-group-flush" id="deptList">
-										    <a class="list-group-item list-group-item-action dept-item active" data-dept="0">
-											    <div class="d-flex w-100 justify-content-between align-items-center">
-											        <span><i class='bx bx-globe me-2'></i> 전체 사원</span>
-											        <span class="badge bg-label-primary rounded-pill">${count.total}</span>
-											    </div>
-											</a>
-										
-										    <div class="list-group-item fw-bold bg-light d-flex justify-content-between align-items-center" style="pointer-events: none;">
-										        경영지원
-										    </div>
-										
-										    <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="20" data-name="임원">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ 임원</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['20']}</span>
-										            </div>
-										        </div>
-										    </a>
-										
-										    <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="10" data-name="인사팀">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ 인사팀</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['10']}</span>
-										            </div>
-										        </div>
-										    </a>
-										
-										    <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="11" data-name="회계팀">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ 회계팀</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['11']}</span>
-										            </div>
-										        </div>
-										    </a>
-										
-										    <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="12" data-name="재무팀">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ 재무팀</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['12']}</span>
-										            </div>
-										        </div>
-										    </a>
-										
-										
-										    <div class="list-group-item fw-bold bg-light d-flex justify-content-between align-items-center" style="pointer-events: none;">
-										        영업/마케팅
-										    </div>
-										
-										    <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="13" data-name="영업팀">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ 영업팀</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['13']}</span>
-										            </div>
-										        </div>
-										    </a>
-										
-										    <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="14" data-name="CS팀">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ CS팀</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['14']}</span>
-										            </div>
-										        </div>
-										    </a>
-										
-										    <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="15" data-name="마케팅팀">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ 마케팅팀</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['15']}</span>
-										            </div>
-										        </div>
-										    </a>
-										    
-										   
-										
-										
-										    <div class="list-group-item fw-bold bg-light d-flex justify-content-between align-items-center" style="pointer-events: none;">
-										        기술
-										    </div>
-										
-										    <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="16" data-name="식품개발팀">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ 식품개발팀</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['16']}</span>
-										            </div>
-										        </div>
-										    </a>
-										    
-										    <div class="list-group-item fw-bold bg-light d-flex justify-content-between align-items-center" style="pointer-events: none;">
-										        가맹점
-										    </div>
-										     <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="17" data-name="가맹점">
-										        <div class="d-flex w-100 justify-content-between align-items-center">
-										            <span>└ 가맹점</span>
-										            <div class="dept-right-group">
-										                <span class="badge bg-label-primary rounded-pill">${count['17']}</span>
-										            </div>
-										        </div>
-										    </a>
-										</div>
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header d-flex justify-content-between align-items-center border-bottom pb-3">
+                                    <h5 class="mb-0 fw-bold text-dark"><i class='bx bx-buildings me-2 text-primary'></i>부서 목록</h5>
+                                    <button type="button" class="btn btn-sm btn-icon btn-light text-primary" 
+                                            data-bs-toggle="modal" data-bs-target="#modalDeptAdd" title="부서 추가">
+                                        <i class='bx bx-plus'></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="card-body pt-3 px-2">
+                                    <div class="list-group list-group-flush" id="deptList">
+                                        <a class="list-group-item list-group-item-action dept-item active mb-2" data-dept="0">
+                                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                                <span><i class='bx bx-globe me-2'></i>전체 조직</span>
+                                                <span class="badge bg-white text-primary shadow-sm rounded-pill">${totalCount}</span>
+                                            </div>
+                                        </a>
+
+                                        <c:set var="currentGroup" value=""/>
+                                        <c:forEach var="dept" items="${deptCount}">
+                                            <c:choose>
+                                                <c:when test="${dept.deptCode == 99 || dept.deptCode == 20}">
+                                                    <c:set var="groupName" value="임원 및 관리자"/>
+                                                </c:when>
+                                                <c:when test="${dept.deptCode >= 10 && dept.deptCode <= 12}">
+                                                    <c:set var="groupName" value="경영지원본부"/>
+                                                </c:when>
+                                                <c:when test="${dept.deptCode >= 13 && dept.deptCode <= 15}">
+                                                    <c:set var="groupName" value="영업 / 마케팅"/>
+                                                </c:when>
+                                                <c:when test="${dept.deptCode == 16}">
+                                                    <c:set var="groupName" value="기술연구소"/>
+                                                </c:when>
+                                                <c:when test="${dept.deptCode == 17}">
+                                                    <c:set var="groupName" value="가맹 사업부"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:set var="groupName" value="기타 부서"/>
+                                                </c:otherwise>
+                                            </c:choose>
+
+                                            <c:if test="${currentGroup != groupName}">
+                                                <div class="list-group-header">${groupName}</div>
+                                                <c:set var="currentGroup" value="${groupName}"/>
+                                            </c:if>
+
+                                            <a class="list-group-item list-group-item-action dept-item sub-dept" data-dept="${dept.deptCode}" data-name="${dept.memDeptName}">
+                                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                                    <span>${dept.memDeptName}</span>
+                                                    <span class="badge bg-label-secondary rounded-pill" style="font-size:0.75rem;">${dept.count}</span>
+                                                </div>
+                                            </a>
+                                        </c:forEach>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-8 col-lg-9 mb-4">
-                            <div class="card h-100">
-                                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-0 fw-bold" id="selectedDeptTitle">전체 사원</h5>
-                                        <small class="text-muted" id="selectedDeptCount">${count.total} 명</small>
-                                    </div>
-                                    <div class="input-group input-group-sm w-auto">
-                                        <span class="input-group-text"><i class="bx bx-search"></i></span>
-                                        <input type="text" class="form-control" placeholder="이름, 직급 검색..." id="searchMember">
-                                    </div>
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                                
+                                <div class="d-flex align-items-baseline">
+                                    <h4 class="mb-0 fw-bold text-dark me-2" id="selectedDeptTitle">전체 사원</h4>
+                                    <span class="text-muted fs-6" id="selectedDeptCount">(총 ${totalCount}명)</span>
                                 </div>
 
-                                <div class="table-responsive text-nowrap">
-                                    <table class="table table-hover">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>이름 / 사번</th>
-                                                <th>부서</th>
-                                                <th>직급</th>
-                                                <th>상태</th>
-                                                <th>연락처</th>
-                                                <th class="text-center">상세</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="memberTableBody">
-                                            </tbody>
-                                    </table>
+                                <div class="top-controls">
+                                    <div class="form-check form-switch m-0 d-flex align-items-center">
+                                        <input class="form-check-input my-0 me-2" type="checkbox" id="checkRetired" style="cursor: pointer;">
+                                        <label class="form-check-label text-nowrap text-muted fw-semibold" for="checkRetired" style="cursor: pointer;">퇴사자 포함</label>
+                                    </div>
+
+                                    <div class="input-group input-group-merge shadow-sm" style="width: 280px; border-radius: 10px; overflow: hidden; height: 45px;">
+                                        <span class="input-group-text border-0 ps-3 bg-white"><i class="bx bx-search"></i></span>
+                                        <input type="text" class="form-control border-0 bg-white" placeholder="이름, 직급, 사번 검색" id="searchMember">
+                                    </div>
                                 </div>
+                            </div>
+
+                            <div class="table-responsive text-nowrap" style="min-height: 500px;">
+                                <table class="table table-borderless">
+                                    <colgroup>
+                                        <col style="width: 25%;">
+                                        <col style="width: 15%;">
+                                        <col style="width: 15%;">
+                                        <col style="width: 15%;">
+                                        <col style="width: 20%;">
+                                        <col style="width: 10%;">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>이름 / 사번</th>
+                                            <th>부서</th>
+                                            <th>직급</th>
+                                            <th class="text-center">상태</th>
+                                            <th>연락처</th>
+                                            <th class="text-center">상세</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="memberTableBody">
+                                        </tbody>
+                                </table>
                                 
                                 <div id="noDataMessage" class="text-center py-5" style="display: none;">
-                                    <i class="bx bx-user-x fs-1 text-muted mb-2"></i>
-                                    <p class="text-muted">해당 부서에 소속된 사원이 없습니다.</p>
+                                    <div class="py-5">
+                                        <div class="mb-3">
+                                            <span class="badge bg-label-secondary p-3 rounded-circle">
+                                                <i class="bx bx-user-x fs-1"></i>
+                                            </span>
+                                        </div>
+                                        <h5 class="text-muted mb-1">표시할 사원이 없습니다.</h5>
+                                        <p class="text-muted small">검색 조건을 확인하거나 부서를 선택해주세요.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +192,6 @@
 
             <div class="modal-body p-4">
                 <div class="tab-content p-0">
-                    
                     <div class="tab-pane fade show active" id="tab-basic" role="tabpanel">
                         <form id="memberDetailForm">
                             <div class="row g-4">
@@ -282,7 +203,6 @@
                                     <label class="form-label">이름</label>
                                     <input type="text" class="form-control" id="modalName">
                                 </div>
-                                
                                 <div class="col-md-6">
                                     <label class="form-label">소속 부서</label>
                                     <select class="form-select" id="modalDeptCode">
@@ -303,7 +223,6 @@
                                         <option value="부장">부장</option>
                                     </select>
                                 </div>
-
                                 <div class="col-md-6">
                                     <label class="form-label">이메일</label>
                                     <input type="email" class="form-control" id="modalEmail">
@@ -312,7 +231,6 @@
                                     <label class="form-label">연락처</label>
                                     <input type="text" class="form-control" id="modalPhone">
                                 </div>
-
                                 <div class="col-md-6">
                                     <label class="form-label">입사일</label>
                                     <div class="input-group">
@@ -332,14 +250,12 @@
                             </div>
                         </form>
                     </div>
-
                     <div class="tab-pane fade" id="tab-work" role="tabpanel">
                         <div class="text-center py-5">
                             <i class="bx bx-time-five fs-1 text-muted mb-3"></i>
                             <p class="text-muted">이번 달 근태 기록이 표시됩니다.</p>
                         </div>
                     </div>
-
                     <div class="tab-pane fade" id="tab-vacation" role="tabpanel">
                         <div class="d-flex justify-content-between mb-3 bg-lighter p-3 rounded">
                             <div class="text-center">
@@ -358,7 +274,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="modal-footer border-top">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
                 <button type="button" class="btn btn-primary" onclick="saveMemberDetails()">저장</button>
@@ -370,7 +285,6 @@
 <div class="modal fade" id="modalDeptAdd" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm">
         <div class="modal-content">
-        
             <div class="modal-header">
                 <h5 class="modal-title fw-bold">새 부서 추가</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -464,8 +378,7 @@
 <script src="/vendor/js/menu.js"></script>
 <script src="/js/main.js"></script>
 <script src="/js/member/AM_member_detail.js"></script>
-
-
 <script src="/js/member/AM_group_chat.js"></script>
+<link rel="stylesheet" href="/css/member/AM_group_chart.css" />
 </body>
 </html>

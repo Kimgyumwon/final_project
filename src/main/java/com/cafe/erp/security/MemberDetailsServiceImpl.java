@@ -1,5 +1,7 @@
 package com.cafe.erp.security;
 
+import com.cafe.erp.store.StoreDAO;
+import com.cafe.erp.store.StoreDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,8 @@ public class MemberDetailsServiceImpl implements UserDetailsService {
     
     @Autowired
     private MemberDAO memberDAO;
+    @Autowired
+    private StoreDAO storeDAO;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -43,8 +47,12 @@ public class MemberDetailsServiceImpl implements UserDetailsService {
         
         if (memberDTO == null) {
             throw new UsernameNotFoundException("회원 없음");
-        } 
+        }
 
+        if (username.startsWith("2")) {
+            StoreDTO storeDTO = storeDAO.findByMemberId(memberId);
+            return new UserDTO(memberDTO, storeDTO);
+        }
 
         return new UserDTO(memberDTO);
     }
