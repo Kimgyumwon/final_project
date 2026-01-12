@@ -134,22 +134,22 @@
       <ul class="menu-sub">
         <li class="menu-item">
           <a href="/order/request" class="menu-link">
-            <div data-i18n="Error">Request</div>
+            <div data-i18n="Error">발주요청</div>
           </a>
         </li>
         <li class="menu-item">
           <a href="/order/approval" class="menu-link">
-            <div data-i18n="Under Maintenance">Approval</div>
+            <div data-i18n="Under Maintenance">발주승인</div>
           </a>
         </li>
         <li class="menu-item">
           <a href="/order/receive" class="menu-link">
-            <div data-i18n="Under Maintenance">Receive</div>
+            <div data-i18n="Under Maintenance">입고</div>
           </a>
         </li>
         <li class="menu-item">
           <a href="/order/release_hq" class="menu-link">
-            <div data-i18n="Under Maintenance">ReleaseHq</div>
+            <div data-i18n="Under Maintenance">출고</div>
           </a>
         </li>
       </ul>
