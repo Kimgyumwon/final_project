@@ -35,32 +35,41 @@ function connectNotificationSocket(memberId) {
 }
 
 function onReceiveNotification(notification) {
-	console.log("🔥 onReceiveNotification payload:", notification);
-	console.log("🔥 keys:", Object.keys(notification));
-	console.log("🔥 notificationContent:", notification.notificationContent);
 
-    showToast(notification.notificationContent);
+    showToast(notification);
     increaseNotificationBadge();
     prependNotification(notification);
 }
 
 
-function showToast(message) {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
 
-    toast.className = 'toast';
-    toast.innerText = message;
+function showToast(notification) {
+    const container = document.getElementById("toast-container");
+
+    const toast = document.createElement("div");
+    toast.className = `toast show ${notification.notificationType?.toLowerCase() || 'voc'}`;
+
+    toast.innerHTML = `
+        <div class="toast-title">
+            ${notification.notificationTitle}
+        </div>
+        <div class="toast-content">
+            ${notification.notificationContent}
+        </div>
+    `;
+
+    toast.onclick = () => {
+        location.href = notification.notificationLink;
+    };
 
     container.appendChild(toast);
 
-    setTimeout(() => toast.classList.add('show'), 10);
-
     setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 200);
     }, 3000);
 }
+
 
 function increaseNotificationBadge() {
     const badge = document.getElementById("notificationBadge");
@@ -71,15 +80,28 @@ function increaseNotificationBadge() {
 }
 
 
+
 function prependNotification(n) {
     const list = document.getElementById("notificationList");
 
+    const type = n.notificationType?.toLowerCase() || "voc";
+
+    const iconMap = {
+        voc: "bx-comment-detail",
+        chat: "bx-chat",
+        notice: "bx-info-circle"
+    };
+
     const li = document.createElement("li");
     li.innerHTML = `
-        <a class="dropdown-item p-2 rounded mb-2"
-           style="background:#f8f9ff;">
-            <div class="fw-bold">${n.notificationTitle}</div>
-            <small class="text-muted">${n.notificationContent}</small>
+        <a class="dropdown-item notification-row ${type}">
+            <div class="notification-icon">
+                <i class="bx ${iconMap[type]}"></i>
+            </div>
+            <div class="notification-text">
+                <div class="notification-title">${n.notificationTitle}</div>
+                <div class="notification-desc">${n.notificationContent}</div>
+            </div>
         </a>
     `;
 
@@ -90,3 +112,5 @@ function prependNotification(n) {
 
     list.prepend(li);
 }
+
+
