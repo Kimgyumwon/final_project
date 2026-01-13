@@ -51,6 +51,8 @@ public class MemberController {
 	
 	@Autowired
 	private MemberAttendanceDAO memberAttendanceDAO;
+	
+	
 
 	MemberController(PasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;
@@ -75,9 +77,10 @@ public class MemberController {
 	@ResponseBody
 	public List<Map<String, Object>> holidayView(@AuthenticationPrincipal UserDTO userDTO) throws Exception{
 		List<CompanyHolidayDTO> list = companyHolidayService.selectHolidaysList();
+		int memberId = userDTO.getMember().getMemberId();
+		
 		
 		List<Map<String, Object>> view = new ArrayList<>();
-		
 		for(CompanyHolidayDTO dto : list) {
 			Map<String, Object> calendar = new HashMap<>();
 			calendar.put("title", dto.getComHolidayName()); // 휴일 이름
@@ -88,8 +91,19 @@ public class MemberController {
 			view.add(calendar);
 		}
 		
+		List<MemberAttendanceDTO> attList = memberAttendanceDAO.selectApprovedAttendance(memberId);
+	    for(MemberAttendanceDTO dto : attList) {
+	        Map<String, Object> attMap = new HashMap<>();
+	        attMap.put("title", dto.getMemAttendanceType()); // "연차", "오후반차" 등
+	        
+	        String startDate = dto.getMemAttendanceStartDate().toString().split(" ")[0];
+	        attMap.put("start", startDate); 
+	        
+	        attMap.put("className", "attendance-approved-event"); // CSS 구분용
+	        attMap.put("allDay", true);
+	        view.add(attMap);
+	    }
 		
-		int memberId = userDTO.getMember().getMemberId();
 		
 		MemberCommuteDTO commuteDTO = new MemberCommuteDTO();
 		commuteDTO.setMemberId(memberId);

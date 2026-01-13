@@ -522,118 +522,134 @@
                     <!-- 휴가 현황 -->
                                    <div class="tab-pane fade" id="navs-vacation" role="tabpanel">
 
-									    <div class="row mb-4">
+									    <div class="row mb-4 g-3">
 									        <div class="col-md-4">
-									            <div class="card bg-label-secondary border-0 text-center">
+									            <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #8592a3 !important;">
 									                <div class="card-body">
-									                    <i class='bx bx-calendar-star mb-2' style="font-size: 2rem;"></i>
-									                    <h5 class="card-title mb-1">총 부여 연차</h5>
-									                    <h3 class="card-text text-secondary fw-bold">
-									                        ${stats.memLeaveTotalDays} <span class="fs-6 fw-normal">일</span>
-									                    </h3>
+									                    <span class="d-block text-muted mb-1">총 부여 연차</span>
+									                    <div class="d-flex align-items-center justify-content-between">
+									                        <h2 class="mb-0 fw-bold text-dark">${stats.memLeaveTotalDays}</h2>
+									                        <div class="p-2 rounded-circle bg-label-secondary">
+									                            <i class='bx bx-calendar fs-4 text-secondary'></i>
+									                        </div>
+									                    </div>
 									                </div>
 									            </div>
 									        </div>
 									        
 									        <div class="col-md-4">
-									            <div class="card bg-label-warning border-0 text-center">
+									            <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #ffab00 !important;">
 									                <div class="card-body">
-									                    <i class='bx bx-calendar-minus mb-2' style="font-size: 2rem;"></i>
-									                    <h5 class="card-title mb-1">사용 연차</h5>
-									                    <h3 class="card-text text-warning fw-bold">
-									                        ${stats.memLeaveUsedDays} <span class="fs-6 fw-normal">일</span>
-									                    </h3>
+									                    <span class="d-block text-muted mb-1">사용 연차</span>
+									                    <div class="d-flex align-items-center justify-content-between">
+									                        <h2 class="mb-0 fw-bold text-warning">${stats.memLeaveUsedDays}</h2>
+									                        <div class="p-2 rounded-circle bg-label-warning">
+									                            <i class='bx bx-minus fs-4 text-warning'></i>
+									                        </div>
+									                    </div>
 									                </div>
 									            </div>
 									        </div>
 									        
 									        <div class="col-md-4">
-									            <div class="card bg-label-success border-0 text-center">
+									            <div class="card h-100 border-0 shadow-sm" style="border-top: 4px solid #71dd37 !important;">
 									                <div class="card-body">
-									                    <i class='bx bx-calendar-check mb-2' style="font-size: 2rem;"></i>
-									                    <h5 class="card-title mb-1">잔여 연차</h5>
-									                    <h3 class="card-text text-success fw-bold">
-									                        ${stats.remainingDays} <span class="fs-6 fw-normal">일</span>
-									                    </h3>
+									                    <span class="d-block text-muted mb-1">잔여 연차</span>
+									                    <div class="d-flex align-items-center justify-content-between">
+									                        <h2 class="mb-0 fw-bold text-success">${stats.remainingDays}</h2>
+									                        <div class="p-2 rounded-circle bg-label-success">
+									                            <i class='bx bx-check fs-4 text-success'></i>
+									                        </div>
+									                    </div>
 									                </div>
 									            </div>
 									        </div>
 									    </div>
 									    
-									    <div class="card mb-4">
-									        <div class="card-body">
+									    <div class="card mb-4 border-0 shadow-sm">
+									        <div class="card-body py-3">
 									            <div class="d-flex justify-content-between mb-1">
-									                <span class="fw-semibold">연차 소진율</span>
-									                <span class="fw-semibold">${stats.usageRate}%</span>
+									                <small class="fw-semibold text-muted">연차 사용률</small>
+									                <small class="fw-bold text-dark">${stats.usageRate}%</small>
 									            </div>
-									            <div class="progress" style="height: 10px;">
-									                <div class="progress-bar bg-warning" role="progressbar" 
+									            <div class="progress" style="height: 6px;">
+									                <div class="progress-bar bg-success" role="progressbar" 
 									                     style="width: ${stats.usageRate}%;" 
 									                     aria-valuenow="${stats.usageRate}" aria-valuemin="0" aria-valuemax="100">
 									                </div>
 									            </div>
-									            <small class="text-muted mt-1 d-block">
-									                총 ${stats.memLeaveTotalDays}일 중 ${stats.memLeaveUsedDays}일 사용
-									            </small>
 									        </div>
 									    </div>
-									    <h5 class="fw-bold py-2 mb-2"><i class='bx bx-list-ul me-1'></i> 휴가 사용 내역</h5>
-											<div class="table-responsive text-nowrap bg-white border rounded">
-											    <table class="table table-hover">
-											        <thead class="table-light">
-											            <tr>
-											                <th>기간</th>
-											                <th>휴가 종류</th>
-											                <th>차감 일수</th>
-											                <th>사유</th>
-											                <th>상태</th>
-											            </tr>
-											        </thead>
-											        <tbody>
-											            <c:if test="${empty vacationList}">
-											                <tr><td colspan="5" class="text-center py-4">사용 내역이 없습니다.</td></tr>
-											            </c:if>
-											
-											            <c:forEach var="dto" items="${vacationList}">
-											                <tr>
-											                    <td>
-											                        <fmt:formatDate value="${dto.memAttendanceStartDate}" pattern="yyyy-MM-dd"/> 
-											                        ~ 
-											                        <fmt:formatDate value="${dto.memAttendanceEndDate}" pattern="yyyy-MM-dd"/>
-											                    </td>
-											                    
-											                    <td><span class="badge bg-label-primary">${dto.memAttendanceType}</span></td>
-											                    
-											                    <td class="fw-bold text-danger">
-																    <c:choose>
-																        <c:when test="${dto.appStatus eq '반려'}">
-																            - 0.0 </c:when>
-																        <c:otherwise>
-																            - ${dto.memAttendanceUsedDays} </c:otherwise>
-																    </c:choose>
-																</td>
-											                    
-											                    <td>${dto.memAttendanceReason}</td>
-											                    
-											                    <td>
-											                        <c:choose>
-											                            <c:when test="${dto.appStatus eq '승인'}">
-											                                <span class="badge bg-success">승인완료</span>
-											                            </c:when>
-											                            <c:when test="${dto.appStatus eq '반려'}">
-											                                <span class="badge bg-danger">반려</span>
-											                            </c:when>
-											                            <c:otherwise>
-											                                <span class="badge bg-warning">결재중</span>
-											                            </c:otherwise>
-											                        </c:choose>
-											                    </td>
-											                </tr>
-											            </c:forEach>
-											        </tbody>
-											    </table>
-									        <div class="text-center py-4" style="display:none;">
-									            <p class="text-muted">사용 내역이 없습니다.</p>
+									
+									    <h6 class="fw-bold text-muted mb-3">사용 내역</h6>
+									    
+									    <div class="card border-0 shadow-sm">
+									        <div class="table-responsive">
+									            <table class="table align-middle table-hover">
+									                <thead class="table-light">
+									                    <tr>
+									                        <th class="text-center text-secondary border-bottom-0" style="font-size: 0.85rem;">신청일/기간</th>
+									                        <th class="text-center text-secondary border-bottom-0" style="font-size: 0.85rem;">종류</th>
+									                        <th class="text-center text-secondary border-bottom-0" style="font-size: 0.85rem;">사용</th>
+									                        <th class="text-secondary border-bottom-0 ps-4" style="font-size: 0.85rem;">사유</th>
+									                        <th class="text-center text-secondary border-bottom-0" style="font-size: 0.85rem;">상태</th>
+									                    </tr>
+									                </thead>
+									                <tbody class="border-top-0">
+									                    <c:if test="${empty vacationList}">
+									                        <tr><td colspan="5" class="text-center py-4 text-muted">내역이 없습니다.</td></tr>
+									                    </c:if>
+									
+									                    <c:forEach var="dto" items="${vacationList}">
+									                        <tr>
+									                            <td class="text-center">
+									                                <div class="d-flex flex-column">
+									                                    <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+									                                        <fmt:formatDate value="${dto.memAttendanceStartDate}" pattern="yyyy-MM-dd"/> 
+									                                        ~ 
+									                                        <fmt:formatDate value="${dto.memAttendanceEndDate}" pattern="yyyy-MM-dd"/>
+									                                    </span>
+									                                </div>
+									                            </td>
+									                            
+									                            <td class="text-center">
+									                                <span class="text-dark">${dto.memAttendanceType}</span>
+									                            </td>
+									                            
+									                            <td class="text-center">
+									                                <c:choose>
+									                                    <c:when test="${dto.appStatus eq '반려'}">
+									                                        <span class="text-muted text-decoration-line-through">-</span>
+									                                    </c:when>
+									                                    <c:otherwise>
+									                                        <span class="text-danger fw-bold">-${dto.memAttendanceUsedDays}</span>
+									                                    </c:otherwise>
+									                                </c:choose>
+									                            </td>
+									                            
+									                            <td class="ps-4">
+									                                <span class="text-muted text-truncate d-inline-block" style="max-width: 300px; vertical-align: middle;">
+									                                    ${dto.memAttendanceReason}
+									                                </span>
+									                            </td>
+									                            
+									                            <td class="text-center">
+									                                <c:choose>
+									                                    <c:when test="${dto.appStatus eq '승인'}">
+									                                        <span class="badge bg-label-success rounded-pill">승인</span>
+									                                    </c:when>
+									                                    <c:when test="${dto.appStatus eq '반려'}">
+									                                        <span class="badge bg-label-danger rounded-pill">반려</span>
+									                                    </c:when>
+									                                    <c:otherwise>
+									                                        <span class="badge bg-label-warning rounded-pill">대기</span>
+									                                    </c:otherwise>
+									                                </c:choose>
+									                            </td>
+									                        </tr>
+									                    </c:forEach>
+									                </tbody>
+									            </table>
 									        </div>
 									    </div>
 									</div>

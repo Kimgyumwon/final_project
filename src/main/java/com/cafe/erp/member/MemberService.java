@@ -93,6 +93,9 @@ public class MemberService {
 		memberDTO.setMemPassword(bcpw);
 		
 		int result = memberDAO.add(memberDTO);
+		if (result > 0) {
+	        memberDAO.addFirstLeave(memberDTO);
+	    }
 		return result;
 	}
 	

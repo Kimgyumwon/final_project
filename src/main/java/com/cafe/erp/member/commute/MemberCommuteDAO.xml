@@ -34,4 +34,6 @@
 		      AND mem_commute_work_date = CURDATE()
 		      AND mem_commute_out_time IS NULL  
 		 </update>
+		 
+		 
     </mapper> 
