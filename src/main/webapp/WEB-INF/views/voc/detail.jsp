@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html>
 <%@taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <html
   lang="en"
@@ -163,7 +164,8 @@
                           <div class="card-body overflow-auto" style="max-height: 500px; background-color: #f8f9fa; padding-bottom: 0;" id="replyArea">
                               <input type="hidden" value="${listSize}" id="isFirst">
                               <c:forEach var="process" items="${list}">
-                              	<c:set var="isMe" value="${process.memName == '최영업'}" />
+								  <sec:authentication property="principal.member" var="memberInfo"/>
+								  <c:set var="isMe" value="${process.memberId eq memberInfo.memberId}" />
 						        <div class="d-flex w-100 my-3 ${isMe ? 'justify-content-end' : 'justify-content-start'}">
 						            <div style="max-width: 80%;" class="${isMe ? 'text-end' : 'text-start'}">
 						                <small class="d-block mb-1 ${isMe ? 'me-2 text-primary fw-bold' : 'ms-2 text-dark fw-bold'}">
