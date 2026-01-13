@@ -1,9 +1,11 @@
 package com.cafe.erp.store.qsc;
 
+import com.cafe.erp.security.UserDTO;
 import com.cafe.erp.store.qsc.dto.QscDTO;
 import com.cafe.erp.store.qsc.dto.QscQuestionDTO;
 import com.cafe.erp.store.qsc.dto.QscQuestionSearchDTO;
 import com.cafe.erp.store.qsc.dto.QscSearchDTO;
+import com.cafe.erp.store.voc.VocDTO;
 import com.cafe.erp.util.ExcelUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +28,29 @@ public class QscController {
     private QscService qscService;
 
     @GetMapping("list")
-    public String qscList(QscSearchDTO searchDTO, Model model) throws Exception {
-        List<QscDTO> qscList = qscService.qscList(searchDTO);
-        model.addAttribute("list", qscList);
-        model.addAttribute("pager", searchDTO);
+    public String qscList(QscSearchDTO searchDTO, Model model, Authentication authentication) throws Exception {
+        UserDTO user = (UserDTO) authentication.getPrincipal();
+        String memberId = user.getUsername();
 
-        return "qsc/list";
+        if (memberId.startsWith("2")) {
+            if (user.getStore() != null) {
+                searchDTO.setSearchStoreId(user.getStore().getStoreId());
+            } else {
+                searchDTO.setSearchStoreId(-1);
+            }
+
+            List<QscDTO> qscList = qscService.qscList(searchDTO);
+            model.addAttribute("list", qscList);
+            model.addAttribute("pager", searchDTO);
+
+            return "view_store/store/qsc_list";
+        } else {
+            List<QscDTO> qscList = qscService.qscList(searchDTO);
+            model.addAttribute("list", qscList);
+            model.addAttribute("pager", searchDTO);
+
+            return "qsc/list";
+        }
     }
 
     @GetMapping("add")
@@ -59,6 +78,22 @@ public class QscController {
         model.addAttribute("dto", qscDTO);
 
         return "qsc/detail";
+    }
+
+    @GetMapping("edit")
+    public String qscEdit(Integer qscId, Model model, Authentication authentication) throws Exception {
+        QscDTO qscDTO = qscService.qscDetail(qscId);
+        if (! authentication.getName().equals(qscDTO.getMemberId().toString())) return "error/forbidden";
+
+        model.addAttribute("dto", qscDTO);
+
+        return "qsc/edit";
+    }
+
+    @PostMapping("update")
+    @ResponseBody
+    public Map<String, Object> qscUpdate(@RequestBody QscDTO qscDTO) throws Exception {
+        return result(qscService.updateQsc(qscDTO));
     }
 
     @GetMapping("/downloadExcel")

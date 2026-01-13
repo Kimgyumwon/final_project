@@ -119,8 +119,8 @@ public class StoreController {
 	// contract list tab
 	@GetMapping("search")
 	@ResponseBody
-	public List<StoreDTO> searchStore(@RequestParam String keyword) throws Exception {
-		return storeService.searchStore(keyword);
+	public List<StoreDTO> searchStore(@RequestParam String keyword, @RequestParam String isManager, Authentication authentication) throws Exception {
+		return storeService.searchStore(keyword, isManager, authentication.getName());
 	}
 
 	@GetMapping("notFound")

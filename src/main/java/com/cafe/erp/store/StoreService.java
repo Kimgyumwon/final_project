@@ -69,7 +69,9 @@ public class StoreService {
 		return storeDAO.add(storeDTO);
 	}
 
-	public List<StoreDTO> searchStore(String keyword) throws Exception {
+	public List<StoreDTO> searchStore(String keyword, String isManager, String memberId) throws Exception {
+		if (isManager.equals("1")) return storeDAO.searchMyStore(keyword, memberId);
+
 		return storeDAO.searchStore(keyword);
 	}
 

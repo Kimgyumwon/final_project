@@ -86,7 +86,7 @@
 							<a href="/store/qsc/list" class="nav-link active"><i class="bx bx-task me-1"></i> QSC</a>
 						</li>
                         <li class="nav-item">
-                        	<a href="/store/qsc/admin/question" class="nav-link active"><i class="bx bx-list-check me-1"></i> QSC 질문</a>
+                        	<a href="/store/qsc/admin/question" class="nav-link active"><i class="bx bx-list-check me-1"></i> 항목</a>
                         </li>
                     </ul>
                 </div>

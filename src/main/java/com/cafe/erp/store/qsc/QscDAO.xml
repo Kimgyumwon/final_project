@@ -40,11 +40,10 @@
 
 	<update id="updateQuestion" parameterType="QscQuestionDTO">
 		UPDATE qsc_list
-		SET list_category = #{listCategory}, list_question = #{listQuestion}, list_max_score = #{listMaxScore}, list_is_use= #{listIsUse}
-		WHERE list_id = #{listId}
+		SET list_is_use= #{listIsUse} WHERE list_id = #{listId}
 	</update>
 
-	<select id="excelQuestionList" parameterType="QscQuestionSearchDTO" resultType="QscQuestionDTO">
+    <select id="excelQuestionList" parameterType="QscQuestionSearchDTO" resultType="QscQuestionDTO">
 		SELECT * FROM qsc_list
 		<include refid="searchQuestionCondition" />
 		ORDER BY list_id
@@ -126,6 +125,16 @@
 		INSERT INTO qsc_detail
 		VALUE (null, #{qscId}, #{listId}, #{detailScore})
 	</insert>
+
+	<update id="updateQsc" parameterType="QscDTO">
+		UPDATE qsc
+		SET qsc_title = #{qscTitle}, qsc_total_score = #{qscTotalScore}, qsc_grade = #{qscGrade}, qsc_opinion = #{qscOpinion}
+		WHERE qsc_id = #{qscId}
+	</update>
+
+	<update id="updateDetail" parameterType="QscDetailDTO">
+		UPDATE qsc_detail SET detail_score = #{detailScore} WHERE detail_id = #{detailId}
+	</update>
 
 	<select id="qscDetail" parameterType="Integer" resultMap="QscDetailMap">
 		SELECT

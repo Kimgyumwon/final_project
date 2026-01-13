@@ -6,15 +6,14 @@ async function fetchJson(url, options = {}) {
 
 async function searchStore() {
     const keyword = document.getElementById("storeNameInput").value.trim();
+    const isManager = 1;
     const resultListElement = document.getElementById("storeResultList");
 
-    if (!keyword) {
-        alert("검색어를 입력해주세요.");
-        return;
-    }
-
     try {
-        const params = new URLSearchParams({ keyword: keyword });
+        const params = new URLSearchParams({
+            keyword: keyword,
+            isManager: isManager
+        });
 		const data = await 	fetchJson(`/store/search?${params.toString()}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" }
@@ -180,8 +179,68 @@ async function submitQscForm() {
             throw new Error(`서버 오류: ${response.status}`);
         }
 
-        alert("QSC 점검이 등록되었습니다.");
         location.href = "/store/qsc/list";
+        alert("QSC 점검이 등록되었습니다.");
+    } catch (error) {
+        console.error('Error:', error);
+        alert("등록 중 오류가 발생했습니다.");
+    }
+}
+
+async function submitQscUpdateForm() {
+    const qscId = document.getElementById("qscId");
+    const qscTitle = document.getElementById("qscTitle");
+    const qscOpinion = document.getElementById("qscOpinion");
+
+    if (!qscTitle.value) {
+        alert("제목을 입력해주세요.");
+        qscTitle.focus();
+        return;
+    }
+    if (!validateScores()) {
+        return;
+    }
+    const displayStoreName = document.getElementById('storeNameInput').innerText;
+    const displayGrade = document.getElementById('displayGrade').innerText;
+    const confirmMessage =  `[${qscTitle.value}]\n` +
+                            `- 대상 가맹점: ${displayStoreName}\n` +
+                            `- 예상 등급: ${displayGrade}\n\n` +
+                            `이대로 저장하시겠습니까?`;
+
+    if(!confirm(confirmMessage)) {
+        return;
+    }
+
+    const scoreList = [];
+    document.querySelectorAll('.score-input').forEach(input => {
+        scoreList.push({
+            detailId: input.getAttribute('data-detail-id'),
+            detailScore: parseInt(input.value) || 0
+        });
+    });
+
+    const formData = {
+        qscId: qscId.value,
+        qscTitle: qscTitle.value,
+        qscOpinion: qscOpinion.value,
+        qscDetailDTOS: scoreList
+    };
+
+    try {
+        const response = await fetch('/store/qsc/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`서버 오류: ${response.status}`);
+        }
+
+        alert("QSC 점검이 수정되었습니다.");
+        location.href = `/store/qsc/detail?qscId=${qscId.value}`;
     } catch (error) {
         console.error('Error:', error);
         alert("등록 중 오류가 발생했습니다.");

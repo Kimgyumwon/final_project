@@ -115,10 +115,14 @@ function openUpdateModal(button) {
     const status = button.dataset.status;
 
     document.getElementById('updateListId').value = listId;
-    document.getElementById('updateListCategory').value = category;
-    document.getElementById('updateListQuestion').value = question;
-    document.getElementById('updateListMaxScore').value = score;
+    document.getElementById('updateListCategory').innerHTML = category;
+    document.getElementById('updateListQuestion').innerHTML = question;
+    document.getElementById('updateListMaxScore').innerHTML = score;
     document.getElementById('listStatus').value = status;
+
+    if (category == 'Quality') document.getElementById('updateListCategory').classList.add('bg-label-primary');
+    else if (category == 'Service') document.getElementById('updateListCategory').classList.add('bg-label-warning');
+    else if (category == 'Cleanliness') document.getElementById('updateListCategory').classList.add('bg-label-info');
 
     const modalElement = document.getElementById('updateQuestionModal');
     const modal = new bootstrap.Modal(modalElement);
@@ -127,27 +131,10 @@ function openUpdateModal(button) {
 
 async function submitQuestionUpdate() {
     const listId = document.getElementById('updateListId').value;
-    const listCategory = document.getElementById('updateListCategory').value;
-    const listMaxScore = document.getElementById('updateListMaxScore').value;
     const listStatus = document.getElementById('listStatus').value;
-    const listQuestion = document.getElementById('updateListQuestion').value;
-
-    if (!listQuestion) {
-        alert("질문을 입력해주세요.");
-        document.getElementById('listQuestion').focus();
-        return;
-    }
-    if (!listMaxScore) {
-        alert("배점을 입력해주세요.");
-        document.getElementById('updateListMaxScore').focus();
-        return;
-    }
 
     const formData = {
         listId: listId,
-        listCategory: listCategory,
-        listMaxScore: listMaxScore,
-        listQuestion: listQuestion,
         listIsUse: listStatus
     };
 
@@ -181,3 +168,15 @@ async function submitQuestionUpdate() {
         alert("수정 중 오류가 발생했습니다.");
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const questionModalEl = document.getElementById('registerQuestionModal');
+
+    if (questionModalEl) {
+        questionModalEl.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('listCategory').selectedIndex = 0;
+            document.getElementById('listMaxScore').value = '';
+            document.getElementById('listQuestion').value = '';
+        });
+    }
+});

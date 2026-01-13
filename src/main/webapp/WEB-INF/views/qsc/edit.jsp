@@ -82,13 +82,21 @@
                 <h4 class="fw-bold py-3 mb-3"><a href="/store/qsc/list" class="text-muted fw-normal">QSC /</a> 상세</h4>
                 <div id="tab-content-area">
 					<div class="card shadow-none border bg-white">
+                        <form method="post" id="qscUpdateForm" onsubmit="return false;">
+                            <input type="hidden" id="qscId" value="${dto.qscId}">
+
                             <div class="row g-3 p-4">
                                 <div class="col-12 text-center mb-4" style="margin-top: 50px">
-                                    <h3 class="fw-bold">[ ${dto.qscTitle} ]</h3>
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                        <h3 class="fw-bold mb-0">[</h3>
+                                        <input type="text" id="qscTitle" class="form-control fw-bold text-center"
+                                               value="${dto.qscTitle}" style="width: 50%; font-size: 1.5rem;">
+                                        <h3 class="fw-bold mb-0">]</h3>
+                                    </div>
                                 </div>
                                 <div class="col-12 text-end">
                                     <h6 class="mb-1 text-muted">담당자 : <span class="text-dark fw-bold">${dto.memName}</span></h6>
-                                    <h6 class="mb-4 text-muted">가맹점명 : <span class="text-dark fw-bold">${dto.storeName}</span></h6>
+                                    <h6 class="mb-4 text-muted">가맹점명 : <span class="text-dark fw-bold" id="storeNameInput">${dto.storeName}</span></h6>
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -111,7 +119,12 @@
                                                 <td>${detail.questionDTO.listQuestion}</td>
                                                 <td>${detail.questionDTO.listMaxScore}</td>
                                                 <td>
-                                                    ${detail.detailScore}
+                                                    <input type="text"
+                                                           class="form-control form-control-sm score-input text-center"
+                                                           value="${detail.detailScore}"
+                                                           data-detail-id="${detail.detailId}"
+                                                           data-max-score="${detail.questionDTO.listMaxScore}"
+                                                           oninput="handleMaxScore(this); calculateTotal();">
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -121,13 +134,15 @@
                                             <td><span id="displayTotalScore" class="text-primary">${dto.qscTotalScore}</span></td>
                                         </tr>
                                         <tr class="fw-bold">
-                                            <input type="hidden" id="hiddenTotalMax" value="${totalMax}">
+                                            <input type="hidden" id="hiddenTotalMax" value="${dto.qscQuestionTotalScore}">
                                             <td class="text-primary" colspan="3">등급</td>
                                             <td>
-                                                <c:if test="${dto.qscGrade eq 'A'}"><span class="badge bg-label-primary">A</span></c:if>
-                                                <c:if test="${dto.qscGrade eq 'B'}"><span class="badge bg-label-success">B</span></c:if>
-                                                <c:if test="${dto.qscGrade eq 'C'}"><span class="badge bg-label-warning">C</span></c:if>
-                                                <c:if test="${dto.qscGrade eq 'D'}"><span class="badge bg-label-danger">D</span></c:if>
+                                                <c:set var="initBadge" value="bg-label-danger"/>
+                                                <c:if test="${dto.qscGrade eq 'A'}"> <c:set var="initBadge" value="bg-label-primary"/> </c:if>
+                                                <c:if test="${dto.qscGrade eq 'B'}"> <c:set var="initBadge" value="bg-label-success"/> </c:if>
+                                                <c:if test="${dto.qscGrade eq 'C'}"> <c:set var="initBadge" value="bg-label-warning"/> </c:if>
+
+                                                <span id="displayGrade" class="badge ${initBadge}">${dto.qscGrade}</span>
                                             </td>
                                             <td><span id="displayTotalScoreTo" class="text-primary">${dto.qscScore}</span></td>
                                         </tr>
@@ -138,17 +153,19 @@
                                 <div class="col-md-12">
                                     <label class="form-label" for="qscOpinion">종합 의견</label>
                                     <div class="input-group">
-                                        <textarea class="form-control" rows="3" id="qscOpinion" readonly>${dto.qscOpinion}</textarea>
+                                        <textarea class="form-control" rows="3" id="qscOpinion">${dto.qscOpinion}</textarea>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end gap-2 p-4">
-                                <a href="/store/qsc/list" class="btn btn-outline-secondary">목록</a>
-                                <sec:authentication property="principal.member" var="memberInfo"/>
-                                <c:if test="${dto.memberId eq memberInfo.memberId}">
-                                    <a href="/store/qsc/edit?qscId=${dto.qscId}"class="btn btn-primary">수정</a>
-                                </c:if>
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        onclick="if(confirm('현재 작성된 내용은 저장되지 않습니다.\n정말 목록으로 돌아가시겠습니까?')) history.back();">
+                                    취소
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="submitQscUpdateForm()">저장</button>
                             </div>
+                        </form>
 					</div>
                 </div>
 			  	

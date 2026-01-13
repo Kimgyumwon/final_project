@@ -155,6 +155,28 @@ async function submitManagerUpdate() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    const updateManagerModalEl = document.getElementById('updateManagerModal');
+
+    if (updateManagerModalEl) {
+        updateManagerModalEl.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('managerNameInput').value = '';
+            document.getElementById('memberId').value = '';
+            document.getElementById('manageStartDate').value = '';
+            document.getElementById('storeId').value = '';
+
+            const resultList = document.getElementById('managerResultList');
+            if (resultList) {
+                resultList.style.display = 'none';
+                resultList.innerHTML = '';
+            }
+
+            document.getElementById('managerInfo').style.setProperty('display', 'none', 'important');
+            document.getElementById('emptyState').style.display = '';
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
     // DOM 요소 가져오기
     const btnEditInfo = document.getElementById('btnEditInfo');
     const viewTime = document.getElementById('viewTime');

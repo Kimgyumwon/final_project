@@ -88,4 +88,43 @@ public class QscService {
     public int updateQuestion(QscQuestionDTO questionDTO) throws Exception {
         return qscDAO.updateQuestion(questionDTO);
     }
+
+    @Transactional
+    public int updateQsc(QscDTO qscDTO) throws Exception {
+        List<QscDetailDTO> qscDetailDTOS = qscDTO.getQscDetailDTOS();
+        List<Integer> questionIds = qscDetailDTOS.stream()
+                .map(QscDetailDTO::getListId)
+                .collect(Collectors.toList());
+        List<QscQuestionDTO> questionList = qscDAO.questionListById(questionIds);
+        Map<Integer, Integer> maxScoreMap = questionList.stream()
+                .collect(Collectors.toMap(QscQuestionDTO::getListId, QscQuestionDTO::getListMaxScore));
+
+        int totalScore = 0;
+        int maxScore = 0;
+        for (QscDetailDTO detail: qscDetailDTOS) {
+            totalScore += detail.getDetailScore();
+            maxScore += maxScoreMap.getOrDefault(detail.getListId(), 0);
+        }
+
+        String grade = "D";
+        double percent = 0.0;
+        if (maxScore > 0) {
+            percent = (double) totalScore / maxScore * 100;
+
+            if (percent >= 90) grade = "A";
+            else if (percent >= 80) grade = "B";
+            else if (percent >= 70) grade = "C";
+        }
+
+        qscDTO.setQscTotalScore(totalScore);
+        qscDTO.setQscGrade(grade);
+
+        int result = qscDAO.updateQsc(qscDTO);
+
+        for (QscDetailDTO detail : qscDetailDTOS) {
+            qscDAO.updateDetail(detail);
+        }
+
+        return result;
+    }
 }
