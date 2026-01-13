@@ -82,7 +82,10 @@ async function searchStore() {
     }
 
     try {
-        const params = new URLSearchParams({ keyword: keyword });
+        const params = new URLSearchParams({
+            keyword: keyword,
+            isManager: 0
+        });
 		const data = await 	fetchJson(`/store/search?${params.toString()}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" }
