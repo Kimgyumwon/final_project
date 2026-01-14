@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 
 import com.cafe.erp.item.ItemDTO;
 import com.cafe.erp.member.MemberDTO;
+import com.cafe.erp.notification.service.NotificationService;
 import com.cafe.erp.security.UserDTO;
 
 @Service
@@ -17,6 +18,9 @@ public class OrderService {
 	
 	@Autowired
 	private OrderDAO orderDAO;
+	
+	@Autowired
+	private NotificationService notificationService;
 	
 	public void requestOrder(OrderDTO orderDTO, UserDTO userDTO) { 
 		
@@ -32,8 +36,10 @@ public class OrderService {
 		if(String.valueOf(orderType).charAt(0) == '2') {
 			isHqOrder = true;
 			// 스토어 정보 가져오기
-			int storeId = orderDAO.selectStoreId(orderType);
-			orderDTO.setStoreId(storeId);
+			OrderDTO dto = orderDAO.selectStoreId(orderType);
+			
+			orderDTO.setStoreId(dto.getStoreId());
+			orderDTO.setStoreName(dto.getStoreName());
 		}
 		// 발주번호(orderId) 생성
 		String orderId = generateOrderId(isHqOrder);
@@ -63,6 +69,14 @@ public class OrderService {
 		// 발주 상세 insert
 		insertOrderItemDetail(orderDTO, isHqOrder);
 		
+
+
+		if (isHqOrder) {
+		    notificationService.sendOrderNotificationToFinanceTeam(
+		        orderDTO.getHqOrderId(),
+		        orderType
+		  );
+		}
 		
 	}
 	
@@ -126,6 +140,7 @@ public class OrderService {
 				orderDAO.insertHqOrderItemDetail(detail);
 			}
 		} else {
+			// 가맹점 발주 상세 insert
 			for (OrderItemRequestDTO req : orderDTO.getItems()) {
 				
 				OrderDetailDTO detail = new OrderDetailDTO();
@@ -179,9 +194,21 @@ public class OrderService {
 	public List<OrderDetailDTO> getApprovedOrderDetail() {
 		return orderDAO.getApprovedOrderDetail();
 	}
-	
-	public void rejectOrder(OrderRejectDTO orderRejectDTO) {
+	// 반려
+	public void rejectOrder(OrderRejectDTO orderRejectDTO, UserDTO userDTO) {
+		// 발주테이블 상태값을 반려로 update
 		orderDAO.rejectOrder(orderRejectDTO);
+		// 가맹점주 아이디 조회
+		OrderRejectDTO result = orderDAO.rejectOrderNotification(orderRejectDTO);
+		int senderMemberId = userDTO.getMember().getMemberId(); // 본사 직원 아이디
+		int receiverMemberId = result.getStoreMemberId(); // 가맹점주 아이디
+		String orderId = result.getRejectId(); // 발주 번호
+		
+		notificationService.sendOrderRejectNotification(
+				senderMemberId,
+				receiverMemberId,
+				orderId
+		);
 	}
 
 }

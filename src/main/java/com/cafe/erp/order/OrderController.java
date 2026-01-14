@@ -148,8 +148,11 @@ public class OrderController {
 	// 반려 요청
 	@PostMapping("reject")
 	@ResponseBody
-	public String rejectOrder(@RequestBody OrderRejectDTO orderRejectDTO) {
-		orderService.rejectOrder(orderRejectDTO);
+	public String rejectOrder(
+			@RequestBody OrderRejectDTO orderRejectDTO,
+			@AuthenticationPrincipal UserDTO userDTO
+			) {
+		orderService.rejectOrder(orderRejectDTO,userDTO);
 		return "order/approval";
 	}
 
