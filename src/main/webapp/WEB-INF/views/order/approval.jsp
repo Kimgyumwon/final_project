@@ -167,7 +167,7 @@
 				                      <tbody>
 				                        <c:forEach var="o" items="${orderHqList}">
 				                          <tr class="order-row" data-order-no="${o.hqOrderId}" data-order-member="${member.memberId}" data-order-type="HQ">
-				                            <td class="chk-td"><input type="checkbox" class="order-check" /></td>
+				                            <td class="chk-td"><input type="checkbox" class="order-check"></input> </td>
 				                            <td>${o.hqOrderId}</td>
 				                            <td class="text-end">
 				                              <fmt:formatNumber value="${o.hqOrderTotalAmount}"/>원
