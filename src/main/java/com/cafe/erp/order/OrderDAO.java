@@ -15,7 +15,7 @@ public interface OrderDAO {
 	public String selectMaxOrderHqId(String prefix, String orderDate);
 	public String selectMaxOrderStoreId(String prefix, String orderDate);
 	
-	public int selectStoreId(int memberId);
+	public OrderDTO selectStoreId(int memberId);
 	
 	public void insertHqOrder(OrderDTO orderDTO);
 	public void insertStoreOrder(OrderDTO orderDTO);

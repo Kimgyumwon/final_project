@@ -102,12 +102,26 @@ function loadModalNotifications() {
 
 /* ================= 공통 ================= */
 
+
 function createNotificationItem(n) {
-  const li = document.createElement("li");
-  li.className = `notify-item ${n.notificationReadYn === "N" ? "unread" : ""}`;
+	
+	const li = document.createElement("li");
+	
+	const typeClass = n.notificationType
+	  ? n.notificationType.toLowerCase()
+	  : "voc";
+	
+	li.className = `notify-item ${typeClass} ${n.notificationReadYn === "N" ? "unread" : ""}`;
+
 
   li.innerHTML = `
-    <div class="notify-icon"><i class="bx bx-message-rounded-detail"></i></div>
+	  <div class="notify-icon">
+	    <i class="bx ${
+	      typeClass === "order"
+	        ? "bx-package"
+	        : "bx-message-rounded-detail"
+	    }"></i>
+	  </div>
     <div class="notify-body">
       <div class="notify-header">
         <span class="notify-title">${n.notificationTitle}</span>

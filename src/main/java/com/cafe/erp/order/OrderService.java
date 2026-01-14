@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 
 import com.cafe.erp.item.ItemDTO;
 import com.cafe.erp.member.MemberDTO;
+import com.cafe.erp.notification.service.NotificationService;
 import com.cafe.erp.security.UserDTO;
 
 @Service
@@ -17,6 +18,9 @@ public class OrderService {
 	
 	@Autowired
 	private OrderDAO orderDAO;
+	
+	@Autowired
+	private NotificationService notificationService;
 	
 	public void requestOrder(OrderDTO orderDTO, UserDTO userDTO) { 
 		
@@ -32,8 +36,10 @@ public class OrderService {
 		if(String.valueOf(orderType).charAt(0) == '2') {
 			isHqOrder = true;
 			// 스토어 정보 가져오기
-			int storeId = orderDAO.selectStoreId(orderType);
-			orderDTO.setStoreId(storeId);
+			OrderDTO dto = orderDAO.selectStoreId(orderType);
+			
+			orderDTO.setStoreId(dto.getStoreId());
+			orderDTO.setStoreName(dto.getStoreName());
 		}
 		// 발주번호(orderId) 생성
 		String orderId = generateOrderId(isHqOrder);
@@ -49,8 +55,12 @@ public class OrderService {
 		// 발주 상세 insert
 		insertOrderItemDetail(orderDTO, isHqOrder);
 		
-		
-		
+		if (isHqOrder) {
+		    notificationService.sendOrderNotificationToFinanceTeam(
+		        orderDTO.getHqOrderId(),
+		        orderType
+		  );
+		}
 		
 	}
 	
@@ -114,6 +124,7 @@ public class OrderService {
 				orderDAO.insertHqOrderItemDetail(detail);
 			}
 		} else {
+			// 가맹점 발주 상세 insert
 			for (OrderItemRequestDTO req : orderDTO.getItems()) {
 				
 				OrderDetailDTO detail = new OrderDetailDTO();

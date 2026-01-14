@@ -14,8 +14,8 @@
 			where store_order_id LIKE CONCAT(#{prefix}, #{orderDate}, '%')    	
     	</select>
     	
-    	<select id="selectStoreId" parameterType="Integer" resultType="Integer">
-    		select store_id from store where member_id = #{memberId}
+    	<select id="selectStoreId" parameterType="Integer" resultType="OrderDTO">
+    		select store_id, store_name from store where member_id = #{memberId}
     	</select>
     	
     	<!-- 발주 추가 -->

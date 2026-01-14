@@ -43,6 +43,26 @@
   border-left-color: #6366f1;
 }
 
+/* ================= ORDER 알림 ================= */
+
+.toast.order {
+  border-left-color: #22c55e;
+}
+
+.notify-item.order .notify-icon {
+  background: #ecfdf5;
+  color: #22c55e;
+}
+
+.notify-item.order.unread {
+  box-shadow: inset 3px 0 0 #22c55e;
+  background: #f0fdf4;
+}
+
+.modal-list .notify-item.order.unread {
+  border-left: 4px solid #22c55e;
+}
+
 
 #notificationList {
   display: flex;
