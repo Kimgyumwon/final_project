@@ -13,6 +13,9 @@ import com.cafe.erp.member.MemberDTO;
 import com.cafe.erp.notification.service.NotificationService;
 import com.cafe.erp.order.event.OrderReceivedEvent;
 import com.cafe.erp.security.UserDTO;
+import com.cafe.erp.stock.StockDTO;
+import com.cafe.erp.stock.StockInoutDTO;
+import com.cafe.erp.stock.StockService;
 
 @Service
 public class OrderService {
@@ -25,6 +28,9 @@ public class OrderService {
 	
 	@Autowired
 	private NotificationService notificationService;
+	
+	@Autowired
+	private StockService stockService;
 	
 	public void requestOrder(OrderDTO orderDTO, UserDTO userDTO) { 
 		
@@ -213,25 +219,96 @@ public class OrderService {
 				orderId
 		);
 	}
+
 	@Transactional
-	public void receiveOrder(List<OrderRequestDTO> orderNos) {
+	public void receiveOrder(List<OrderRequestDTO> orderNos, MemberDTO member) {
+		System.out.println("🔥 orderNos size = " + orderNos.size());
+		
+		List<OrderDetailDTO> orderDetailList;
+		StockInoutDTO stockInoutDTO = new StockInoutDTO();
+		int inputId = 0;
+		int warehouseNo = 0;
 		
 		for (OrderRequestDTO orderNo : orderNos) {
-			
+			// 1️ 이미 입고완료인지 체크
 			if ("HQ".equals(orderNo.getOrderType())) {
-				
-				orderDAO.receiveHqOrder(orderNo.getOrderNo());
-                eventPublisher.publishEvent(
+				orderDAO.receiveHqOrder(orderNo.getOrderNo());							
+			} else if("STORE".equals(orderNo.getOrderType())){
+				orderDAO.receiveStoreOrder(orderNo.getOrderNo());							
+
+			    OrderDTO hqOrder = orderDAO.isHqAlreadyReceived(orderNo.getOrderNo());
+			    if (hqOrder != null && hqOrder.getHqOrderStatus() == 400) {
+			        continue;
+			    }
+
+			} else if ("STORE".equals(orderNo.getOrderType())) {
+
+			    OrderDTO storeOrder = orderDAO.isStoreAlreadyReceived(orderNo.getOrderNo());
+			    if (storeOrder != null && storeOrder.getHqOrderStatus() == 400) {
+			        continue;
+			    }
+			}
+
+	        // 2️ 승인/입고완료 상태 변경
+	        if ("HQ".equals(orderNo.getOrderType())) {
+	            orderDAO.receiveHqOrder(orderNo.getOrderNo());
+	            eventPublisher.publishEvent(
                         new OrderReceivedEvent("HQ", orderNo.getOrderNo())
                 );
-			} else if("STORE".equals(orderNo.getOrderType())) {
-				
-				orderDAO.receiveStoreOrder(orderNo.getOrderNo());
-				eventPublisher.publishEvent(
+	            orderDetailList = orderDAO.getHqOrderDetail(orderNo.getOrderNo());
+	            // 3 입출고번호 생성(입출고타입, 창고번호, 본사발주번호, 가맹발주번호)
+	            warehouseNo = 11;
+	            stockInoutDTO = settingStock(orderNo.getOrderType(), 11, orderNo.getOrderNo());
+	        } else {
+	            orderDAO.receiveStoreOrder(orderNo.getOrderNo());
+	            eventPublisher.publishEvent(
 	                    new OrderReceivedEvent("STORE", orderNo.getOrderNo())
 	            );
-			}
+	            orderDetailList = orderDAO.getStoreOrderDetail(orderNo.getOrderNo());
+	            // 3 입출고번호 생성(입출고타입, 창고번호, 본사발주번호, 가맹발주번호)
+	            int storeId = member.getMemberId();
+	            warehouseNo = orderDAO.findByWarehouseId(storeId);	            
+	            stockInoutDTO = settingStock(orderNo.getOrderType(), warehouseNo, orderNo.getOrderNo());
+	        }
+	        	orderDAO.insertOrderInOut(stockInoutDTO);
+	        	inputId = stockInoutDTO.getInputId();
+
+	        // 4️ 상세 목록 조회 (이게 핵심)
+	        List<OrderDetailDTO> details =
+	            "HQ".equals(orderNo.getOrderType())
+	            ? orderDAO.getHqOrderDetail(orderNo.getOrderNo())
+	            : orderDAO.getStoreOrderDetail(orderNo.getOrderNo());
+
+	        // 5️ 상세 기준 재고 처리
+	        for (OrderDetailDTO d : details) {
+	    		StockDTO stockDTO = new StockDTO();
+	        	stockDTO.setWarehouseId(warehouseNo);
+	            stockDTO.setInputId(inputId);
+	            
+	            // 5-1️ 재고 이력 INSERT
+	            stockDTO = stockService.insertStockHistory(stockDTO, d);
+
+	            // 5-2️ 현재 재고 UPDATE / INSERT
+	            if(stockService.existsStock(stockDTO) > 0) {
+	            	stockService.updateStockQuantity(stockDTO);	            	
+	            } else {
+	            	stockService.insertStock(stockDTO);	            		            	
+	            }
+	        }
 		}
+	}
+	public StockInoutDTO settingStock(String OrderType, int warehouseNo, String orderNo) {
+		StockInoutDTO stockInoutDTO = new StockInoutDTO();
+		if("HQ".equals(OrderType)) {
+			stockInoutDTO.setInputType("IN");
+			stockInoutDTO.setWarehouseId(11);
+			stockInoutDTO.setHqOrderId(orderNo);
+		} else {
+			stockInoutDTO.setInputType("IN");
+			stockInoutDTO.setWarehouseId(warehouseNo);
+			stockInoutDTO.setHqOrderId(orderNo);
+		}
+		return stockInoutDTO;
 	}
 	public void cancelApprove(List<OrderRequestDTO> orderNos) {
 		for (OrderRequestDTO orderNo : orderNos) {
