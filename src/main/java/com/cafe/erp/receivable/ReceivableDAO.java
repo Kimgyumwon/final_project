@@ -12,6 +12,9 @@ import com.cafe.erp.receivable.detail.ReceivableItemDTO;
 import com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO;
 import com.cafe.erp.receivable.detail.ReceivableRoyaltyDTO;
 import com.cafe.erp.receivable.detail.ReceivableTransactionDTO;
+import com.cafe.erp.receivable.hq.HqPayableSearchDTO;
+import com.cafe.erp.receivable.hq.HqPayableSummaryDTO;
+import com.cafe.erp.receivable.hq.HqPayableTotalSummaryDTO;
 
 @Mapper
 public interface ReceivableDAO {
@@ -59,21 +62,31 @@ public interface ReceivableDAO {
     public int insertMonthlyRoyaltyReceivable();
     
     // 생성된 채권인지 확인 (본사 - 거래처)
-    boolean existsByHqOrderId(String hqOrderId);
+    public boolean existsByHqOrderId(String hqOrderId);
     // 발주 공급가액 조회 (본사 - 거래처)
-    Integer selectHqOrderSupplyAmount(String hqOrderId);
+    public Integer selectHqOrderSupplyAmount(String hqOrderId);
     // 발주테이블 상태값이 400이면 채권생성 
-    void insertReceivableForHqOrder(String hqOrderId, Integer supplyAmount );
+    public void insertReceivableForHqOrder(String hqOrderId, Integer supplyAmount );
     
     // 생성된 채권인지 확인 (본사 - 가맹점)
-    boolean existsByStoreOrderId(String storeOrderId);
+    public boolean existsByStoreOrderId(String storeOrderId);
     // 발주 공급가액 조회 (본사 - 가맹점)
-    Integer selectStoreOrderSupplyAmount(String storeOrderId);
+    public Integer selectStoreOrderSupplyAmount(String storeOrderId);
     // 발주테이블 상태값이 400이면 채권생성 
-    void insertReceivableForStoreOrder(String storeOrderId, int supplyAmount );
+    public void insertReceivableForStoreOrder(String storeOrderId, int supplyAmount );
 
     
+    // 거래처 코드
     
+	// 월 기준 목록/카운트
+	List<HqPayableSummaryDTO> selectHqPayableListByMonth(HqPayableSearchDTO dto);
+	Long selectHqPayableCountByMonth(HqPayableSearchDTO dto);
+	HqPayableTotalSummaryDTO selectHqPayableTotalSummaryByMonth(HqPayableSearchDTO dto);
+
+	// 전체(월 조건 없음) 목록/카운트
+	List<HqPayableSummaryDTO> selectHqPayableListAll(HqPayableSearchDTO dto);
+	Long selectHqPayableCountAll(HqPayableSearchDTO dto);
+	HqPayableTotalSummaryDTO selectHqPayableTotalSummaryAll(HqPayableSearchDTO dto);
     
     
     

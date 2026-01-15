@@ -574,7 +574,7 @@
 	  FROM order_store
 	  WHERE store_order_id = #{storeOrderId}
 	</select>
-		
+	<!-- 가맹점 발주 채권 생성 -->
 	<insert id="insertReceivableForStoreOrder">
 	  INSERT INTO receivable (
 	      receivable_id,
@@ -603,9 +603,297 @@
 	      #{storeOrderId}
 	  )
 	</insert>
+	<!-- ======================= 거래처 데이터 =========================== -->
 	
 	
-	
+	<!-- =========================
+	     1) 월 기준 목록
+	     ========================= -->
+	<select id="selectHqPayableListByMonth"
+	        parameterType="com.cafe.erp.receivable.hq.HqPayableSearchDTO"
+	        resultType="com.cafe.erp.receivable.hq.HqPayableSummaryDTO">
+
+	  SELECT
+	    v.vendor_code AS vendorCode,
+	    v.vendor_name AS vendorName,
+	    #{baseMonth}  AS baseMonth,
+
+	    (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) AS totalUnpaidAmount
+
+	  FROM receivable r
+
+	  LEFT JOIN (
+	    SELECT
+	      receivable_id,
+	      SUM(transaction_amount) AS paid_amount
+	    FROM receivable_transaction
+	    WHERE transaction_type = 'P'
+	    GROUP BY receivable_id
+	  ) rt
+	    ON r.receivable_id = rt.receivable_id
+
+	  JOIN order_hq_detail ohd
+	    ON r.hq_order_id = ohd.hq_order_id
+
+	  JOIN vendor v
+	    ON ohd.vendor_code = v.vendor_code
+
+	  WHERE r.receivable_type = 'P'
+	    AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
+
+	  <if test="vendorName != null and vendorName != ''">
+	    AND v.vendor_name LIKE CONCAT('%', #{vendorName}, '%')
+	  </if>
+
+	  GROUP BY v.vendor_code, v.vendor_name
+
+	  HAVING (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) > 0
+	  <if test="payStatus == 'UNPAID'">
+	    AND IFNULL(SUM(rt.paid_amount), 0) = 0
+	  </if>
+	  <if test="payStatus == 'PARTIAL'">
+	    AND IFNULL(SUM(rt.paid_amount), 0) > 0
+	  </if>
+
+	  ORDER BY v.vendor_name ASC
+	  LIMIT #{pager.perPage}
+	  OFFSET #{pager.startNum}
+	</select>
+
+	<select id="selectHqPayableCountByMonth"
+	        parameterType="com.cafe.erp.receivable.hq.HqPayableSearchDTO"
+	        resultType="long">
+
+	  SELECT COUNT(*)
+	  FROM (
+	    SELECT v.vendor_code
+	    FROM receivable r
+
+	    LEFT JOIN (
+	      SELECT
+	        receivable_id,
+	        SUM(transaction_amount) AS paid_amount
+	      FROM receivable_transaction
+	      WHERE transaction_type = 'P'
+	      GROUP BY receivable_id
+	    ) rt
+	      ON r.receivable_id = rt.receivable_id
+
+	    JOIN order_hq_detail ohd
+	      ON r.hq_order_id = ohd.hq_order_id
+
+	    JOIN vendor v
+	      ON ohd.vendor_code = v.vendor_code
+
+	    WHERE r.receivable_type = 'P'
+	      AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
+
+	    <if test="vendorName != null and vendorName != ''">
+	      AND v.vendor_name LIKE CONCAT('%', #{vendorName}, '%')
+	    </if>
+
+	    GROUP BY v.vendor_code, v.vendor_name
+
+	    HAVING (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) > 0
+	    <if test="payStatus == 'UNPAID'">
+	      AND IFNULL(SUM(rt.paid_amount), 0) = 0
+	    </if>
+	    <if test="payStatus == 'PARTIAL'">
+	      AND IFNULL(SUM(rt.paid_amount), 0) > 0
+	    </if>
+	  ) t
+	</select>
+
+	<select id="selectHqPayableTotalSummaryByMonth"
+	        parameterType="com.cafe.erp.receivable.hq.HqPayableSearchDTO"
+	        resultType="com.cafe.erp.receivable.hq.HqPayableTotalSummaryDTO">
+
+	  SELECT
+	    IFNULL(SUM(t.total_unpaid_amount), 0) AS totalUnpaidAmount,
+	    COUNT(*) AS payableCount
+	  FROM (
+	    SELECT
+	      v.vendor_code,
+	      (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) AS total_unpaid_amount
+	    FROM receivable r
+
+	    LEFT JOIN (
+	      SELECT
+	        receivable_id,
+	        SUM(transaction_amount) AS paid_amount
+	      FROM receivable_transaction
+	      WHERE transaction_type = 'P'
+	      GROUP BY receivable_id
+	    ) rt
+	      ON r.receivable_id = rt.receivable_id
+
+	    JOIN order_hq_detail ohd
+	      ON r.hq_order_id = ohd.hq_order_id
+
+	    JOIN vendor v
+	      ON ohd.vendor_code = v.vendor_code
+
+	    WHERE r.receivable_type = 'P'
+	      AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
+
+	    <if test="vendorName != null and vendorName != ''">
+	      AND v.vendor_name LIKE CONCAT('%', #{vendorName}, '%')
+	    </if>
+
+	    GROUP BY v.vendor_code, v.vendor_name
+
+	    HAVING (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) > 0
+	    <if test="payStatus == 'UNPAID'">
+	      AND IFNULL(SUM(rt.paid_amount), 0) = 0
+	    </if>
+	    <if test="payStatus == 'PARTIAL'">
+	      AND IFNULL(SUM(rt.paid_amount), 0) > 0
+	    </if>
+	  ) t
+	</select>
+
+	<!-- =========================
+	     2) 전체(월 조건 없음) 목록
+	     ========================= -->
+	<select id="selectHqPayableListAll"
+	        parameterType="com.cafe.erp.receivable.hq.HqPayableSearchDTO"
+	        resultType="com.cafe.erp.receivable.hq.HqPayableSummaryDTO">
+
+	  SELECT
+	    v.vendor_code AS vendorCode,
+	    v.vendor_name AS vendorName,
+	    ''           AS baseMonth,
+
+	    (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) AS totalUnpaidAmount
+
+	  FROM receivable r
+
+	  LEFT JOIN (
+	    SELECT
+	      receivable_id,
+	      SUM(transaction_amount) AS paid_amount
+	    FROM receivable_transaction
+	    WHERE transaction_type = 'P'
+	    GROUP BY receivable_id
+	  ) rt
+	    ON r.receivable_id = rt.receivable_id
+
+	  JOIN order_hq_detail ohd
+	    ON r.hq_order_id = ohd.hq_order_id
+
+	  JOIN vendor v
+	    ON ohd.vendor_code = v.vendor_code
+
+	  WHERE r.receivable_type = 'P'
+
+	  <if test="vendorName != null and vendorName != ''">
+	    AND v.vendor_name LIKE CONCAT('%', #{vendorName}, '%')
+	  </if>
+
+	  GROUP BY v.vendor_code, v.vendor_name
+
+	  HAVING (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) > 0
+	  <if test="payStatus == 'UNPAID'">
+	    AND IFNULL(SUM(rt.paid_amount), 0) = 0
+	  </if>
+	  <if test="payStatus == 'PARTIAL'">
+	    AND IFNULL(SUM(rt.paid_amount), 0) > 0
+	  </if>
+
+	  ORDER BY v.vendor_name ASC
+	  LIMIT #{pager.perPage}
+	  OFFSET #{pager.startNum}
+	</select>
+
+	<select id="selectHqPayableCountAll"
+	        parameterType="com.cafe.erp.receivable.hq.HqPayableSearchDTO"
+	        resultType="long">
+
+	  SELECT COUNT(*)
+	  FROM (
+	    SELECT v.vendor_code
+	    FROM receivable r
+
+	    LEFT JOIN (
+	      SELECT
+	        receivable_id,
+	        SUM(transaction_amount) AS paid_amount
+	      FROM receivable_transaction
+	      WHERE transaction_type = 'P'
+	      GROUP BY receivable_id
+	    ) rt
+	      ON r.receivable_id = rt.receivable_id
+
+	    JOIN order_hq_detail ohd
+	      ON r.hq_order_id = ohd.hq_order_id
+
+	    JOIN vendor v
+	      ON ohd.vendor_code = v.vendor_code
+
+	    WHERE r.receivable_type = 'P'
+
+	    <if test="vendorName != null and vendorName != ''">
+	      AND v.vendor_name LIKE CONCAT('%', #{vendorName}, '%')
+	    </if>
+
+	    GROUP BY v.vendor_code, v.vendor_name
+
+	    HAVING (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) > 0
+	    <if test="payStatus == 'UNPAID'">
+	      AND IFNULL(SUM(rt.paid_amount), 0) = 0
+	    </if>
+	    <if test="payStatus == 'PARTIAL'">
+	      AND IFNULL(SUM(rt.paid_amount), 0) > 0
+	    </if>
+	  ) t
+	</select>
+
+	<select id="selectHqPayableTotalSummaryAll"
+	        parameterType="com.cafe.erp.receivable.hq.HqPayableSearchDTO"
+	        resultType="com.cafe.erp.receivable.hq.HqPayableTotalSummaryDTO">
+
+	  SELECT
+	    IFNULL(SUM(t.total_unpaid_amount), 0) AS totalUnpaidAmount,
+	    COUNT(*) AS payableCount
+	  FROM (
+	    SELECT
+	      v.vendor_code,
+	      (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) AS total_unpaid_amount
+	    FROM receivable r
+
+	    LEFT JOIN (
+	      SELECT
+	        receivable_id,
+	        SUM(transaction_amount) AS paid_amount
+	      FROM receivable_transaction
+	      WHERE transaction_type = 'P'
+	      GROUP BY receivable_id
+	    ) rt
+	      ON r.receivable_id = rt.receivable_id
+
+	    JOIN order_hq_detail ohd
+	      ON r.hq_order_id = ohd.hq_order_id
+
+	    JOIN vendor v
+	      ON ohd.vendor_code = v.vendor_code
+
+	    WHERE r.receivable_type = 'P'
+
+	    <if test="vendorName != null and vendorName != ''">
+	      AND v.vendor_name LIKE CONCAT('%', #{vendorName}, '%')
+	    </if>
+
+	    GROUP BY v.vendor_code, v.vendor_name
+
+	    HAVING (SUM(r.receivable_total_amount) - IFNULL(SUM(rt.paid_amount), 0)) > 0
+	    <if test="payStatus == 'UNPAID'">
+	      AND IFNULL(SUM(rt.paid_amount), 0) = 0
+	    </if>
+	    <if test="payStatus == 'PARTIAL'">
+	      AND IFNULL(SUM(rt.paid_amount), 0) > 0
+	    </if>
+	  ) t
+	</select>
 	
 	
 </mapper>

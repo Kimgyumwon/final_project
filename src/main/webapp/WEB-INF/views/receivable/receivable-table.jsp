@@ -23,7 +23,6 @@
       <tr>
         <td class="fw-semibold">${row.storeName}</td>
         <td>${row.baseMonth}</td>
-
         <td class="text-end fw-bold text-primary">
           <fmt:formatNumber value="${row.totalAmount}" />
         </td>

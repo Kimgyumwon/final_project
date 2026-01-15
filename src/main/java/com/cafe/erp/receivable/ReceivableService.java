@@ -14,6 +14,9 @@ import com.cafe.erp.receivable.detail.ReceivableItemDTO;
 import com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO;
 import com.cafe.erp.receivable.detail.ReceivableRoyaltyDTO;
 import com.cafe.erp.receivable.detail.ReceivableTransactionDTO;
+import com.cafe.erp.receivable.hq.HqPayableSearchDTO;
+import com.cafe.erp.receivable.hq.HqPayableSummaryDTO;
+import com.cafe.erp.receivable.hq.HqPayableTotalSummaryDTO;
 import com.cafe.erp.util.Pager;
 
 @Service
@@ -191,6 +194,35 @@ public class ReceivableService {
             supplyAmount
         );
     }
+    
+    // 거래처 코드
+	public List<HqPayableSummaryDTO> hqPayableSearchList(HqPayableSearchDTO dto) {
+
+		boolean hasBaseMonth = dto.getBaseMonth() != null && !dto.getBaseMonth().isBlank();
+
+		Long totalCount = hasBaseMonth
+				? dao.selectHqPayableCountByMonth(dto)
+				: dao.selectHqPayableCountAll(dto);
+
+		try {
+			Pager pager = dto.getPager();
+			pager.pageing(totalCount);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return hasBaseMonth
+				? dao.selectHqPayableListByMonth(dto)
+				: dao.selectHqPayableListAll(dto);
+	}
+
+	public HqPayableTotalSummaryDTO getHqPayableSummary(HqPayableSearchDTO dto) {
+		boolean hasBaseMonth = dto.getBaseMonth() != null && !dto.getBaseMonth().isBlank();
+
+		return hasBaseMonth
+				? dao.selectHqPayableTotalSummaryByMonth(dto)
+				: dao.selectHqPayableTotalSummaryAll(dto);
+	}
     
     
     
