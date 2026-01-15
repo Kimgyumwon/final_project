@@ -60,7 +60,10 @@ function appendFileField(containerId, inputName) {
 async function fetchJson(url, options = {}) {
     const response = await fetch(url, options);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    return response.json();
+    const text = await response.text();
+    if (!text) return null;
+
+    return JSON.parse(text);
 }
 
 async function searchStore() {
@@ -205,6 +208,16 @@ async function submitContractRegistration() {
         });
 
         if (!response.ok) throw new Error(`서버 오류: ${response.status}`);
+
+        const result = await response.json();
+
+        if (result.status === 'error') {
+            alert(result.message);
+            return;
+        } else if (result.status === 'fail') {
+            alert("계약 등록 중 오류가 발생했습니다.");
+            return;
+        }
         
         alert("계약이 성공적으로 등록되었습니다.");
         
@@ -222,9 +235,14 @@ async function submitContractRegistration() {
 async function getContractDetail(contractId) {
     try {
 		const data = await fetchJson(`/store/contract/detail?contractId=${contractId}`, { method: "GET" });
+
+		if (!data) {
+		    alert('해당 정보를 열람할 수 없습니다.');
+		    return;
+		}
         
 		// 전역 변수에 저장
-        currentContractData = data; 
+        currentContractData = data;
 
         document.getElementById('detailContractId').innerText = data.contractId;
         document.getElementById('detailStoreName').innerText = data.storeName;
@@ -457,7 +475,17 @@ async function updateContract() {
 
         if (!response.ok) throw new Error(`서버 오류: ${response.status}`);
 
-        alert("계약 정보가 수정되었습니다.");
+        const result = await response.json();
+
+        if (result.status === 'error') {
+            alert(result.message);
+            return;
+        } else if (result.status === 'fail') {
+            alert("계약정보 수정 중 오류가 발생했습니다.");
+            return;
+        }
+
+        alert("계약정보가 수정되었습니다.");
 
 		isContractUpdated = true;
         await getContractDetail(contractId);

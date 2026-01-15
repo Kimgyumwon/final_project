@@ -46,6 +46,7 @@ public class StoreController {
 		return "store/tab_store";
 	}
 
+	@PreAuthorize("hasAnyRole('DEPT_SALES', 'EXEC', 'MASTER')")
 	@PostMapping("add") 
 	@ResponseBody
 	public Map<String, Object> addStore(@RequestBody StoreDTO storeDTO) throws Exception { 

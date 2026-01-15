@@ -24,7 +24,6 @@ public class SecurityConfig {
 
     @Autowired 
     private UserDetailsService userDetailsService;
-
     @Autowired
     private LoginSuccessHandler loginSuccessHandler;
 
@@ -51,7 +50,7 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider(passwordEncoder))
             .authorizeHttpRequests(auth -> auth
             		.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                    .requestMatchers("/member/login", "/login", "/error", "/member/sessionCheck").permitAll()
+                    .requestMatchers("/member/login", "/login", "/error/**", "favicon.ico", "/member/sessionCheck").permitAll()
                     .anyRequest().authenticated() // 로그인 안 된 사용자 막기
             )
             .formLogin(login -> login
@@ -75,7 +74,6 @@ public class SecurityConfig {
                     .maxSessionsPreventsLogin(false)
                     .expiredUrl("/member/login")
             );
-
         return http.build();
     }
     

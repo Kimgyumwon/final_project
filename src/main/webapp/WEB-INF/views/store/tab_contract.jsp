@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <%@taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <html
   lang="en"
@@ -174,9 +175,11 @@
 					       		<button type="button" class="btn btn-outline-success me-2" onclick="downloadExcel()">
 					            	<i class='bx bx-download me-1'></i> 엑셀 다운로드
 					            </button>
-					          	<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerContractModal">
-					                <i class="bx bx-plus me-1"></i> 계약 등록
-					          	</button>
+								<sec:authorize access="hasAnyRole('DEPT_SALES', 'EXEC', 'MASTER')">
+									<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerContractModal">
+										<i class="bx bx-plus me-1"></i> 계약 등록
+									</button>
+								</sec:authorize>
 					     	</div>
 						</div>
 					  
@@ -240,90 +243,92 @@
                 </div>
 			  	
 	          </div>
-	          
-			      <div class="modal fade" id="registerContractModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-			        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
-			            <div class="modal-content">
-			                <div class="modal-header">
-			                    <h5 class="modal-title">가맹점 계약 등록</h5>
-			                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			                </div>
-			                <div class="modal-body">
-			                    <form id="registerContractForm">
-			                        <div class="row g-3">
-			                        
-			                        	<div class="col-md-12">
-			                                <label class="form-label" for="storeNameInput">가맹점명 검색 <span class="text-danger">*</span></label>
-			                                <div class="input-group">
-			                                	<span class="input-group-text"><i class="bx bx-store"></i></span>
-			                                    <input type="text" id="storeNameInput" class="form-control" placeholder="가맹점명 입력" onkeyup="if(window.event.keyCode==13){searchStore()}" required />
-			                                    <input type="hidden" id="storeId" name="storeId" />
-			                                    <button class="btn btn-primary" type="button" onclick="searchStore()">
-			                                        <i class="bx bx-search"></i>
-			                                    </button>
-			                                </div>
-			                                
-			                                <ul id="storeResultList" class="list-group position-absolute overflow-auto" 
-									        	style="max-height: 200px; width: 90%; z-index: 1050; display: none; margin-top: 5px; box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.15); background-color: rgba(255, 255, 255, 0.9);">
-									        </ul>
-			                            </div>
-			                            
-			                            <div class="col-12"><hr class="my-2"></div>
-			                            <div class="col-md-6">
-			                                <label class="form-label" for="royalti">로얄티</label>
-			                                <div class="input-group">
-			                                    <span class="input-group-text">₩</span>
-			                                    <input type="number" id="royalti" class="form-control" placeholder="500000" />
-			                                    <span class="input-group-text">원</span>
-			                                </div>
-			                            </div>
-			                            <div class="col-md-6">
-			                                <label class="form-label" for="deposit">여신 (보증금)</label>
-			                                <div class="input-group">
-			                                    <span class="input-group-text">₩</span>
-			                                    <input type="number" id="deposit" class="form-control" placeholder="50000000" />
-			                                    <span class="input-group-text">원</span>
-			                                </div>
-			                            </div>
-			                            <div class="col-12"><hr class="my-2"></div>
-			                            
-										<div class="col-md-6">
-											<label class="form-label" for="startDate">계약 시작일</label>
-											<input type="date" id="startDate" class="form-control" required />
+
+				<sec:authorize access="hasAnyRole('DEPT_SALES', 'EXEC', 'MASTER')">
+					  <div class="modal fade" id="registerContractModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+						<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">가맹점 계약 등록</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="registerContractForm">
+										<div class="row g-3">
+
+											<div class="col-md-12">
+												<label class="form-label" for="storeNameInput">가맹점명 검색 <span class="text-danger">*</span></label>
+												<div class="input-group">
+													<span class="input-group-text"><i class="bx bx-store"></i></span>
+													<input type="text" id="storeNameInput" class="form-control" placeholder="가맹점명 입력" onkeyup="if(window.event.keyCode==13){searchStore()}" required />
+													<input type="hidden" id="storeId" name="storeId" />
+													<button class="btn btn-primary" type="button" onclick="searchStore()">
+														<i class="bx bx-search"></i>
+													</button>
+												</div>
+
+												<ul id="storeResultList" class="list-group position-absolute overflow-auto"
+													style="max-height: 200px; width: 90%; z-index: 1050; display: none; margin-top: 5px; box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.15); background-color: rgba(255, 255, 255, 0.9);">
+												</ul>
+											</div>
+
+											<div class="col-12"><hr class="my-2"></div>
+											<div class="col-md-6">
+												<label class="form-label" for="royalti">로얄티</label>
+												<div class="input-group">
+													<span class="input-group-text">₩</span>
+													<input type="number" id="royalti" class="form-control" placeholder="500000" />
+													<span class="input-group-text">원</span>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<label class="form-label" for="deposit">여신 (보증금)</label>
+												<div class="input-group">
+													<span class="input-group-text">₩</span>
+													<input type="number" id="deposit" class="form-control" placeholder="50000000" />
+													<span class="input-group-text">원</span>
+												</div>
+											</div>
+											<div class="col-12"><hr class="my-2"></div>
+
+											<div class="col-md-6">
+												<label class="form-label" for="startDate">계약 시작일</label>
+												<input type="date" id="startDate" class="form-control" required />
+											</div>
+
+											<div class="col-md-6">
+												<label class="form-label" for="endDate">계약 종료일</label>
+												<input type="date" id="endDate" class="form-control" required />
+											</div>
+
+
+											<div class="col-12 mt-3">
+												<label class="form-label">첨부파일</label>
+												<div id="fileContainer">
+													<div class="input-group mb-2">
+														<input type="file" class="form-control" name="contractFiles">
+														<button type="button" class="btn btn-outline-primary" onclick="addFileField()">
+															<i class="bx bx-plus"></i>
+														</button>
+													</div>
+												</div>
+												<div class="form-text small text-muted">
+													※  + 버튼을 누르면 첨부파일 칸이 추가됩니다.
+												</div>
+											</div>
+
 										</div>
-										
-										<div class="col-md-6">
-											<label class="form-label" for="endDate">계약 종료일</label>
-											<input type="date" id="endDate" class="form-control" required />
-										</div>
-			                          
-			
-			                            <div class="col-12 mt-3">
-			                                <label class="form-label">첨부파일</label>
-			                                <div id="fileContainer">
-			                                    <div class="input-group mb-2">
-			                                        <input type="file" class="form-control" name="contractFiles">
-			                                        <button type="button" class="btn btn-outline-primary" onclick="addFileField()">
-			                                            <i class="bx bx-plus"></i>
-			                                        </button>
-			                                    </div>
-			                                </div>
-			                                <div class="form-text small text-muted">
-			                                    ※  + 버튼을 누르면 첨부파일 칸이 추가됩니다.
-			                                </div>
-			                            </div>
-			
-			                        </div>
-			                    </form>
-			                </div>
-			                <div class="modal-footer">
-			                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
-			                    <button type="button" class="btn btn-primary" onclick="submitContractRegistration()">계약 저장</button>
-			                </div>
-			            </div>
-			        </div>
-			    </div>
-			    
+									</form>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+									<button type="button" class="btn btn-primary" onclick="submitContractRegistration()">계약 저장</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</sec:authorize>
+
 				<div class="modal fade" id="detailContractModal" tabindex="-1" aria-hidden="true">
 				    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
 				        <div class="modal-content">
@@ -440,17 +445,21 @@
 									<i class="bx bxs-file-pdf me-1"></i> 계약서 PDF 저장
 								</button>
 								<div class="d-felx">
-									<button type="button" id="btnEditMode" class="btn btn-primary px-4 me-2" onclick="enableEditMode()">
-							            <i class="bx bx-edit me-1"></i> 수정
-							        </button>
+									<sec:authorize access="hasAnyRole('DEPT_SALES', 'EXEC', 'MASTER')">
+										<button type="button" id="btnEditMode" class="btn btn-primary px-4 me-2" onclick="enableEditMode()">
+											<i class="bx bx-edit me-1"></i> 수정
+										</button>
+									</sec:authorize>
 					                <button type="button" id="btnCloseModal" class="btn btn-secondary px-4" data-bs-dismiss="modal">닫기</button>
-					                
-							        <button type="button" id="btnCancelEdit" class="btn btn-secondary px-4 me-2 d-none" onclick="cancelEditMode()">
-							            취소
-							        </button>
-					                <button type="button" id="btnSaveContract" class="btn btn-primary px-4 d-none" onclick="updateContract()">
-							            계약 저장
-							        </button>
+
+									<sec:authorize access="hasAnyRole('DEPT_SALES', 'EXEC', 'MASTER')">
+										<button type="button" id="btnCancelEdit" class="btn btn-secondary px-4 me-2 d-none" onclick="cancelEditMode()">
+											취소
+										</button>
+										<button type="button" id="btnSaveContract" class="btn btn-primary px-4 d-none" onclick="updateContract()">
+											계약 저장
+										</button>
+									</sec:authorize>
 								</div>
 				            </div>
 				        </div>
