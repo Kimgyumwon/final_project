@@ -57,4 +57,24 @@ public interface ReceivableDAO {
     
     // 채권 매월 1일에 자동 생성
     public int insertMonthlyRoyaltyReceivable();
+    
+    // 생성된 채권인지 확인 (본사 - 거래처)
+    boolean existsByHqOrderId(String hqOrderId);
+    // 발주 공급가액 조회 (본사 - 거래처)
+    Integer selectHqOrderSupplyAmount(String hqOrderId);
+    // 발주테이블 상태값이 400이면 채권생성 
+    void insertReceivableForHqOrder(String hqOrderId, Integer supplyAmount );
+    
+    // 생성된 채권인지 확인 (본사 - 가맹점)
+    boolean existsByStoreOrderId(String storeOrderId);
+    // 발주 공급가액 조회 (본사 - 가맹점)
+    Integer selectStoreOrderSupplyAmount(String storeOrderId);
+    // 발주테이블 상태값이 400이면 채권생성 
+    void insertReceivableForStoreOrder(String storeOrderId, int supplyAmount );
+
+    
+    
+    
+    
+    
 }

@@ -159,4 +159,39 @@ public class ReceivableService {
 		return dao.getAvailableReceivables(receivableSummaryDTO);
 	}
 	
+	// 본사 채권 생성
+    @Transactional
+    public void createReceivableForHqOrder(String hqOrderId) {
+
+        // 중복 생성 방지
+        if (dao.existsByHqOrderId(hqOrderId)) {
+            return;
+        }
+
+        Integer supplyAmount =
+        		dao.selectHqOrderSupplyAmount(hqOrderId);
+
+        dao.insertReceivableForHqOrder(
+                hqOrderId,
+                supplyAmount
+        );
+    }
+    // 가맹점 채권 생성
+    public void createReceivableForStoreOrder(String storeOrderId) {
+
+        if (dao.existsByStoreOrderId(storeOrderId)) {
+            return;
+        }
+
+        Integer supplyAmount =
+        		dao.selectStoreOrderSupplyAmount(storeOrderId);
+
+        dao.insertReceivableForStoreOrder(
+            storeOrderId,
+            supplyAmount
+        );
+    }
+    
+    
+    
 }

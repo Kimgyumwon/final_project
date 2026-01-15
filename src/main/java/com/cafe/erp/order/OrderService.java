@@ -5,12 +5,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.cafe.erp.item.ItemDTO;
 import com.cafe.erp.member.MemberDTO;
 import com.cafe.erp.notification.service.NotificationService;
+import com.cafe.erp.order.event.OrderReceivedEvent;
 import com.cafe.erp.security.UserDTO;
 
 @Service
@@ -18,6 +19,9 @@ public class OrderService {
 	
 	@Autowired
 	private OrderDAO orderDAO;
+	
+	@Autowired
+	private ApplicationEventPublisher eventPublisher;
 	
 	@Autowired
 	private NotificationService notificationService;
@@ -209,12 +213,23 @@ public class OrderService {
 				orderId
 		);
 	}
+	@Transactional
 	public void receiveOrder(List<OrderRequestDTO> orderNos) {
+		
 		for (OrderRequestDTO orderNo : orderNos) {
+			
 			if ("HQ".equals(orderNo.getOrderType())) {
-				orderDAO.receiveHqOrder(orderNo.getOrderNo());							
-			} else if("STORE".equals(orderNo.getOrderType())){
-				orderDAO.receiveStoreOrder(orderNo.getOrderNo());							
+				
+				orderDAO.receiveHqOrder(orderNo.getOrderNo());
+                eventPublisher.publishEvent(
+                        new OrderReceivedEvent("HQ", orderNo.getOrderNo())
+                );
+			} else if("STORE".equals(orderNo.getOrderType())) {
+				
+				orderDAO.receiveStoreOrder(orderNo.getOrderNo());
+				eventPublisher.publishEvent(
+	                    new OrderReceivedEvent("STORE", orderNo.getOrderNo())
+	            );
 			}
 		}
 	}

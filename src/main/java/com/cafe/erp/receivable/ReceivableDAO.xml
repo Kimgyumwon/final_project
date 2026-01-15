@@ -505,12 +505,104 @@
 	</insert>
 	
 	
+	<!-- 거래처 발주 총액 조회 -->
+	<select id="selectHqOrderSupplyAmount"
+        parameterType="string"
+        resultType="int">
+		    SELECT hq_order_total_amount
+		    FROM order_hq
+		    WHERE hq_order_id = #{hqOrderId}
+	</select>
+	<!-- 거래처 발주 채권 생성 -->
+	<insert id="insertReceivableForHqOrder">
+	    INSERT INTO receivable (
+	        receivable_id,
+	        receivable_type,
+	        receivable_supply_amount,
+	        receivable_tax_amount,
+	        receivable_total_amount,
+	        receivable_date,
+	        receivable_status,
+	        hq_order_id
+	    ) VALUES (
+	        CONCAT(
+	            'RCV-',
+	            'P',
+	            '-',
+	            DATE_FORMAT(NOW(), '%Y%m'),
+	            '-',
+	            #{hqOrderId}
+	        ),
+	        'P',
+	        #{supplyAmount},
+	        FLOOR(#{supplyAmount} * 0.1),
+	        #{supplyAmount} + FLOOR(#{supplyAmount} * 0.1),
+	        NOW(),
+	        'O',
+	        #{hqOrderId}
+	    )
+	</insert>
 	
+	<!-- 중복 체크 거래처 채권 -->
+	<select id="existsByHqOrderId"
+        parameterType="string"
+        resultType="boolean">
+	  SELECT EXISTS (
+	    SELECT 1
+	    FROM receivable
+	    WHERE hq_order_id = #{hqOrderId}
+	      AND receivable_type = 'P'
+	  )
+	</select>
 	
-	
-	
-	
-	
+	<!-- 중복 체크 가맹점 채권 -->
+	<select id="existsByStoreOrderId"
+        parameterType="string"
+        resultType="boolean">
+	  SELECT EXISTS (
+	    SELECT 1
+	    FROM receivable
+	    WHERE store_order_id = #{storeOrderId}
+	      AND receivable_type = 'R'
+	  )
+	</select>
+	<!-- 가맹점 발주 총액 조회 -->
+	<select id="selectStoreOrderSupplyAmount"
+	        parameterType="string"
+	        resultType="int">
+	  SELECT store_order_total_amount
+	  FROM order_store
+	  WHERE store_order_id = #{storeOrderId}
+	</select>
+		
+	<insert id="insertReceivableForStoreOrder">
+	  INSERT INTO receivable (
+	      receivable_id,
+	      receivable_type,
+	      receivable_supply_amount,
+	      receivable_tax_amount,
+	      receivable_total_amount,
+	      receivable_date,
+	      receivable_status,
+	      store_order_id
+	  ) VALUES (
+	      CONCAT(
+	          'RCV-',
+	          'R',
+	          '-',
+	          DATE_FORMAT(NOW(), '%Y%m'),
+	          '-',
+	          #{storeOrderId}
+	      ),
+	      'R',
+	      #{supplyAmount},
+	      FLOOR(#{supplyAmount} * 0.1),
+	      #{supplyAmount} + FLOOR(#{supplyAmount} * 0.1),
+	      NOW(),
+	      'O',
+	      #{storeOrderId}
+	  )
+	</insert>
 	
 	
 	
