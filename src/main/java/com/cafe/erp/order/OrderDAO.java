@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 
 import com.cafe.erp.item.ItemDTO;
 import com.cafe.erp.member.MemberDTO;
+import com.cafe.erp.stock.StockInoutDTO;
 
 @Mapper
 public interface OrderDAO {
@@ -41,6 +42,11 @@ public interface OrderDAO {
 	
 	public void receiveHqOrder(@Param("orderNo") String orderNo);
 	public void receiveStoreOrder(@Param("orderNo") String orderNo);
+	
+	public OrderDTO isHqAlreadyReceived(@Param("orderNo") String orderNo);
+	public OrderDTO isStoreAlreadyReceived(@Param("orderNo") String orderNo);
+	public int findByWarehouseId(@Param("storeId") int storeId);
+	public void insertOrderInOut(StockInoutDTO stockInoutDTO);
 
 	public void cancelApproveHqOrder(@Param("orderNo") String orderNo);
 	public void cancelApproveStoreOrder(@Param("orderNo") String orderNo);

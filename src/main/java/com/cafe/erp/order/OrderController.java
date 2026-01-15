@@ -160,8 +160,10 @@ public class OrderController {
 	// 입고 요청
 	@PostMapping("receive")
 	@ResponseBody
-	public String receive(@RequestBody List<OrderRequestDTO> orderNos) {
-		orderService.receiveOrder(orderNos);
+	public String receive(@RequestBody List<OrderRequestDTO> orderNos,@AuthenticationPrincipal UserDTO userDTO) {
+		MemberDTO member = userDTO.getMember();
+		System.out.println("🔥 receive controller 진입");
+		orderService.receiveOrder(orderNos, member);
 		return "redirect:/order/receive";
 	}
 	

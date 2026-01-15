@@ -128,7 +128,8 @@
     		store_order_item_name as hqOrderItemName,
     		store_order_qty as hqOrderQty,
     		store_order_price as hqOrderPrice,
-    		store_order_amount as hqOrderAmount
+    		store_order_amount as hqOrderAmount,
+    		item_id as itemId
     		from order_store_detail where store_order_id = #{orderNo}
     	</select>
     	
@@ -167,4 +168,25 @@
     	<update id="receiveStoreOrder">
     		update order_store set store_order_status = 400 where store_order_id = #{orderNo}
     	</update>
+		<!-- 입고 상태 체크 -->
+		<select id="isHqAlreadyReceived" resultType="OrderDTO">
+			select * from order_hq where hq_order_id = #{orderNo}
+		</select>
+		<select id="isStoreAlreadyReceived" resultType="OrderDTO">
+			select * from order_store where store_order_id = #{orderNo}
+		</select>
+		<!-- 가맹주 창고 번호 찾기 -->
+		<select id="findByWarehouseId" resultType="Integer">
+			select warehouse_id from order_warehouse where store_id = #{storeId}
+		</select>
+		<!-- 입출고 기록 -->
+		<insert id="insertOrderInOut" parameterType="StockInoutDTO" 
+		useGeneratedKeys="true" keyProperty="inputId">
+			INSERT INTO order_in_out (
+        input_type,
+        warehouse_id,
+        hq_order_id,
+        store_order_id
+    )  values(#{inputType}, #{warehouseId}, #{hqOrderId}, #{storeOrderId})
+		</insert>
     </mapper>

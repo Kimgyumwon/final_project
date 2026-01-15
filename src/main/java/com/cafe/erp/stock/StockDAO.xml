@@ -4,8 +4,41 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
     <mapper namespace="com.cafe.erp.stock.StockDAO">
     	
-    	<!-- 입고 -->
-    	<insert id="">
+    	<!-- 입고 상세 내역 -->
+    	<insert id="insertStockHistory" parameterType="StockDTO">
+    		insert into order_stock_history 
+    		values(NULL, #{warehouseId}, #{itemId}, #{stockInoutType}, #{stockQuantity}, #{inputId}, NOW())
     	</insert>
-    
+    	
+    	<!-- 입고 요약 반영 -->
+    	<!-- 재고 여부 -->
+    	<select id="existsStock" parameterType="StockDTO" resultType="int">
+		  SELECT COUNT(*) FROM order_stock
+		  WHERE warehouse_id = #{warehouseId} AND item_id = #{itemId}
+		</select>
+		<!-- 재고 보유 -->
+    	<update id="updateStockQuantity" parameterType="StockDTO">
+		  UPDATE order_stock
+		  SET stock_quantity = stock_quantity + #{stockQuantity},
+		      stock_updated_at = NOW()
+		  WHERE warehouse_id = #{warehouseId}
+		    AND item_id = #{itemId}
+		</update>
+    	<!-- 재고 미보유 -->
+    	<insert id="insertStock" parameterType="StockDTO">
+		  INSERT INTO order_stock (
+		    stock_id,
+		    warehouse_id,
+		    item_id,
+		    stock_quantity,
+		    stock_updated_at
+		  )
+		  VALUES (
+		    NULL,
+		    #{warehouseId},
+		    #{itemId},
+		    #{stockQuantity},
+		    NOW()
+		  )
+		</insert>
     </mapper>
