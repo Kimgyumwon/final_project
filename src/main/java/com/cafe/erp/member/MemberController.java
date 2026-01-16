@@ -1,6 +1,7 @@
 package com.cafe.erp.member;
 
 import java.time.YearMonth;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,9 @@ import com.cafe.erp.member.attendance.MemberLeaveStatsDTO;
 import com.cafe.erp.member.commute.MemberCommuteDTO;
 import com.cafe.erp.member.commute.MemberCommuteSearchDTO;
 import com.cafe.erp.member.commute.MemberCommuteService;
+import com.cafe.erp.member.history.MemberHistorySearchDTO;
+import com.cafe.erp.member.history.MemberHistoryService;
+import com.cafe.erp.member.history.MemberLoginHistoryDTO;
 import com.cafe.erp.security.UserDTO;
 
 import jakarta.validation.Valid;
@@ -57,6 +61,10 @@ public class MemberController {
 	
 	@Autowired
 	private MemberAttendanceDAO memberAttendanceDAO;
+	
+	@Autowired
+	private MemberHistoryService memberHistoryService;
+	
 	
 
 	MemberController(PasswordEncoder passwordEncoder) {
@@ -379,6 +387,37 @@ public class MemberController {
 
 	    return "member/AM_member_detail";
 	}
+	
+	
+	
+	
+	
+	@GetMapping("admin_login_history")
+    public String loginHistory(Model model, MemberHistorySearchDTO memberHistorySearchDTO) throws Exception{
+		
+		/* 최근 3개월 이력 출력 */
+		if (memberHistorySearchDTO.getStartDate() == null || memberHistorySearchDTO.getStartDate().equals("")) {
+	        LocalDate today = LocalDate.now();
+	        LocalDate threeMonthsAgo = today.minusMonths(3);
+	        
+	        memberHistorySearchDTO.setStartDate(threeMonthsAgo.toString()); 
+	        memberHistorySearchDTO.setEndDate(today.toString());          
+	    }
+        List<MemberLoginHistoryDTO> list = memberHistoryService.selectLoginHistoryList(memberHistorySearchDTO);
+        
+        model.addAttribute("historyList", list);
+        model.addAttribute("pager", memberHistorySearchDTO); 
+        model.addAttribute("totalCount", memberHistorySearchDTO.getTotalCount());
+        
+        return "member/admin_login_history";
+    }
+	
+	
+	
+	
+	
+	
+	
 	
 	
 
