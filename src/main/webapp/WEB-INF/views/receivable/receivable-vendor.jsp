@@ -183,6 +183,120 @@
       <div class="layout-overlay layout-menu-toggle"></div>
     </div>
 
+
+	
+	<!-- ============================
+	     지급 처리 모달 (최종본)
+	     ============================ -->
+	<div class="modal fade" id="payModal" tabindex="-1" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered modal-md">
+	    <div class="modal-content">
+	
+	      <!-- ===== Header ===== -->
+	      <div class="modal-header">
+	        <h5 class="modal-title">지급 등록</h5>
+	        <button type="button"
+	                class="btn-close"
+	                data-bs-dismiss="modal"
+	                aria-label="Close"></button>
+	      </div>
+	
+	      <!-- ===== Body ===== -->
+	      <div class="modal-body">
+	        <form id="payForm">
+	
+	          <!-- hidden 값 -->
+	          <input type="hidden" name="vendorCode">
+	          <input type="hidden" name="baseMonth">
+	          <input type="hidden" name="remainAmount">
+	
+	          <!-- 거래처 / 기준월 -->
+	          <div class="row mb-3">
+	            <div class="col-md-6">
+	              <label class="form-label">거래처</label>
+	              <input type="text"
+	                     class="form-control"
+	                     name="vendorName"
+	                     readonly>
+	            </div>
+	            <div class="col-md-6">
+	              <label class="form-label">기준월</label>
+	              <input type="text"
+	                     class="form-control"
+	                     name="baseMonthView"
+	                     readonly>
+	            </div>
+	          </div>
+	
+	          <!-- 남은 금액 / 지급 금액 -->
+	          <div class="row mb-2">
+	            <div class="col-md-6">
+	              <label class="form-label">남은 미지급 금액</label>
+	              <input type="text"
+	                     class="form-control text-end"
+	                     name="remainAmountView"
+	                     readonly>
+	            </div>
+	            <div class="col-md-6">
+	              <label class="form-label">지급 금액</label>
+	              <input type="text"
+	                     class="form-control text-end"
+	                     name="payAmount"
+	                     value="0"
+	                     inputmode="numeric"
+	                     autocomplete="off">
+	            </div>
+	          </div>
+	
+	          <!-- 금액 버튼 -->
+	          <div class="mb-3">
+	            <button type="button"
+	                    class="btn btn-outline-secondary btn-sm pay-btn"
+	                    data-amount="10000">1만</button>
+	            <button type="button"
+	                    class="btn btn-outline-secondary btn-sm pay-btn"
+	                    data-amount="50000">5만</button>
+	            <button type="button"
+	                    class="btn btn-outline-secondary btn-sm pay-btn"
+	                    data-amount="100000">10만</button>
+	            <button type="button"
+	                    class="btn btn-outline-primary btn-sm"
+	                    id="btnPayAll">완납</button>
+	            <button type="button"
+	                    class="btn btn-outline-danger btn-sm"
+	                    id="btnPayReset">금액 초기화</button>
+	          </div>
+	
+	          <!-- 비고 -->
+	          <div class="mb-3">
+	            <label class="form-label">비고</label>
+	            <textarea class="form-control"
+	                      name="memo"
+	                      rows="3"></textarea>
+	          </div>
+	
+	        </form>
+	      </div>
+	
+	      <!-- ===== Footer ===== -->
+	      <div class="modal-footer">
+	        <button type="button"
+	                class="btn btn-secondary"
+	                data-bs-dismiss="modal">
+	          취소
+	        </button>
+	        <button type="button"
+	                class="btn btn-primary"
+	                id="btnPaySubmit">
+	          지급
+	        </button>
+	      </div>
+	
+	    </div>
+	  </div>
+	</div>
+
+	
     <!-- Core JS -->
     <script src="/vendor/libs/jquery/jquery.js"></script>
     <script src="/vendor/libs/popper/popper.js"></script>
@@ -195,7 +309,8 @@
     <script src="/js/dashboards-analytics.js"></script>
 
     <script src="/js/pager/pagination.js"></script>
-	<script type="text/javascript" src="/js/receivable/receivable-vendor.js"></script>    
-    
+	<script type="text/javascript" src="/js/receivable/receivable-vendor.js"></script>
+	<script type="text/javascript" src="/js/receivable/receivable-vendor-payment.js"></script>
+	
   </body>
 </html>

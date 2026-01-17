@@ -14,6 +14,7 @@ import com.cafe.erp.receivable.detail.ReceivableItemDTO;
 import com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO;
 import com.cafe.erp.receivable.detail.ReceivableRoyaltyDTO;
 import com.cafe.erp.receivable.detail.ReceivableTransactionDTO;
+import com.cafe.erp.receivable.hq.HqPayablePaymentDTO;
 import com.cafe.erp.receivable.hq.HqPayableSearchDTO;
 import com.cafe.erp.receivable.hq.HqPayableSummaryDTO;
 import com.cafe.erp.receivable.hq.HqPayableTotalSummaryDTO;
@@ -31,7 +32,6 @@ public class ReceivableService {
 	public void collectReceivable(ReceivableCollectionRequestDTO receivableCollectionRequestDTO , Integer memberId) {
 		
 		receivableCollectionRequestDTO.setMemberId(memberId);
-		
 		
 		// 지급 내역 DB반영
 		dao.insertCollection(receivableCollectionRequestDTO);
@@ -197,35 +197,100 @@ public class ReceivableService {
     }
     
     // 거래처 코드
-	public List<HqPayableSummaryDTO> hqPayableSearchList(HqPayableSearchDTO dto) {
+    public List<HqPayableSummaryDTO> hqPayableSearchList(HqPayableSearchDTO dto) {
 
-		boolean hasBaseMonth = dto.getBaseMonth() != null && !dto.getBaseMonth().isBlank();
+        long totalCount = dao.selectHqPayableCountByMonth(dto);
 
-		Long totalCount = hasBaseMonth
-				? dao.selectHqPayableCountByMonth(dto)
-				: dao.selectHqPayableCountAllGroupedByMonth(dto);
-		
-		try {
-			Pager pager = dto.getPager();
-			
-
+        try {
+        	Pager pager = dto.getPager();
 			pager.pageing(totalCount);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return hasBaseMonth
-				? dao.selectHqPayableListByMonth(dto)
-				: dao.selectHqPayableListAllGroupedByMonth(dto);
-	}
 
-	public HqPayableTotalSummaryDTO getHqPayableSummary(HqPayableSearchDTO dto) {
+        return dao.selectHqPayableListByMonth(dto);
+    }
 
-		boolean hasBaseMonth = dto.getBaseMonth() != null && !dto.getBaseMonth().isBlank();
 
-		return hasBaseMonth
-				? dao.selectHqPayableTotalSummaryByMonth(dto)
-				: dao.selectHqPayableTotalSummaryAllGroupedByMonth(dto);
-	}
+    public HqPayableTotalSummaryDTO getHqPayableSummary(HqPayableSearchDTO dto) {
+
+        return dao.selectHqPayableTotalSummaryByMonth(dto);
+    }
+
 	
+    @Transactional
+    public void payHqReceivable(
+            HqPayablePaymentDTO paymentDTO,
+            Integer memberId
+    ) {
+
+        String receivableId = dao.selectReceivableIdByVendorAndBaseMonth(
+                paymentDTO.getVendorCode(),
+                paymentDTO.getBaseMonth()
+        );
+
+        if (receivableId == null) {
+            throw new IllegalStateException("지급 대상 채권이 존재하지 않습니다.");
+        }
+
+        Integer totalAmount = dao.selectVendorTotalAmountByMonth(
+                paymentDTO.getVendorCode(),
+                paymentDTO.getBaseMonth()
+        );
+
+        if (totalAmount == null || totalAmount == 0) {
+            throw new IllegalStateException("해당 거래처의 발주 금액이 없습니다.");
+        }
+
+        Integer remainAmount = dao.selectVendorRemainAmountByMonth(
+                paymentDTO.getVendorCode(),
+                paymentDTO.getBaseMonth()
+        );
+
+        if (remainAmount == null) {
+            throw new IllegalStateException("남은 미지급 금액 조회 실패");
+        }
+
+        Integer payAmount = paymentDTO.getPayAmount();
+
+        if (payAmount == null || payAmount <= 0) {
+            throw new IllegalArgumentException("지급 금액이 올바르지 않습니다.");
+        }
+
+        if (payAmount > remainAmount) {
+            throw new IllegalArgumentException("지급 금액이 남은 미지급 금액을 초과했습니다.");
+        }
+
+        ReceivableCollectionRequestDTO insertDTO =
+                new ReceivableCollectionRequestDTO();
+
+        insertDTO.setReceivableId(receivableId);
+        insertDTO.setAmount(payAmount);
+        insertDTO.setMemo(paymentDTO.getMemo());
+        insertDTO.setMemberId(memberId);
+
+        dao.insertHqPayment(insertDTO);
+
+        Integer afterRemainAmount = dao.selectVendorRemainAmountByMonth(
+                paymentDTO.getVendorCode(),
+                paymentDTO.getBaseMonth()
+        );
+
+        String status;
+        if (afterRemainAmount.equals(totalAmount)) {
+            status = "O";   // 미지급
+        } else if (afterRemainAmount == 0) {
+            status = "C";   // 완납
+        } else {
+            status = "P";   // 부분지급
+        }
+
+        insertDTO.setStatus(status);
+        dao.updateReceivableStatus(insertDTO);
+    }
+
+    
+    
+    
+    
 }

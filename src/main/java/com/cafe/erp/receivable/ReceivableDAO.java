@@ -12,6 +12,7 @@ import com.cafe.erp.receivable.detail.ReceivableItemDTO;
 import com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO;
 import com.cafe.erp.receivable.detail.ReceivableRoyaltyDTO;
 import com.cafe.erp.receivable.detail.ReceivableTransactionDTO;
+import com.cafe.erp.receivable.hq.HqPayablePaymentDTO;
 import com.cafe.erp.receivable.hq.HqPayableSearchDTO;
 import com.cafe.erp.receivable.hq.HqPayableSummaryDTO;
 import com.cafe.erp.receivable.hq.HqPayableTotalSummaryDTO;
@@ -84,20 +85,29 @@ public interface ReceivableDAO {
 
 	public HqPayableTotalSummaryDTO selectHqPayableTotalSummaryByMonth(HqPayableSearchDTO dto);
 
-	// baseMonth 미선택: 전체를 (거래처+기준월)로 그룹핑해서 월별 row 생성
-	public List<HqPayableSummaryDTO> selectHqPayableListAllGroupedByMonth(HqPayableSearchDTO dto);
-
-	public Long selectHqPayableCountAllGroupedByMonth(HqPayableSearchDTO dto);
-
-	public HqPayableTotalSummaryDTO selectHqPayableTotalSummaryAllGroupedByMonth(HqPayableSearchDTO dto);
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	public void payHqReceivable(HqPayablePaymentDTO dto);
     
+	
+	// 1. vendor + 기준월 → receivable_id 조회
+	String selectReceivableIdByVendorAndBaseMonth(
+	        Integer vendorCode,
+	        String baseMonth
+	);
+
+	// 2. vendor + 기준월 → 총 발주 금액
+	Integer selectVendorTotalAmountByMonth(
+	        Integer vendorCode,
+	        String baseMonth
+	);
+
+	// 3. vendor + 기준월 → 남은 미지급 금액 (차선책)
+	Integer selectVendorRemainAmountByMonth(
+	        Integer vendorCode,
+	        String baseMonth
+	);
+
+	// 4. HQ 지급 INSERT
+	void insertHqPayment(
+			ReceivableCollectionRequestDTO dto
+	);
 }

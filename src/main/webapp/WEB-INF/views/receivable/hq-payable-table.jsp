@@ -48,18 +48,15 @@
 	
 	      <!-- 지급 버튼 -->
 	      <td class="text-center">
-	        <button
-	          type="button"
-	          class="btn btn-sm btn-primary"
-	          onclick="openPayModal(
-	            '${row.vendorCode}',
-	            '${row.baseMonth}',
-	            ${row.remainUnpaidAmount}
-	          )"
-	          <c:if test="${row.payStatus == 'PAID'}">disabled</c:if>
-	        >
-	          지급
-	        </button>
+			<button
+			  type="button"
+			  class="btn btn-sm btn-primary btn-pay"
+			  data-vendor-code="${row.vendorCode}"
+			  data-vendor-name="${row.vendorName}"
+			  data-base-month="${row.baseMonth}"
+			  data-remain-amount="${row.remainUnpaidAmount}">
+			  지급
+			</button>
 	      </td>
 	    </tr>
 	  </c:forEach>

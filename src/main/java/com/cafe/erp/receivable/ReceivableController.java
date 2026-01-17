@@ -3,6 +3,7 @@ package com.cafe.erp.receivable;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,7 @@ import com.cafe.erp.receivable.detail.ReceivableAmountSummaryDTO;
 import com.cafe.erp.receivable.detail.ReceivableOrderSummaryDTO;
 import com.cafe.erp.receivable.detail.ReceivableRoyaltyDTO;
 import com.cafe.erp.receivable.detail.ReceivableTransactionDTO;
+import com.cafe.erp.receivable.hq.HqPayablePaymentDTO;
 import com.cafe.erp.receivable.hq.HqPayableSearchDTO;
 import com.cafe.erp.receivable.hq.HqPayableSummaryDTO;
 import com.cafe.erp.receivable.hq.HqPayableTotalSummaryDTO;
@@ -96,7 +98,15 @@ public class ReceivableController {
 		return service.getHqPayableSummary(dto);
 	}
 	
-	
+	@PostMapping("/hq/pay")
+	@ResponseBody
+	public void payHqReceivable(
+			HqPayablePaymentDTO dto,
+			@AuthenticationPrincipal Integer memberId
+			) {
+		service.payHqReceivable(dto,memberId);
+	}
+
 	
 	
 }
