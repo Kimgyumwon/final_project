@@ -138,7 +138,7 @@
           </a>
         </li>
         <li class="menu-item">
-          <a href="/order/releaseHq" class="menu-link">
+          <a href="/order/release" class="menu-link">
             <div data-i18n="Under Maintenance">출고</div>
           </a>
         </li>

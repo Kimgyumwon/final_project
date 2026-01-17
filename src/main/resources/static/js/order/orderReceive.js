@@ -1,14 +1,6 @@
-
 $(document).on('click', '#receiveBtn', function () {
 
   const $approvalRows = $('#approvalListBody tr[data-order-no]');
-
-  console.log('입고 대상 개수:', $approvalRows.length);
-
-  if ($approvalRows.length === 0) {
-    alert('입고할 발주가 없습니다.');
-    return;
-  }
 
   const orderNos = [];
   $approvalRows.each(function () {
@@ -23,13 +15,12 @@ $(document).on('click', '#receiveBtn', function () {
 	});
 	
   });
-
-  if (!confirm('선택한 발주를 입고 처리하시겠습니까?')) {
-    return;
-  }
+  if ($approvalRows.length === 0) {
+      alert('입고할 발주가 없습니다.');
+      return;
+    }
 
   // 여기까지는 절대 초기화하지 마라
-
   $.ajax({
     url: '/order/receive',
     type: 'POST',
@@ -76,49 +67,6 @@ function updateOrderStatusToReceive(orders) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-	const userType = document.body.dataset.userType;
 
-	function updateButtonsByTab(tabTarget) {
-	  const userType = document.body.dataset.userType;
-	  const receiveBtn = document.getElementById('receiveBtn');
-	  const cancelBtn = document.getElementById('cancelApproveBtn');
-	  const cancelReceiveBtn = document.getElementById('cancelReceiveBtn');
 
-	  // 본사 유저
-	  if (userType === 'HQ') {
-	    if (tabTarget === '#hqOrderTab') {
-	      if (receiveBtn) receiveBtn.style.display = '';
-	      if (cancelBtn) cancelBtn.style.display = '';
-	      if (cancelReceiveBtn) cancelReceiveBtn.style.display = 'none';
-	    }
-
-	    if (tabTarget === '#storeOrderTab') {
-	      if (receiveBtn) receiveBtn.style.display = 'none';
-	      if (cancelBtn) cancelBtn.style.display = 'none';
-	      if (cancelReceiveBtn) cancelReceiveBtn.style.display = '';
-	    }
-	  }
-
-	  // 가맹 유저
-	  if (userType === 'STORE') {
-	    if (receiveBtn) receiveBtn.style.display = '';
-	    if (cancelBtn) cancelBtn.style.display = '';
-	  }
-	}
-
-  // 탭 클릭 이벤트
-  document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-    tab.addEventListener('shown.bs.tab', function (e) {
-      const target = e.target.getAttribute('data-bs-target');
-      updateButtonsByTab(target);
-    });
-  });
-
-  // 🔥 초기 진입 시 (active 탭 기준)
-  const activeTab = document.querySelector('.nav-link.active');
-  if (activeTab) {
-    updateButtonsByTab(activeTab.getAttribute('data-bs-target'));
-  }
-});
 

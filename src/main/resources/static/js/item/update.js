@@ -40,7 +40,8 @@ $(document).on("click", ".btn-update-price", function () {
 
   $(".modal-title").text("단가 등록");
   showPriceFields();
-
+  
+  $("#btn-submit").text("추가");
   $("#itemName").val($(this).data("name")).prop("readonly", true);
   $("#itemId").val($(this).data("id"));
 

@@ -124,18 +124,7 @@
 									      <button type="button" class="btn btn-sm btn-success" id="approveBtn">승인</button>
 									      <button type="button" class="btn btn-sm btn-warning" id="rejectBtn">반려</button>
 									    </c:if>
-									    <c:if test="${hasApproved}">
-									      <button class="btn btn-success btn-sm" id="receiveBtn">입고</button>
-									      <button type="button" class="btn btn-danger btn-sm" id="cancelApproveBtn">승인취소</button>
-									      <button type="button" class="btn btn-danger btn-sm" id="cancelReceiveBtn" style="display:none">출고취소</button>
-									    </c:if>
 									  </c:when>
-									  <c:otherwise>
-									    <c:if test="${hasApproved}">
-									      <button class="btn btn-success btn-sm" id="receiveBtn">입고</button>
-									      <button type="button" class="btn btn-danger btn-sm" id="cancelApproveBtn">승인취소</button>
-									    </c:if>
-									  </c:otherwise>
 									</c:choose>
 				                  </div>
 				                </div>
@@ -418,7 +407,6 @@
 	<!-- JS -->    
     <script src="/js/order/orderApprove.js"></script>
     <script src="/js/order/orderReject.js"></script>
-    <script src="/js/order/orderReceive.js"></script>
     <script src="/js/order/orderCancel.js"></script>
   </body>
 </html>

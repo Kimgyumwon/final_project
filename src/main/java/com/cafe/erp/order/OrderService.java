@@ -2,6 +2,7 @@ package com.cafe.erp.order;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,8 @@ public class OrderService {
 				}
 			}
 			if (isAutoOrder == 0) {
-				orderDTO.setHqOrderStatus(200);	// isAutoOrder 값이 0이면 자동승인			
+				orderDTO.setHqOrderStatus(330);	// isAutoOrder 값이 0이면 자동승인
+				orderDTO.setStoreOrderApprover(999999);
 			}
 		}
 		// 발주 insert
@@ -231,7 +233,7 @@ public class OrderService {
 	@Transactional
 	public void inoutOrder(List<OrderRequestDTO> orderNos, String inoutType) {
 		
-		List<OrderDetailDTO> orderDetailList;
+		List<OrderDetailDTO> orderDetailList = new ArrayList<>();
 		StockInoutDTO stockInoutDTO = new StockInoutDTO();
 		int inputId = 0;
 		int warehouseNo = 0;
@@ -239,21 +241,27 @@ public class OrderService {
 		for (OrderRequestDTO orderNo : orderNos) {
 			// 1️ 이미 입고완료인지 체크
 			if ("HQ".equals(orderNo.getOrderType())) {
+				OrderDTO storeOrder = orderDAO.isHqAlreadyReceived(orderNo.getOrderNo());
+				if (storeOrder == null) {
+				    // 데이터 자체가 없음 → 방어
+					throw new IllegalArgumentException("입고 처리 중 오류가 발생했습니다.");
+				}
+
+				int status = storeOrder.getHqOrderStatus();
+				System.out.println("HQ STATUS = " + status);
+
+				if (status == 400) {
+				    // 이미 입고 완료 → 처리 금지
+					throw new IllegalArgumentException("이미 입고된 발주입니다.");
+				}
+
 				orderDAO.receiveHqOrder(orderNo.getOrderNo());							
 			} else if("STORE".equals(orderNo.getOrderType())){
+				OrderDTO storeOrder = orderDAO.isStoreAlreadyReceived(orderNo.getOrderNo());
+				if (storeOrder != null && (storeOrder.getHqOrderStatus() == 400 || storeOrder.getHqOrderStatus() == 330)) {
+					continue;
+				}
 				orderDAO.receiveStoreOrder(orderNo.getOrderNo());							
-
-			    OrderDTO hqOrder = orderDAO.isHqAlreadyReceived(orderNo.getOrderNo());
-			    if (hqOrder != null && hqOrder.getHqOrderStatus() == 400) {
-			        continue;
-			    }
-
-			} else if ("STORE".equals(orderNo.getOrderType())) {
-
-			    OrderDTO storeOrder = orderDAO.isStoreAlreadyReceived(orderNo.getOrderNo());
-			    if (storeOrder != null && storeOrder.getHqOrderStatus() == 400) {
-			        continue;
-			    }
 			}
 
 	        // 2️ 승인/입고완료 상태 변경
@@ -322,12 +330,52 @@ public class OrderService {
 		return stockInoutDTO;
 	}
 	public void cancelApprove(List<OrderRequestDTO> orderNos) {
+		
 		for (OrderRequestDTO orderNo : orderNos) {
 			if ("HQ".equals(orderNo.getOrderType())) {
 				orderDAO.cancelApproveHqOrder(orderNo.getOrderNo());							
 			} else if("STORE".equals(orderNo.getOrderType())){
+				OrderDTO storeOrder = orderDAO.isStoreAlreadyReceived(orderNo.getOrderNo());
+				if(storeOrder != null && storeOrder.getHqOrderStatus() == 350 ) {
+					continue;
+				}
 				orderDAO.cancelApproveStoreOrder(orderNo.getOrderNo());							
 			}
+		}
+	}
+	// 입고 취소는 본사만 가능
+	@Transactional
+	public void cancelReceive(List<OrderRequestDTO> orderNos) {
+		for (OrderRequestDTO orderNo : orderNos) {	
+			OrderDTO storeOrder = orderDAO.isHqAlreadyReceived(orderNo.getOrderNo());
+			System.out.println(storeOrder.getHqOrderStatus());
+			if(storeOrder != null && storeOrder.getHqOrderStatus() == 400 ) {
+				List<OrderStockHistoryDTO> deleteStock = orderDAO.getDeleteStock(orderNo.getOrderNo());
+				orderDAO.cancelReceive(orderNo.getOrderNo());
+				for (OrderStockHistoryDTO orderRequestDTO : deleteStock) {
+					orderDAO.deleteStockHistory(orderRequestDTO.getInputID());
+					orderDAO.deleteInput(orderRequestDTO.getInputID());
+					orderDAO.updateStockDelete(orderRequestDTO.getItemId(),orderRequestDTO.getOrderQty(), orderRequestDTO.getWarehouseId());
+				}
+			}
+		}
+	}
+	public void updateReceiveStatusByStoreOrder(List<OrderRequestDTO> orderNos) {
+		for (OrderRequestDTO orderNo : orderNos) {
+			orderDAO.updateReceiveStatusByStoreOrder(orderNo.getOrderNo());										
+		}
+	}
+	public void updateCancelReceiveStatusByStoreOrder(List<OrderRequestDTO> orderNos) {
+		for (OrderRequestDTO orderNo : orderNos) {
+			orderDAO.updateCancelReceiveStatusByStoreOrder(orderNo.getOrderNo());										
+		}
+	}
+	
+	@Transactional
+	public void releaseByHq(List<OrderRequestDTO> orderNos) {
+		for (OrderRequestDTO orderNo : orderNos) {
+			 List<OrderDetailDTO> releaseItemList = orderDAO.getStoreOrderDetail(orderNo.getOrderNo());
+			orderDAO.releaseByHq(releaseItemList);
 		}
 	}
 	

@@ -102,17 +102,34 @@ public class OrderController {
 		String viewType = "HQ_APPROVAL";
 	    return orderList(statuses, viewType, model, member);
 	}
-	// 입고 목록 요청
+	//입고 목록 요청
 	@GetMapping("receive")
-	public String receive(Model model, @AuthenticationPrincipal UserDTO userDTO) {
-		MemberDTO member = userDTO.getMember();
-		List<Integer> statuses = List.of(200, 330, 350); // 승인
-		String viewType = "HQ_RECEIVE";
-		return orderList(statuses, viewType, model, member);
+	@Transactional
+	public String receiveList(Model model, @AuthenticationPrincipal UserDTO userDTO) {
+
+	    MemberDTO member = userDTO.getMember();
+
+	    // 본사 유저
+	    if (String.valueOf(member.getMemberId()).charAt(0) == '1' ) {
+	        // 가맹 발주 중 출고 대상
+	        List<OrderDTO> storeReleaseList =
+	            orderService.listHq(List.of(200, 400), member);
+	        model.addAttribute("orderStoreList", storeReleaseList);
+	    }
+
+	    // 가맹 유저
+	    if (String.valueOf(member.getMemberId()).charAt(0) == '2') {
+	        List<OrderDTO> storeReleaseReqList =
+	            orderService.getStoreReleaseRequests(List.of(330, 350), member);
+	        model.addAttribute("orderStoreList", storeReleaseReqList);
+	    }
+	    model.addAttribute("member", member);
+
+	    return "order/receive";
 	}
 	
 	//출고 목록 요청
-	@GetMapping("releaseHq")
+	@GetMapping("release")
 	@Transactional
 	public String releaseList(Model model, @AuthenticationPrincipal UserDTO userDTO) {
 
@@ -122,16 +139,15 @@ public class OrderController {
 	    if (String.valueOf(member.getMemberId()).charAt(0) == '1' ) {
 	        // 가맹 발주 중 출고 대상
 	        List<OrderDTO> storeReleaseList =
-	            orderService.getStoreReleaseTarget(List.of(330), member);
+	            orderService.getStoreReleaseTarget(List.of(330, 350), member);
 	        model.addAttribute("orderStoreList", storeReleaseList);
-	        System.out.println(storeReleaseList.getFirst().getHqOrderId());
 	    }
 
 	    // 가맹 유저
 	    if (String.valueOf(member.getMemberId()).charAt(0) == '2') {
 	        List<OrderDTO> storeReleaseReqList =
 	            orderService.getStoreReleaseRequests(List.of(450), member);
-	        model.addAttribute("storeReleaseList", storeReleaseReqList);
+	        model.addAttribute("orderStoreList", storeReleaseReqList);
 	    }
 	    model.addAttribute("member", member);
 
@@ -178,11 +194,11 @@ public class OrderController {
 		return "order/approval";
 	}
 	// 승인 취소 요청
-		@PostMapping("cancelApprove")
-		public String cancelApprove(@RequestBody List<OrderRequestDTO> orderNos) {
-			orderService.cancelApprove(orderNos);
-			return "redirect:/order/receive";
-		}
+	@PostMapping("cancelApprove")
+	public String cancelApprove(@RequestBody List<OrderRequestDTO> orderNos) {
+		orderService.cancelApprove(orderNos);
+		return "redirect:/order/receive";
+	}
 	
 	// 반려 요청
 	@PostMapping("reject")
@@ -202,13 +218,42 @@ public class OrderController {
 		orderService.inoutOrder(orderNos, "IN");
 		return "redirect:/order/receive";
 	}
+	// 입고 취소 요청
+	@PostMapping("cancelReceive")
+	@ResponseBody
+	public String cancelReceive(@RequestBody List<OrderRequestDTO> orderNos) {
+		orderService.cancelReceive(orderNos);
+		return "redirect:/order/receive";
+	}
+	// 본사출고완료
+	@PostMapping("updateReceiveStatusByStoreOrder")
+	@ResponseBody
+	public String updateReceiveStatusByStoreOrder(@RequestBody List<OrderRequestDTO> orderNos) {
+		orderService.updateReceiveStatusByStoreOrder(orderNos);
+		return "redirect:/order/receive";
+	}
+	// 본사출고취소
+	@PostMapping("updateCancelReceiveStatusByStoreOrder")
+	@ResponseBody
+	public String updateCancelReceiveStatusByStoreOrder(@RequestBody List<OrderRequestDTO> orderNos) {
+		orderService.updateCancelReceiveStatusByStoreOrder(orderNos);
+		return "redirect:/order/receive";
+	}
 	
-	// 입고 요청
+	@PostMapping("releaseByHq")
+	@ResponseBody
+	@Transactional
+	public String releaseByHq(@RequestBody List<OrderRequestDTO> orderNos) {
+		orderService.releaseByHq(orderNos);
+		orderService.inoutOrder(orderNos, "IN");
+		return "redirect:/order/receive";
+	}
+	// 가맹 출고 요청
 	@PostMapping("release")
 	@ResponseBody
 	public String release(@RequestBody List<OrderRequestDTO> orderNos) {
 		orderService.inoutOrder(orderNos, "OUT");
-		return "redirect:/order/receive";
+		return "redirect:/order/release";
 	}
 	
 	

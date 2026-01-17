@@ -19,7 +19,7 @@
     content="width=device-width, initial-scale=1.0, user-scalable=no"
   />
 
-  <title>출고 처리</title>
+  <title>입고 처리</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
@@ -82,7 +82,7 @@
                   <div class="row mb-4">
                     <div class="col">
                       <h4 class="fw-bold">
-                        <span class="text-muted fw-light">발주 관리 /</span> 출고 처리
+                        <span class="text-muted fw-light">발주 관리 /</span> 입고 처리
                       </h4>
                     </div>
                   </div>
@@ -96,17 +96,19 @@
                         <div class="card h-100 d-flex flex-column">
 
                           <div class="card-header d-flex justify-content-between">
-                            <h5 class="mb-0">출고 대상 목록</h5>
+                            <h5 class="mb-0">입고 대상 목록</h5>
 
                             <div class="d-flex gap-2">
-                              <c:if test="${fn:startsWith(member.memberId, '1')}">
-                                <button class="btn btn-primary btn-sm" id="updateReceiveStatusByStoreOrder">출고</button>
-                                <button class="btn btn-danger btn-sm" id="updateCancelReceiveStatusByStoreOrder">출고취소</button>
+                            <c:if test="${fn:startsWith(member.memberId, '1')}">
+                                <button class="btn btn-primary btn-sm" id="receiveBtn">입고</button>
+                                <button class="btn btn-danger btn-sm" id="cancelReceiveBtn">입고취소</button>
                               </c:if>
 
                               <c:if test="${fn:startsWith(member.memberId, '2')}">
-                                <button class="btn btn-success btn-sm" id="requestReleaseBtn">출고요청</button>
+                                <button class="btn btn-primary btn-sm" id="receiveByStoreBtn">입고</button>
+                                <button class="btn btn-danger btn-sm" id="cancelApproveBtn">승인취소</button>
                               </c:if>
+                                
                             </div>
                           </div>
 
@@ -115,7 +117,7 @@
                             <ul class="nav nav-tabs">
                               <li class="nav-item">
                                 <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#storeOrderTab">
-                                  출고
+                                  입고
                                 </button>
                               </li>
                             </ul>
@@ -151,11 +153,17 @@
                                       <td>${o.memberId}</td>
                                       <td>
                                         <c:choose>
+                                          <c:when test="${o.hqOrderStatus == 200}">
+                                            <span class="badge bg-label-success">승인</span>
+                                          </c:when>
                                           <c:when test="${o.hqOrderStatus == 330}">
                                             <span class="badge bg-label-info">출고대기</span>
                                           </c:when>
                                           <c:when test="${o.hqOrderStatus == 350}">
                                             <span class="badge bg-label-success">출고완료</span>
+                                          </c:when>
+                                          <c:when test="${o.hqOrderStatus == 400}">
+                                            <span class="badge bg-label-primary">입고</span>
                                           </c:when>
                                         </c:choose>
                                       </td>
@@ -175,7 +183,7 @@
                         <!-- 출고 리스트 -->
                         <div class="card approval-list">
                           <div class="card-header">
-                            <h5 class="mb-0">출고 리스트</h5>
+                            <h5 class="mb-0">입고 리스트</h5>
                           </div>
                           <div class="order-scroll">
                             <table class="table table-sm table-bordered text-center mb-0">
@@ -200,7 +208,7 @@
                         <!-- 출고 상세 -->
                         <div class="card order-detail">
                           <div class="card-header">
-                            <h5 class="mb-1">출고 상세</h5>
+                            <h5 class="mb-1">입고 상세</h5>
                             <small class="text-muted">
                               발주번호: <span id="selectedOrderId">-</span>
                             </small>
@@ -268,8 +276,10 @@
 <script src="/js/main.js"></script>
 
 <!-- Page JS -->
-<script src="/js/order/orderApprove.js"></script>
 <script src="/js/order/orderRelease.js"></script>
+<script src="/js/order/orderReceive.js"></script>
+<script src="/js/order/orderApprove.js"></script>
+<script src="/js/order/orderCancel.js"></script>
 
 </body>
 </html>
