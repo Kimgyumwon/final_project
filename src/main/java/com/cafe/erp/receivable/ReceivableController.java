@@ -99,7 +99,7 @@ public class ReceivableController {
 	}
 	
 	@PostMapping("/hq/pay")
-	@ResponseBody
+	@ResponseBody	
 	public void payHqReceivable(
 			HqPayablePaymentDTO dto,
 			@AuthenticationPrincipal Integer memberId
