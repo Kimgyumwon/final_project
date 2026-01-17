@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.cafe.erp.store.qsc.QscDAO">
+
+	<sql id="searchQuestionCondition">
+		<where>
+			<if test="searchCategory != null and searchCategory != ''">
+				AND list_category = #{searchCategory}
+			</if>
+
+			<if test="searchIsUse != null">
+				AND list_is_use = #{searchIsUse}
+			</if>
+
+			<if test="searchQuestion != null and searchQuestion != ''">
+				AND list_question LIKE CONCAT('%', #{searchQuestion}, '%')
+			</if>
+		</where>
+	</sql>
+
+    <select id="questionList" parameterType="QscQuestionSearchDTO" resultType="QscQuestionDTO">
+		SELECT * FROM qsc_list
+		<include refid="searchQuestionCondition" />
+		<choose>
+			<when test="sortConditions != null and sortConditions.size() > 0">
+				ORDER BY
+				<foreach collection="sortConditions" item="sort" separator=",">
+					<choose>
+						<when test="sort.field == 'listId'"> list_id </when>
+						<when test="sort.field == 'category'"> list_category </when>
+						<when test="sort.field == 'question'"> list_question </when>
+						<when test="sort.field == 'score'"> list_max_score </when>
+						<when test="sort.field == 'isUsed'"> list_is_use </when>
+						<otherwise> list_id </otherwise>
+					</choose>
+
+					<if test="sort.dir == 'DESC'"> DESC </if>
+					<if test="sort.dir == 'ASC'"> ASC </if>
+				</foreach>
+			</when>
+			<otherwise>
+				ORDER BY list_id
+			</otherwise>
+		</choose>
+		LIMIT #{startNum}, #{perPage}
+	</select>
+
+	<select id="questionCount" parameterType="QscQuestionSearchDTO" resultType="Long">
+		SELECT COUNT(list_id)
+		FROM qsc_list
+		<include refid="searchQuestionCondition" />
+	</select>
+
+	<insert id="addQuestion" parameterType="QscQuestionDTO">
+		INSERT INTO qsc_list VALUE (null, #{listCategory}, #{listQuestion}, #{listMaxScore}, 1)
+	</insert>
+
+	<update id="updateQuestion" parameterType="QscQuestionDTO">
+		UPDATE qsc_list
+		SET list_is_use= #{listIsUse} WHERE list_id = #{listId}
+	</update>
+
+    <select id="excelQuestionList" parameterType="QscQuestionSearchDTO" resultType="QscQuestionDTO">
+		SELECT * FROM qsc_list
+		<include refid="searchQuestionCondition" />
+		<choose>
+			<when test="sortConditions != null and sortConditions.size() > 0">
+				ORDER BY
+				<foreach collection="sortConditions" item="sort" separator=",">
+					<choose>
+						<when test="sort.field == 'listId'"> list_id </when>
+						<when test="sort.field == 'category'"> list_category </when>
+						<when test="sort.field == 'question'"> list_question </when>
+						<when test="sort.field == 'score'"> list_max_score </when>
+						<when test="sort.field == 'isUsed'"> list_is_use </when>
+					</choose>
+
+					<if test="sort.dir == 'DESC'"> DESC </if>
+					<if test="sort.dir == 'ASC'"> ASC </if>
+				</foreach>
+			</when>
+			<otherwise>
+				ORDER BY list_id
+			</otherwise>
+		</choose>
+	</select>
+
+	<sql id="searchQscCondition">
+		<where>
+			<if test="searchStoreId != null">
+				AND q.store_id = #{searchStoreId}
+			</if>
+
+			<if test="searchStoreName != null and searchStoreName != ''">
+				AND s.store_name LIKE CONCAT('%', #{searchStoreName}, '%')
+			</if>
+
+			<if test="searchMemname != null and searchMemname != ''">
+				AND m.mem_name LIKE CONCAT('%', #{searchMemname}, '%')
+			</if>
+
+			<if test="searchQscTitle != null and searchQscTitle != ''">
+				AND q.qsc_title LIKE CONCAT('%', #{searchQscTitle}, '%')
+			</if>
+
+			<if test="searchStartDate != null">
+				AND q.qsc_date >= CONCAT(#{searchStartDate}, ' 00:00:00')
+			</if>
+
+			<if test="searchEndDate != null">
+				AND q.qsc_date &lt;= CONCAT(#{searchEndDate}, ' 23:59:59')
+			</if>
+
+			<if test="searchQscGrade != null and searchQscGrade != ''">
+				AND q.qsc_grade = #{searchQscGrade}
+			</if>
+		</where>
+	</sql>
+
+	<select id="qscCount" parameterType="QscSearchDTO" resultType="Long">
+		SELECT COUNT(q.qsc_id)
+		FROM qsc q
+		LEFT JOIN store s ON q.store_id = s.store_id
+		LEFT JOIN member m ON q.member_id = m.member_id
+		<include refid="searchQscCondition" />
+	</select>
+
+	<select id="qscList" parameterType="QscSearchDTO" resultType="QscDTO">
+		SELECT
+			q.qsc_id,
+			q.store_id,
+			q.member_id,
+			q.qsc_title,
+			q.qsc_date,
+			q.qsc_grade,
+			s.store_name,
+			m.mem_name
+		FROM qsc q
+		LEFT JOIN store s ON q.store_id = s.store_id
+		LEFT JOIN member m ON q.member_id = m.member_id
+		<include refid="searchQscCondition" />
+		<choose>
+			<when test="sortConditions != null and sortConditions.size() > 0">
+				ORDER BY
+				<foreach collection="sortConditions" item="sort" separator=",">
+					<choose>
+						<when test="sort.field == 'qscId'"> q.qsc_id </when>
+						<when test="sort.field == 'manager'"> m.mem_name </when>
+						<when test="sort.field == 'storeName'"> s.store_name </when>
+						<when test="sort.field == 'title'"> q.qsc_title </when>
+						<when test="sort.field == 'grade'"> q.qsc_grade </when>
+						<when test="sort.field == 'datetime'"> q.qsc_date </when>
+					</choose>
+
+					<if test="sort.dir == 'DESC'"> DESC </if>
+					<if test="sort.dir == 'ASC'"> ASC </if>
+				</foreach>
+			</when>
+			<otherwise>
+				ORDER BY q.qsc_date DESC
+			</otherwise>
+		</choose>
+		LIMIT #{startNum}, #{perPage}
+	</select>
+
+    <select id="questionListById" parameterType="List" resultType="QscQuestionDTO">
+		SELECT list_id, list_max_score
+		FROM qsc_list
+		WHERE list_id IN
+		<foreach item="id" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+
+	<insert id="addQsc" parameterType="QscDTO" useGeneratedKeys="true" keyProperty="qscId">
+		INSERT INTO qsc
+		VALUE (null, #{storeId}, #{memberId}, #{qscTitle}, now(), #{qscQuestionTotalScore}, #{qscTotalScore}, #{qscGrade}, #{qscOpinion})
+	</insert>
+
+	<insert id="addDetail" parameterType="QscDetailDTO">
+		INSERT INTO qsc_detail
+		VALUE (null, #{qscId}, #{listId}, #{detailScore})
+	</insert>
+
+	<update id="updateQsc" parameterType="QscDTO">
+		UPDATE qsc
+		SET qsc_title = #{qscTitle}, qsc_total_score = #{qscTotalScore}, qsc_grade = #{qscGrade}, qsc_opinion = #{qscOpinion}
+		WHERE qsc_id = #{qscId}
+	</update>
+
+	<update id="updateDetail" parameterType="QscDetailDTO">
+		UPDATE qsc_detail SET detail_score = #{detailScore} WHERE detail_id = #{detailId}
+	</update>
+
+	<select id="qscDetail" parameterType="Integer" resultMap="QscDetailMap">
+		SELECT
+			q.qsc_id,
+			q.store_id,
+			q.member_id,
+			q.qsc_title,
+			q.qsc_date,
+			q.qsc_grade,
+			q.qsc_question_total_score,
+			q.qsc_total_score,
+			q.qsc_opinion,
+			s.store_name,
+			m.mem_name,
+			qd.detail_id,
+			qd.list_id,
+			qd.detail_score,
+			ql.list_category,
+			ql.list_question,
+			ql.list_max_score
+		FROM qsc q
+		LEFT JOIN store s ON q.store_id = s.store_id
+		LEFT JOIN member m ON q.member_id = m.member_id
+		LEFT JOIN qsc_detail qd ON q.qsc_id = qd.qsc_id
+		LEFT JOIN qsc_list ql ON qd.list_id = ql.list_id
+		WHERE q.qsc_id = #{qscId};
+	</select>
+
+	<resultMap id="QscDetailMap" type="QscDTO">
+		<id property="qscId" column="qsc_id"/>
+		<result property="storeId" column="store_id"/>
+		<result property="memberId" column="member_id"/>
+		<result property="qscTitle" column="qsc_title"/>
+		<result property="qscDate" column="qsc_date"/>
+		<result property="qscGrade" column="qsc_grade"/>
+		<result property="qscQuestionTotalScore" column="qsc_question_total_score"/>
+		<result property="qscTotalScore" column="qsc_total_score"/>
+		<result property="qscOpinion" column="qsc_opinion"/>
+		<result property="storeName" column="store_name"/>
+		<result property="memName" column="mem_name"/>
+
+		<collection property="qscDetailDTOS" javaType="List" ofType="QscDetailDTO">
+			<id property="detailId" column="detail_id"/>
+			<result property="listId" column="list_id"/>
+			<result property="detailScore" column="detail_score"/>
+
+			<association property="questionDTO" javaType="QscQuestionDTO">
+				<id property="listId" column="list_id"/>
+				<result property="listCategory" column="list_category"/>
+				<result property="listQuestion" column="list_question"/>
+				<result property="listMaxScore" column="list_max_score"/>
+			</association>
+		</collection>
+	</resultMap>
+
+	<select id="excelList" resultType="QscDTO">
+		SELECT
+			q.qsc_id,
+			s.store_name,
+			o.mem_name AS owner_name,
+			s.store_address,
+			m.mem_name,
+			q.qsc_title,
+			q.qsc_date,
+			q.qsc_question_total_score,
+			q.qsc_total_score,
+			q.qsc_grade,
+			q.qsc_opinion
+			FROM qsc q
+		LEFT JOIN store s ON q.store_id = s.store_id
+		LEFT JOIN member m ON q.member_id = m.member_id
+		LEFT JOIN member o ON s.member_id = o.member_id
+		<include refid="searchQscCondition" />
+		<choose>
+			<when test="sortConditions != null and sortConditions.size() > 0">
+				ORDER BY
+				<foreach collection="sortConditions" item="sort" separator=",">
+					<choose>
+						<when test="sort.field == 'qscId'"> q.qsc_id </when>
+						<when test="sort.field == 'manager'"> m.mem_name </when>
+						<when test="sort.field == 'storeName'"> s.store_name </when>
+						<when test="sort.field == 'title'"> q.qsc_title </when>
+						<when test="sort.field == 'grade'"> q.qsc_grade </when>
+						<when test="sort.field == 'datetime'"> q.qsc_date </when>
+					</choose>
+
+					<if test="sort.dir == 'DESC'"> DESC </if>
+					<if test="sort.dir == 'ASC'"> ASC </if>
+				</foreach>
+			</when>
+			<otherwise>
+				ORDER BY q.qsc_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+</mapper>

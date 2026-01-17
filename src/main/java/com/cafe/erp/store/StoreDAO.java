@@ -28,5 +28,8 @@ public interface StoreDAO {
 	public int updateToEnd(StoreManageDTO managerDTO) throws Exception;
 
 	public int addManager(StoreManageDTO managerDTO) throws Exception;
-	
+
+    public StoreDTO findByMemberId(int memberId);
+
+    public List<StoreDTO> searchMyStore(String keyword, String memberId) throws Exception;
 }

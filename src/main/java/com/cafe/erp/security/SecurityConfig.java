@@ -26,6 +26,9 @@ public class SecurityConfig {
     @Autowired
     private MemberDetailsServiceImpl impl;
 
+    @Autowired
+    private LoginSuccessHandler loginSuccessHandler;
+
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
@@ -43,11 +46,11 @@ public class SecurityConfig {
     }
     
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, PasswordEncoder passwordEncoder) throws Exception {
         
         http
             .csrf(csrf -> csrf.disable())
-            .authenticationProvider(authenticationProvider(null))
+            .authenticationProvider(authenticationProvider(passwordEncoder))
             .authorizeHttpRequests(auth -> auth
             		.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                     .requestMatchers("/member/login", "login", "/error", "/member/sessionCheck").permitAll()                    
@@ -57,9 +60,8 @@ public class SecurityConfig {
                     .loginPage("/member/login")
                     .loginProcessingUrl("/login")
                     .usernameParameter("memberId")
-                    
                     .passwordParameter("memPassword")
-                    .defaultSuccessUrl("/member/AM_group_chat", true)
+                    .successHandler(loginSuccessHandler)
                     .permitAll()
             )
             

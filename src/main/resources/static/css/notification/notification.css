@@ -1,0 +1,303 @@
+/* =====================================================
+   TOAST (실시간 알림)
+===================================================== */
+
+#toast-container {
+  position: fixed;
+  top: 72px;
+  right: 24px;
+  z-index: 1055;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  width: 320px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-left: 4px solid transparent;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  cursor: pointer;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.toast-content {
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* toast 타입별 */
+.toast.voc    { border-left-color: #6366f1; }
+.toast.order  { border-left-color: #22c55e; }
+.toast.reject { border-left-color: #be123c; }
+
+
+/* =====================================================
+   DROPDOWN 알림 리스트
+===================================================== */
+
+#notificationList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* 공통 아이템 */
+.notify-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #f9fafc;
+  transition: background-color 0.15s ease;
+}
+
+/* 아이콘 */
+.notify-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* 본문 */
+.notify-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notify-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.notify-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notify-time {
+  font-size: 0.75rem;
+  color: #9aa0ac;
+  white-space: nowrap;
+}
+
+.notify-desc {
+  font-size: 0.85rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* 읽음/안읽음 */
+.notify-item.unread .notify-title {
+  font-weight: 700;
+}
+
+.notify-item:not(.unread) .notify-title {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+
+/* =====================================================
+   TYPE : VOC
+===================================================== */
+
+.notify-item.voc {
+  background: #f7f8ff;
+}
+
+.notify-item.voc .notify-icon {
+  background: #eef2ff;
+  color: #6366f1;
+}
+
+.notify-item.voc.unread {
+  background: #eef2ff;
+  box-shadow: inset 3px 0 0 #6366f1;
+}
+
+.notify-item.voc:hover {
+  background: #e0e7ff;
+}
+
+
+/* =====================================================
+   TYPE : ORDER
+===================================================== */
+
+.notify-item.order {
+  background: #f6fdf9;
+}
+
+.notify-item.order .notify-icon {
+  background: #ecfdf5;
+  color: #22c55e;
+}
+
+.notify-item.order.unread {
+  background: #ecfdf5;
+  box-shadow: inset 3px 0 0 #22c55e;
+}
+
+.notify-item.order:hover {
+  background: #dcfce7;
+}
+
+
+/* =====================================================
+   TYPE : REJECT
+===================================================== */
+
+.notify-item.reject {
+  background: #fff1f2;
+}
+
+.notify-item.reject .notify-icon {
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.notify-item.reject.unread {
+  background: #ffe4e6;
+  box-shadow: inset 3px 0 0 #be123c;
+}
+
+.notify-item.reject:hover {
+  background: #fecdd3;
+}
+
+
+/* =====================================================
+   MODAL 알림 리스트
+===================================================== */
+
+.notification-modal-header {
+  border-bottom: none;
+  padding: 20px 24px 12px;
+}
+
+.notification-modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0 24px 16px;
+}
+
+.modal-list .notify-item {
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.modal-list .notify-item + .notify-item {
+  margin-top: 10px;
+}
+
+/* modal unread 라인 */
+.modal-list .notify-item.voc.unread {
+  border-left: 4px solid #6366f1;
+}
+
+.modal-list .notify-item.order.unread {
+  border-left: 4px solid #22c55e;
+}
+
+.modal-list .notify-item.reject.unread {
+  border-left: 4px solid #be123c;
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.empty-notification {
+  list-style: none;
+  padding: 48px 0;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty-notification i {
+  font-size: 28px;
+  color: #c7cbe1;
+}
+
+
+/* =====================================================
+   TABS
+===================================================== */
+
+#modalNotificationList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notification-tabs {
+  display: flex;
+  gap: 6px;
+  background: #f3f4f6;
+  padding: 6px;
+  border-radius: 999px;
+  width: fit-content;
+  margin-bottom: 16px;
+}
+
+.notification-tabs button {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notification-tabs button:hover {
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.notification-tabs button.active {
+  background: #6366f1;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.35);
+}

@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 
 <html
@@ -46,8 +48,8 @@
     <link rel="stylesheet" href="/vendor/libs/apex-charts/apex-charts.css" />
 
     <!-- Page CSS -->
-    <link rel="stylesheet" href="/css/order/list.css"/>
     <link rel="stylesheet" href="/css/order/main.css"/>
+    <link rel="stylesheet" href="/css/order/approve.css"/>
 
     <!-- Helpers -->
     <script src="/vendor/js/helpers.js"></script>
@@ -66,124 +68,291 @@
         <!-- / Menu -->
 
         <!-- Layout container -->
-        <div class="layout-page">
+        <div class="layout-page ">
+        <c:import url="/WEB-INF/views/template/header.jsp"></c:import>
           <!-- Content wrapper -->
           <div class="content-wrapper">
             
             <!-- Content -->	
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <div class="row">
-              
-              <div class="row mb-3">
-				  <div class="col d-flex justify-content-between align-items-center">
-				    <h4 class="fw-bold mb-0">
-				      <span class="text-muted fw-light">발주 관리 /</span> 발주 승인 요청 목록
-				    </h4>
-				  </div>
-			  </div>
-			  
-			  
-           	<div class="card p-3">
-  				<div class="row g-3">  
-					<div class="col-lg-7">
-					  <div class="card border shadow-none h-100 mb-3">
-					  
-					    <!-- 카드 헤더 -->
-					    <div class="card-header order-card-header border-bottom bg-white">
-						  <h5 class="mb-0">발주 목록</h5>
-						
-						  <div class="d-flex gap-2">
-						    <button class="btn btn-outline-success btn-sm">
-						      <i class="bx bx-check-circle me-1 "></i> 승인
-						    </button>
-						    <button class="btn btn-outline-warning btn-sm">
-						      <i class="bx bx-x-circle me-1"></i> 반려
-						    </button>
-						    <button class="btn btn-outline-danger btn-sm">
-						      <i class="bx bx-trash me-1"></i> 취소
-						    </button>
-						  </div>
-						</div>
-					
-					    <div class="table-responsive">
-					      <table class="table table-hover table-bordered text-center align-middle mb-0">
-					        <thead class="table-light">
-					          <tr>
-					            <th style="width:40px;">
-					              <input type="checkbox" id="checkAll">
-					            </th>
-					            <th>발주번호</th>
-					            <th>금액</th>
-					            <th>요청자</th>
-					            <th>승인자</th>
-					            <th>상태</th>
-					            <th>사유</th>
-					          </tr>
-					        </thead>
-					        <tbody>
-					          <c:forEach var="o" items="${orderList}">
-						          <tr onclick="selectOrder('PO202312010001')" style="cursor:pointer">
-						            <td><input type="checkbox" class="order-check"></td>
-						            <td>${o.hqOrderId}</td>
-						            <td class="text-end">15,000,000</td>
-						            <td>${o.memberId}</td>
-						            <td></td>
-						            <td>
-						              <span class="badge bg-label-warning">요청</span>
-						            </td>
-						            <td></td>
-						          </tr>
-					          </c:forEach>
-					        </tbody>
-					      </table>
-					    </div>
-					  </div>
-					</div>
-					
-					<div class="col-lg-5">
-					  <div class="card border shadow-none h-100 mb-3">
-					
-					    <div class="card-header order-card-header border-bottom bg-white">
-						  <div>
-						    <h5 class="mb-0">발주 상세</h5>
-						    <small class="text-muted">발주번호: PO202312010001</small>
-						  </div>
-						</div>
-					
-					    <div class="table-responsive">
-					      <table class="table table-bordered table-hover mb-0">
-					        <thead class="table-light">
-					          <tr>
-					            <th>상품명</th>
-					            <th class="text-end">수량</th>
-					            <th class="text-end">단가</th>
-					            <th class="text-end">금액</th>
-					          </tr>
-					        </thead>
-					        <tbody id="orderDetailBody">
-					          <tr>
-					            <td>원두 1kg</td>
-					            <td class="text-end">20</td>
-					            <td class="text-end">25,000</td>
-					            <td class="text-end">500,000</td>
-					          </tr>
-					        </tbody>
-					      </table>
-					    </div>
-					
-					  </div>
-					</div>
-				  </div> <!-- row -->
-				</div> <!-- card -->
-			</div>
+            <div class="container-fluid flex-grow-1 container-p-y">
+              <div class="layout-wrapper layout-content-navbar">
+				  <div class="layout-container">
 				
-            <!-- / Content -->
-
+				    <div class="layout-page">
+				      <div class="content-wrapper">
+				
+				        <!-- ================= 발주 화면 ================= -->
+				        <div class="card p-3">
+				          <div class="row g-3">
+				
+				            <!-- ================= 왼쪽: 발주 목록 ================= -->
+				            <div class="col-xl-7 col-lg-12">
+				              <div class="card h-100 d-flex flex-column">
+				
+				                <div class="card-header d-flex justify-content-between">
+				                  <c:choose>
+									<c:when test="${hasRequest}">
+									  <h5 class="mb-0">발주 승인</h5>
+									</c:when>
+									<c:when test="${hasApproved}">
+									  <h5 class="mb-0">입고 관리</h5>
+									</c:when>
+								  </c:choose>
+				                  <div class="d-flex gap-2">
+								  <!-- 본사 -->
+				                  <c:choose>
+									  <c:when test="${fn:startsWith(member.memberId, '1')}">
+									    <c:if test="${hasRequest}">
+									      <button type="button" class="btn btn-sm btn-success" id="approveBtn">승인</button>
+									      <button type="button" class="btn btn-sm btn-warning" id="rejectBtn">반려</button>
+									    </c:if>
+									    <c:if test="${hasApproved}">
+									      <button class="btn btn-success btn-sm" id="receiveBtn">입고</button>
+									      <button type="button" class="btn btn-danger btn-sm">승인취소</button>
+									    </c:if>
+									  </c:when>
+									  <c:otherwise>
+									    <c:if test="${hasApproved}">
+									      <button type="button" class="btn btn-danger btn-sm">승인취소</button>
+									    </c:if>
+									  </c:otherwise>
+									</c:choose>
+				                  </div>
+				                </div>
+				
+				                <!-- 탭 -->
+				                <div class="card-body pb-0">
+				                  <ul class="nav nav-tabs">
+				                    <!-- 본사의 경우 본사/가맹 둘다 표시 -->
+								    <c:if test="${fn:startsWith(member.memberId, '1')}">
+					                    <li class="nav-item">
+					                      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#hqOrderTab">
+					                        본사 발주
+					                      </button>
+					                    </li>
+					                    <li class="nav-item">
+					                      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#storeOrderTab">
+					                        가맹 발주
+					                      </button>
+					                    </li>
+								    </c:if>
+								    <c:if test="${fn:startsWith(member.memberId, '2')}">
+					                    <li class="nav-item">
+					                      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#storeOrderTab">
+					                        가맹 발주
+					                      </button>
+					                    </li>
+								    </c:if>
+								    
+				                  </ul>
+				                </div>
+				
+				                <!-- 목록 -->
+				                <div class="tab-content order-left-body">
+								  <c:if test="${fn:startsWith(member.memberId, '1')}">
+				                  <!-- 본사 발주 -->
+				                  <div class="tab-pane fade show active" id="hqOrderTab">
+				                    <table class="table table-bordered text-center align-middle mb-0">
+				                      <thead class="table-light">
+				                        <tr>
+				                          <th class="chk-td">
+											<input type="checkbox" class="hqCheckAll" data-order-type="HQ"/>                          
+				                          </th>
+				                          <th>발주번호</th>
+				                          <th>금액</th>
+				                          <th>요청자</th>
+				                          <th>상태</th>
+				                        </tr>
+				                      </thead>
+				                      <tbody>
+				                        <c:forEach var="o" items="${orderHqList}">
+				                          <tr class="order-row" data-order-no="${o.hqOrderId}" data-order-member="${member.memberId}" data-order-type="HQ">
+				                            <td class="chk-td"><input type="checkbox" class="order-check"></input> </td>
+				                            <td>${o.hqOrderId}</td>
+				                            <td class="text-end">
+				                              <fmt:formatNumber value="${o.hqOrderTotalAmount}"/>원
+				                            </td>
+				                            <td>${o.memberId}</td>
+				                            <c:choose>
+				                            	<c:when test="${o.hqOrderStatus == 100}">
+						                            <td><span class="badge bg-label-warning">요청</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 150}">
+						                            <td><span class="badge bg-label-danger">반려</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 200}">
+						                            <td><span class="badge bg-label-success">승인</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 300}">
+						                            <td><span class="badge bg-label-secondary">취소</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 350}">
+						                            <td><span class="badge bg-label-info">출고</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 400}">
+						                            <td><span class="badge bg-label-primary">입고</span></td>
+				                            	</c:when>
+				                            </c:choose>
+				                          </tr>
+				                        </c:forEach>
+				                      </tbody>
+				                    </table>
+				                  </div>
+								  </c:if>	
+								  
+								  
+				                  <!-- 가맹 발주 -->
+				                  <div class="tab-pane fade ${fn:startsWith(member.memberId, '2') ? 'active show' : ''}" id="storeOrderTab">
+				                    <table class="table table-bordered text-center align-middle mb-0">
+				                      <thead class="table-light">
+				                        <tr>
+				                          <th class="chk-td">
+				                          	<input type="checkbox" class="hqCheckAll" data-order-type="STORE"/>
+				                          </th>
+				                          <th>발주번호</th>
+				                          <th>금액</th>
+				                          <th>가맹코드</th>
+				                          <th>상태</th>
+				                          <th>사유</th>
+				                        </tr>
+				                      </thead>
+				                      <tbody>
+				                        <c:forEach var="o" items="${orderStoreList}">
+				                          <tr class="order-row" data-order-no="${o.hqOrderId}" data-order-type="STORE" data-status="${o.hqOrderStatus}">
+				                            <td class="chk-td"><input type="checkbox" class="order-check" ${o.hqOrderStatus == 150 ? "disabled" : ""}/></td>
+				                            <td>${o.hqOrderId}</td>
+				                            <td class="text-end">
+				                              <fmt:formatNumber value="${o.hqOrderTotalAmount}"/>원
+				                            </td>
+				                            <td>${o.memberId}</td>
+				                            <c:choose>
+				                            	<c:when test="${o.hqOrderStatus == 100}">
+						                            <td><span class="badge bg-label-warning">요청</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 150}">
+						                            <td><span class="badge bg-label-danger">반려</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 200}">
+						                            <td><span class="badge bg-label-success">승인</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 300}">
+						                            <td><span class="badge bg-label-secondary">취소</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 350}">
+						                            <td><span class="badge bg-label-info">출고</span></td>
+				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 400}">
+						                            <td><span class="badge bg-label-primary">입고</span></td>
+				                            	</c:when>
+				                            </c:choose>
+				                            <td>${o.storeRejectionReason}</td>
+				                          </tr>
+				                        </c:forEach>
+				                      </tbody>
+				                    </table>
+				                  </div>
+				
+				                </div>
+				              </div>
+				            </div>
+				
+				            <!-- ================= 오른쪽 ================= -->
+				            <div class="col-xl-5 col-lg-12 order-right">
+				
+				              <!-- 승인 리스트 -->
+				              <div class="card approval-list">
+				                <div class="card-header">
+				                <c:choose>
+								    <c:when test="${hasRequest}">
+					                  <h5 class="mb-0">승인 리스트</h5>
+									</c:when>
+									<c:when test="${hasApproved}">
+									  <h5 class="mb-0">입고 리스트</h5>
+								    </c:when>
+								</c:choose>
+				                </div>
+				                <div class="order-scroll">
+				                  <table class="table table-sm table-bordered text-center mb-0">
+				                    <thead>
+				                      <tr>
+				                        <th>발주번호</th>
+				                        <c:choose>
+										    <c:when test="${hasRequest}">
+					                          <th>승인일자</th>
+											</c:when>
+											<c:when test="${hasApproved}">
+					                          <th>입고일자</th>
+										    </c:when>
+									    </c:choose>
+				                        <th>총금액</th>
+				                      </tr>
+				                    </thead>
+				                    <tbody id="approvalListBody">
+				                      <tr class="empty-row">
+								        <td colspan="3" class="text-muted text-center">
+								          선택된 발주가 없습니다
+								        </td>
+								      </tr>
+				                    </tbody>
+				                  </table>
+				                </div>
+				              </div>
+				
+				              <!-- 발주 상세 -->
+				              <div class="card order-detail">
+				                <div class="card-header">
+				                  <c:choose>
+								    <c:when test="${hasRequest}">
+					                  <h5 class="mb-1">승인 상세</h5>
+									</c:when>
+									<c:when test="${hasApproved}">
+									  <h5 class="mb-1">입고 상세</h5>
+								    </c:when>
+								  </c:choose>
+				                  <small class="text-muted">
+				                    발주번호: <span id="selectedOrderId">-</span>
+				                  </small>
+				                </div>
+				                <div class="order-scroll">
+				                  <table class="table table-bordered text-center align-middle mb-0">
+				                    <thead class="table-light">
+				                      <tr>
+				                        <th>상품명</th>
+				                        <th>수량</th>
+				                        <th>단가</th>
+				                        <th>금액</th>
+				                      </tr>
+				                    </thead>
+				                    <tbody id="orderDetailBody">
+				                      <tr>
+				                        <td colspan="4" class="text-muted py-4">
+				                          발주를 선택하세요
+				                        </td>
+				                      </tr>
+				                    </tbody>
+				                  </table>
+				                </div>
+				              </div>
+				
+				            </div>
+				          </div>
+				        </div>
+				
+				      </div>
+				    </div>
+				  </div>
+				</div>
+              
+              
+			</div>
+			<!-- content 끝 -->
+			
             <!-- Footer -->
             <c:import url="/WEB-INF/views/template/footer.jsp"></c:import>
             <!-- / Footer -->
 
             <div class="content-backdrop fade"></div>
+          </div>
           <!-- Content wrapper -->
         </div>
         <!-- / Layout page -->
@@ -193,7 +362,10 @@
       <div class="layout-overlay layout-menu-toggle"></div>
     </div>
     <!-- / Layout wrapper -->
-
+    
+    <!-- 모달창 -->
+	<c:import url="/WEB-INF/views/order/orderReject.jsp"></c:import>
+	
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
     <script src="/vendor/libs/jquery/jquery.js"></script>
@@ -215,5 +387,9 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+	
+	<!-- JS -->    
+    <script src="/js/order/orderApprove.js"></script>
+    <script src="/js/order/orderReject.js"></script>
   </body>
 </html>

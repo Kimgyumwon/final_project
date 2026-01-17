@@ -147,10 +147,10 @@
           <form action="/login" class="auth-login-form" method="post">
             <input type="text" name="memberId" id="memberId" placeholder="아이디를 입력하세요" />
 
-            <input type="password" name="memPassword" id="memPasswrod" placeholder="비밀번호를 입력하세요" />
+            <input type="password" name="memPassword" id="memPassword" placeholder="비밀번호를 입력하세요" />
 
             <label class="remember">
-              <input type="checkbox" />
+              <input type="checkbox" id="savedId"/>
               아이디 저장
             </label>
 
@@ -167,6 +167,7 @@
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
     <script src="/assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="/js/member/login.js"></script>
     <script src="/assets/vendor/libs/popper/popper.js"></script>
     <script src="/assets/vendor/js/bootstrap.js"></script>
     <script src="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
@@ -176,12 +177,10 @@
 
     <!-- Vendors JS -->
 
-    <!-- Main JS -->
+    <!-- Main JS --Q
     <script src="/assets/js/main.js"></script>
 
     <!-- Page JS -->
 
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
   </body>
 </html>

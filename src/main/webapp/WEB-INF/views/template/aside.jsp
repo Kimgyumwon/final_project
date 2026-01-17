@@ -90,11 +90,6 @@
       </a>
       <ul class="menu-sub">
         <li class="menu-item">
-          <a href="/item/add" class="menu-link">
-            <div data-i18n="Account">물품등록</div>
-          </a>
-        </li>
-        <li class="menu-item">
           <a href="/item/list" class="menu-link">
             <div data-i18n="Notifications">물품검색</div>
           </a>
@@ -114,11 +109,6 @@
       </a>
       <ul class="menu-sub">
         <li class="menu-item">
-          <a href="/vendor/add" class="menu-link">
-            <div data-i18n="Notifications">거래처등록</div>
-          </a>
-        </li>
-        <li class="menu-item">
           <a href="/vendor/list" class="menu-link">
             <div data-i18n="Notifications">거래처조회</div>
           </a>
@@ -134,22 +124,22 @@
       <ul class="menu-sub">
         <li class="menu-item">
           <a href="/order/request" class="menu-link">
-            <div data-i18n="Error">Request</div>
+            <div data-i18n="Error">발주요청</div>
           </a>
         </li>
         <li class="menu-item">
           <a href="/order/approval" class="menu-link">
-            <div data-i18n="Under Maintenance">Approval</div>
+            <div data-i18n="Under Maintenance">발주승인</div>
           </a>
         </li>
         <li class="menu-item">
           <a href="/order/receive" class="menu-link">
-            <div data-i18n="Under Maintenance">Receive</div>
+            <div data-i18n="Under Maintenance">입고</div>
           </a>
         </li>
         <li class="menu-item">
           <a href="/order/release_hq" class="menu-link">
-            <div data-i18n="Under Maintenance">ReleaseHq</div>
+            <div data-i18n="Under Maintenance">출고</div>
           </a>
         </li>
       </ul>
@@ -172,13 +162,8 @@
           </a>
         </li>
         <li class="menu-item">
-          <a href="javascript:void(0);" class="menu-link">
-            <div data-i18n="Under Maintenance">Receive</div>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="/order/release" class="menu-link">
-            <div data-i18n="Under Maintenance">Release</div>
+          <a href="/store/qsc/list" class="menu-link">
+            <div data-i18n="Under Maintenance">QSC</div>
           </a>
         </li>
       </ul>
@@ -201,17 +186,22 @@
     <li class="menu-item">
       <a href="javascript:void(0)" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-collection"></i>
-        <div data-i18n="Basic">Cards</div>
+        <div data-i18n="Basic">사원</div>
       </a>
       <ul class="menu-sub">
        <li class="menu-item">
-         <a href="extended-ui-perfect-scrollbar.html" class="menu-link">
-           <div data-i18n="Perfect Scrollbar">Perfect scrollbar</div>
+         <a href="/member/admin_member_list" class="menu-link">
+           <div data-i18n="Perfect Scrollbar">사원 목록</div>
          </a>
        </li>
        <li class="menu-item">
-         <a href="extended-ui-text-divider.html" class="menu-link">
-           <div data-i18n="Text Divider">Text Divider</div>
+         <a href="/member/member_mypage" class="menu-link">
+           <div data-i18n="Text Divider">근태 목록</div>
+         </a>
+       </li>
+       <li class="menu-item">
+         <a href="/member/AM_group_chart" class="menu-link">
+           <div data-i18n="Text Divider">부서 목록</div>
          </a>
        </li>
       </ul>

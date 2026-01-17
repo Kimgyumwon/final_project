@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cafe.erp.store.contract.ContractDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,17 +33,33 @@ public class VocController {
 	@Autowired
 	private VocService vocService;
 	
-	@Autowired
-	private NotificationService notificationService;
+
 	
 	
 	@GetMapping("list")
-	public String list(VocSearchDTO searchDTO, Model model) throws Exception {
-		List<VocDTO> vocList = vocService.list(searchDTO);
-		model.addAttribute("list", vocList);
-		model.addAttribute("pager", searchDTO);
-		
-		return "voc/list";
+	public String list(VocSearchDTO searchDTO, Model model, Authentication authentication) throws Exception {
+		UserDTO user = (UserDTO) authentication.getPrincipal();
+		String memberId = user.getUsername();
+
+		if (memberId.startsWith("2")) {
+			if (user.getStore() != null) {
+				searchDTO.setSearchStoreId(user.getStore().getStoreId());
+			} else {
+				searchDTO.setSearchStoreId(-1);
+			}
+
+			List<VocDTO> vocList = vocService.list(searchDTO);
+			model.addAttribute("list", vocList);
+			model.addAttribute("pager", searchDTO);
+
+			return "view_store/store/voc_list";
+		} else {
+			List<VocDTO> vocList = vocService.list(searchDTO);
+			model.addAttribute("list", vocList);
+			model.addAttribute("pager", searchDTO);
+
+			return "voc/list";
+		}
 	}
 	
 	@PostMapping("add")
@@ -52,7 +70,6 @@ public class VocController {
 			)
 			throws Exception {
 		int result = vocService.add(vocDTO , userDTO.getMember().getMemberId());
-		notificationService.sendVocNotification(vocDTO);
 		return result(result); 
 		
 	}
@@ -89,7 +106,17 @@ public class VocController {
 	}
 	
 	@GetMapping("downloadExcel")
-	public void downloadExcel(VocSearchDTO searchDTO, HttpServletResponse response) throws Exception {
+	public void downloadExcel(VocSearchDTO searchDTO, HttpServletResponse response, Authentication authentication) throws Exception {
+		UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+		String memberId = userDTO.getUsername();
+
+		if (memberId.startsWith("2")) {
+			if (userDTO.getStore() != null) {
+				searchDTO.setSearchStoreId(userDTO.getStore().getStoreId());
+			} else {
+				searchDTO.setSearchStoreId(-1);
+			}
+		}
 		List<VocDTO> list = vocService.excelList(searchDTO);
 		String[] headers = {"ID", "작성자ID", "작성자", "가맹점ID", "가맹점명", "점주ID", "점주명", "주소", 
 				            "불만유형", "제목", "처리상태", "고객연락처", "상세내용", "작성일시", "수정일시"};

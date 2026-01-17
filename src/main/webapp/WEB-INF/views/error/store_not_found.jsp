@@ -1,8 +1,6 @@
-
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html>
+<%@taglib prefix="c" uri="jakarta.tags.core" %>
 
 <html
   lang="en"
@@ -67,77 +65,16 @@
 
         <!-- Layout container -->
         <div class="layout-page">
+		<c:import url="/WEB-INF/views/template/header.jsp"></c:import>
+        
           <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
 
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <div class="row">
-				<div class="card">
-				  <h5 class="card-header">원재료 등록</h5>
-				  <div class="card-body">
-				    <form action="/item/add" method="post">
-					  <!-- 거래처코드 -->
-				      <div class="mb-3">
-				        <label class="form-label">거래처코드</label>
-				        <select class="form-select" name="vendorId">
-				          <c:forEach var="v" items="${vendorList}">
-						    <option value="${v.vendorId}">
-						      ${v.vendorName}
-						    </option>
-						  </c:forEach>
-				        </select>
-				      </div>				    	
-				      
-				      <!-- 카테고리 -->
-				      <div class="mb-3">
-				        <label class="form-label">카테고리</label>
-				        <select class="form-select" name="itemCategory" required>
-				          <option value="원두">원두</option>
-				          <option value="유제품">유제품</option>
-				          <option value="시럽/파우더">시럽/파우더</option>
-				          <option value="음료원료">음료원료</option>
-				          <option value="베이커리">베이커리</option>
-				          <option value="포장재">포장재</option>
-				          <option value="소모품">소모품</option>
-				          <option value="장비">장비</option>
-				        </select>
-				      </div>
-				
-				      <!-- 원재료명 -->
-				      <div class="mb-3">
-				        <label class="form-label">물품명</label>
-				        <input type="text" class="form-control" name="itemName" required>
-				      </div>
-				
-				      <!-- 단가 -->
-				      <div class="mb-3">
-				        <label class="form-label">단가</label>
-				        <input type="number" class="form-control" name="itemSupplyPrice" required>
-				      </div>
-				
-				      <!-- 사용 여부 -->
-				      <div class="mb-3">
-				        <label class="form-label">사용 여부</label>
-				        <select class="form-select" name="itemEnable">
-				          <option value="0">사용</option>
-				          <option value="1">미사용</option>
-				        </select>
-				      </div>
-				      
-				      <!-- 사용 여부 -->
-				      <div class="mb-3">
-				        <label class="form-label">자동발주승인</label>
-				        <select class="form-select" name="itemAutoOrder">
-				          <option value="0">승인</option>
-				          <option value="1">미승인</option>
-				        </select>
-				      </div>
-				
-				      <button type="submit" class="btn btn-primary">등록</button>
-				    </form>
-				  </div>
-				</div>
+            <div class="container-xxl flex-grow-1 container-p-y d-flex align-items-center justify-content-center">
+              <div class="text-center">
+                <h1>가맹점 정보가 아직 생성되지 않았습니다.</h1>
+                <h1>담당자에게 연락하세요.</h1>
               </div>
             </div>
             <!-- / Content -->
@@ -178,8 +115,5 @@
     <!-- Page JS -->
     <script src="/js/dashboards-analytics.js"></script>
 
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
   </body>
 </html>
-

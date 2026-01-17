@@ -82,20 +82,6 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <div class="row">
-              
-			    <div class="col-12 px-0">
-                    <ul class="nav nav-pills mb-3" role="tablist">
-                        <li class="nav-item">
-                        	<a href="/store/detail" class="nav-link active"><i class="bx bx-store me-1"></i> 가맹점 정보</a>
-                        </li>
-                        <li class="nav-item">
-                        	<a href="/store/contract/list" class="nav-link"><i class="bx bx-file me-1"></i> 계약 기록</a>
-                        </li>
-                        <li class="nav-item">
-                        	<a href="/store/evaluation" class="nav-link"><i class="bx bx-clipboard me-1"></i> 평가 현황</a>
-                        </li>
-                    </ul>
-                </div>
                 <h4 class="fw-bold py-3 mb-3"><a href="/store/list" class="text-muted fw-normal">가맹점 /</a> 상세 정보</h4>
                	<div class="col-md-6 col-lg-6 mb-4">
 				    <div class="card h-100">
