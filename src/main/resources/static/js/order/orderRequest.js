@@ -38,7 +38,7 @@ function renderItemResult(list) {
         <td class="text-end">${item.itemSupplyPrice.toLocaleString()}</td>
         <td>
           <button class="btn btn-sm btn-primary"
-                  onclick="selectItem(this, '${item.itemId}','${item.itemCode}','${item.itemName}','${item.itemSupplyPrice}','${item.vendorCode}','${item.itemAutoOrder}')">
+                  onclick="selectItem(this, '${item.itemId}','${item.itemCode}','${item.itemName}','${item.itemSupplyPrice}','${item.vendorCode}',${item.itemAutoOrder})">
             선택
           </button>
         </td>
@@ -72,7 +72,7 @@ function selectItem(btn, itemId, itemCode, itemName, itemSupplyPrice, vendorCode
   tr.classList.add("item-row");
   tr.setAttribute("data-item-code", itemCode);
   tr.setAttribute("data-price", itemSupplyPrice);
-
+  console.log(itemAutoOrder);
   tr.innerHTML = `
     <td>
       <input type="checkbox" class="order-check">
@@ -84,6 +84,7 @@ function selectItem(btn, itemId, itemCode, itemName, itemSupplyPrice, vendorCode
 		<input type="hidden" name="items[${index}].itemName" value="${itemName}">
 		<input type="hidden" name="items[${index}].vendorCode" value="${vendorCode}">
 		<input type="hidden" name="items[${index}].itemAutoOrder" value="${itemAutoOrder}">
+		
 	</td>
     <td>${itemName}</td>
     <td class="text-end">
@@ -93,7 +94,7 @@ function selectItem(btn, itemId, itemCode, itemName, itemSupplyPrice, vendorCode
     <td>
       <input type="text"
              class="form-control text-end qty"
-			 name="items[${index}].ItemQuantity"
+			 name="items[${index}].itemQuantity"
              oninput="updateRowTotal(this)">
     </td>
     <td class="row-total text-end">0</td>

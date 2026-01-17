@@ -29,6 +29,10 @@ public interface OrderDAO {
 
 	public List<OrderDetailDTO> getHqOrderDetail(@Param("orderNo") String orderNo);
 	public List<OrderDetailDTO> getStoreOrderDetail(@Param("orderNo") String orderNo);
+	public int getOrderStoreId(@Param("orderNo") String orderNo);
+	
+	public List<OrderDTO> getStoreReleaseTarget(List<Integer> statuses, MemberDTO member);
+	public List<OrderDTO> getStoreReleaseRequests(List<Integer> statuses, MemberDTO member);
 	
 	public void approveHqOrder(String orderNo, int orderApproverId);
 	public void approveStoreOrder(String orderNo, int orderApproverId);
@@ -42,6 +46,11 @@ public interface OrderDAO {
 	
 	public void receiveHqOrder(@Param("orderNo") String orderNo);
 	public void receiveStoreOrder(@Param("orderNo") String orderNo);
+	public void cancelReceive(@Param("orderNo") String orderNo);
+	public List<OrderStockHistoryDTO> getDeleteStock(@Param("orderNo") String orderNo);
+	public void deleteStockHistory(@Param("inputId") Integer inputId);
+	public void deleteInput(@Param("inputId") Integer inputId);
+	public void updateStockDelete(Integer itemId, Integer orderQty, Integer warehouseId);
 	
 	public OrderDTO isHqAlreadyReceived(@Param("orderNo") String orderNo);
 	public OrderDTO isStoreAlreadyReceived(@Param("orderNo") String orderNo);
@@ -50,5 +59,10 @@ public interface OrderDAO {
 
 	public void cancelApproveHqOrder(@Param("orderNo") String orderNo);
 	public void cancelApproveStoreOrder(@Param("orderNo") String orderNo);
+	
+	public void updateReceiveStatusByStoreOrder(@Param("orderNo") String orderNo);
+	public void updateCancelReceiveStatusByStoreOrder(@Param("orderNo") String orderNo);
+
+	public void releaseByHq(List<OrderDetailDTO> releaseItemList);
 	
 }

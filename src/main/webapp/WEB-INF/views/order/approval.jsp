@@ -59,7 +59,7 @@
     <script src="/js/config.js"></script>
   </head>
 
-  <body>
+  <body data-user-type="${fn:startsWith(member.memberId, '1') ? 'HQ' : 'STORE'}">
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
@@ -90,6 +90,9 @@
 									<c:when test="${hasApproved}">
 							      		<span class="text-muted fw-light">발주 관리 /</span> 입고 처리
 									</c:when>
+									<c:when test="${hasWaitRelease}">
+							      		<span class="text-muted fw-light">발주 관리 /</span> 출고 처리
+									</c:when>
 								  </c:choose>
 							    </h4>
 							  </div>
@@ -116,20 +119,12 @@
 								  <!-- 본사 -->
 				                  <c:choose>
 									  <c:when test="${fn:startsWith(member.memberId, '1')}">
+									  	
 									    <c:if test="${hasRequest}">
 									      <button type="button" class="btn btn-sm btn-success" id="approveBtn">승인</button>
 									      <button type="button" class="btn btn-sm btn-warning" id="rejectBtn">반려</button>
 									    </c:if>
-									    <c:if test="${hasApproved}">
-									      <button class="btn btn-success btn-sm" id="receiveBtn">입고</button>
-									      <button type="button" class="btn btn-danger btn-sm" id="cancelApproveBtn">승인취소</button>
-									    </c:if>
 									  </c:when>
-									  <c:otherwise>
-									    <c:if test="${hasApproved}">
-									      <button type="button" class="btn btn-danger btn-sm" id="cancelApproveBtn">승인취소</button>
-									    </c:if>
-									  </c:otherwise>
 									</c:choose>
 				                  </div>
 				                </div>
@@ -233,7 +228,11 @@
 				                      <tbody>
 				                        <c:forEach var="o" items="${orderStoreList}">
 				                          <tr class="order-row" data-order-no="${o.hqOrderId}" data-order-type="STORE" data-status="${o.hqOrderStatus}">
-				                            <td class="chk-td"><input type="checkbox" class="order-check" ${o.hqOrderStatus == 150 ? "disabled" : ""}/></td>
+				                            <td class="chk-td"><input type="checkbox" class="order-check" 
+				                            <c:if test="${o.hqOrderStatus == 150 || o.hqOrderStatus == 350}">
+				                            	disabled
+				                            </c:if>
+				                            /></td>
 				                            <td>${o.hqOrderId}</td>
 				                            <td class="text-end">
 				                              <fmt:formatNumber value="${o.hqOrderTotalAmount}"/>원
@@ -246,14 +245,14 @@
 				                            	<c:when test="${o.hqOrderStatus == 150}">
 						                            <td><span class="badge bg-label-danger">반려</span></td>
 				                            	</c:when>
-				                            	<c:when test="${o.hqOrderStatus == 200}">
-						                            <td><span class="badge bg-label-success">승인</span></td>
-				                            	</c:when>
 				                            	<c:when test="${o.hqOrderStatus == 300}">
 						                            <td><span class="badge bg-label-secondary">취소</span></td>
 				                            	</c:when>
+				                            	<c:when test="${o.hqOrderStatus == 330}">
+						                            <td><span class="badge bg-label-info">출고대기</span></td>
+				                            	</c:when>
 				                            	<c:when test="${o.hqOrderStatus == 350}">
-						                            <td><span class="badge bg-label-info">출고</span></td>
+						                            <td><span class="badge bg-label-info">출고완료</span></td>
 				                            	</c:when>
 				                            	<c:when test="${o.hqOrderStatus == 400}">
 						                            <td><span class="badge bg-label-primary">입고</span></td>
@@ -321,6 +320,9 @@
 									</c:when>
 									<c:when test="${hasApproved}">
 									  <h5 class="mb-1">입고 상세</h5>
+								    </c:when>
+								    <c:when test="${hasWaitRelease}">
+									  <h5 class="mb-1">출고 상세</h5>
 								    </c:when>
 								  </c:choose>
 				                  <small class="text-muted">
@@ -405,7 +407,6 @@
 	<!-- JS -->    
     <script src="/js/order/orderApprove.js"></script>
     <script src="/js/order/orderReject.js"></script>
-    <script src="/js/order/orderReceive.js"></script>
     <script src="/js/order/orderCancel.js"></script>
   </body>
 </html>

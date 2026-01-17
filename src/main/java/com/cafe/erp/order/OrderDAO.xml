@@ -43,7 +43,7 @@
 	            <when test="hqOrderStatus == 100">
 	                NULL
 	            </when>
-	            <when test="hqOrderStatus == 200">
+	            <when test="hqOrderStatus == 330">
 	                NOW()
 	            </when>
 	        </choose>, 
@@ -52,7 +52,7 @@
     		#{storeId}, 
     		#{memberId}, 
     		#{hqOrderTotalAmount}, 
-    		null);
+    		#{storeOrderApprover});
     	</insert>
     	
     	<!-- 발주 상세 추가 -->
@@ -132,16 +132,18 @@
     		item_id as itemId
     		from order_store_detail where store_order_id = #{orderNo}
     	</select>
+    	<!-- 발주 목록 요청 -->
+    	<select id="getOrderStoreId" resultType="int">
+    		select store_id from order_store where store_order_id = #{orderNo} 
+    	</select>
     	
     	<!-- 발주 승인 처리 -->
     	<update id="approveHqOrder">
     		update order_hq set hq_order_status = 200, hq_order_approvaled_at = NOW() where hq_order_id = #{orderNo}
     	</update>
     	<update id="approveStoreOrder">
-    		update order_store set store_order_status = 200, store_order_approver = #{orderApproverId}, store_order_approvaled_at = NOW() where store_order_id = #{orderNo}
+    		update order_store set store_order_status = 330, store_order_approver = #{orderApproverId}, store_order_approvaled_at = NOW() where store_order_id = #{orderNo}
     	</update>
-    	<!-- 발주 자동 승인 처리 -->
-    	
     	
     	<!-- 반려 처리 -->
     	<update id="rejectOrder" parameterType="OrderRejectDTO">
@@ -173,20 +175,101 @@
 			select * from order_hq where hq_order_id = #{orderNo}
 		</select>
 		<select id="isStoreAlreadyReceived" resultType="OrderDTO">
-			select * from order_store where store_order_id = #{orderNo}
+			select 
+				s.store_order_id as hqOrderId,
+				s.store_order_status as hqOrderStatus
+			from order_store s where store_order_id = #{orderNo}
 		</select>
 		<!-- 가맹주 창고 번호 찾기 -->
-		<select id="findByWarehouseId" resultType="Integer">
+		<select id="findByWarehouseId" parameterType="int" resultType="int">
 			select warehouse_id from order_warehouse where store_id = #{storeId}
 		</select>
 		<!-- 입출고 기록 -->
 		<insert id="insertOrderInOut" parameterType="StockInoutDTO" 
 		useGeneratedKeys="true" keyProperty="inputId">
-			INSERT INTO order_in_out (
-        input_type,
-        warehouse_id,
-        hq_order_id,
-        store_order_id
-    )  values(#{inputType}, #{warehouseId}, #{hqOrderId}, #{storeOrderId})
+			INSERT INTO order_in_out
+  			values(NULL, #{inputType}, #{warehouseId}, #{hqOrderId} , #{storeOrderId})
 		</insert>
+		<!-- 입고 취소 -->
+		<update id="cancelReceive" parameterType="String">
+    		update order_hq set hq_order_status = 200 where hq_order_id = #{orderNo}
+    	</update>
+    	<select id="getDeleteStock" resultType="OrderStockHistoryDTO">
+			select 
+			oio.input_id as inputId,
+			oio.warehouse_id as warehouseId,
+			osh.item_id as itemId,
+			osh.stock_quantity as orderQty 
+			from order_in_out oio
+			join order_stock_history osh on oio.input_id = osh.input_id  where oio.hq_order_id = #{orderNo}
+		</select>
+		<delete id="deleteStockHistory" parameterType="Integer">
+			DELETE FROM order_stock_history WHERE input_id = #{inputId};
+		</delete>
+		<delete id="deleteInput" parameterType="Integer">
+			DELETE FROM order_in_out WHERE input_id = #{inputId};
+		</delete>
+		<update id="updateStockDelete">
+			UPDATE order_stock
+			SET stock_quantity = stock_quantity - #{orderQty}
+			WHERE warehouse_id = #{warehouseId}
+  			AND item_id = #{itemId};
+		</update>
+		
+		
+		<!-- 출고 목록 조회 -->
+		<select id="getStoreReleaseTarget" resultType="OrderDTO">
+			select 
+				s.store_order_id          as hqOrderId,
+		        s.store_order_total_amount as hqOrderTotalAmount,
+		        s.member_id               as memberId,
+		        s.store_order_approver    as storeOrderApprover,
+		        s.store_rejection_reason  as storeRejectionReason,
+		        s.store_order_status      as hqOrderStatus
+		        from order_store s
+				    where store_order_status in
+				    <foreach collection="statuses"
+				             item="status"
+				             open="("
+				             separator=","
+				             close=")">
+				        #{status}
+				    </foreach>
+		</select>
+		<select id="getStoreReleaseRequests" resultType="OrderDTO">
+		select 
+			s.store_order_id          as hqOrderId,
+	        s.store_order_total_amount as hqOrderTotalAmount,
+	        s.member_id               as memberId,
+	        s.store_order_approver    as storeOrderApprover,
+	        s.store_rejection_reason  as storeRejectionReason,
+	        s.store_order_status      as hqOrderStatus
+	        from order_store s
+		    where store_order_status in
+		    <foreach collection="statuses"
+		             item="status"
+		             open="("
+		             separator=","
+		             close=")">
+		        #{status}
+		    </foreach>
+		</select>
+		
+		
+    	<update id="updateReceiveStatusByStoreOrder" parameterType="String">
+    		update order_store set store_order_status = 350 where store_order_id = #{orderNo}
+    	</update>
+    	<update id="updateCancelReceiveStatusByStoreOrder" parameterType="String">
+    		update order_store set store_order_status = 330 where store_order_id = #{orderNo}
+    	</update>
+    	<!-- 본사 재고 출고 반영 -->
+    	<update id="releaseByHq" parameterType="OrderDetailDTO">
+    		<foreach collection="list" item="item" separator=";">
+		    UPDATE order_stock
+		    SET stock_quantity = stock_quantity - #{item.hqOrderQty}
+		    WHERE item_id= #{item.itemId}
+		      AND warehouse_id = 11
+		      AND stock_quantity >= #{item.hqOrderQty}
+		  </foreach>
+    	</update>
     </mapper>

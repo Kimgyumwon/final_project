@@ -1,14 +1,6 @@
-
 $(document).on('click', '#receiveBtn', function () {
 
   const $approvalRows = $('#approvalListBody tr[data-order-no]');
-
-  console.log('입고 대상 개수:', $approvalRows.length);
-
-  if ($approvalRows.length === 0) {
-    alert('입고할 발주가 없습니다.');
-    return;
-  }
 
   const orderNos = [];
   $approvalRows.each(function () {
@@ -23,13 +15,12 @@ $(document).on('click', '#receiveBtn', function () {
 	});
 	
   });
-
-  if (!confirm('선택한 발주를 입고 처리하시겠습니까?')) {
-    return;
-  }
+  if ($approvalRows.length === 0) {
+      alert('입고할 발주가 없습니다.');
+      return;
+    }
 
   // 여기까지는 절대 초기화하지 마라
-
   $.ajax({
     url: '/order/receive',
     type: 'POST',
@@ -59,7 +50,7 @@ function updateOrderStatusToReceive(orders) {
 	
 	// 1️ 상태 배지 변경
     $row.find('.badge')
-      .removeClass('bg-label-success')
+      .removeClass('bg-label-success bg-label-info')
       .addClass('bg-label-primary')
       .text('입고');
 
@@ -75,3 +66,7 @@ function updateOrderStatusToReceive(orders) {
     $row.off('click');
   });
 }
+
+
+
+

@@ -1,28 +1,29 @@
-let currentTab = "HQ"
+let currentTab = "HQ";
 
-// 로딩 시 본사 탭이 active니까 반려버튼 숨김
 $(document).ready(function () {
-  $("#rejectBtn").hide().prop("disabled", true);
-  $("#approveBtn").prop("disabled", true);
+  $("#approveBtn, #rejectBtn").prop("disabled", true);
+  $("#rejectBtn").hide(); // 본사 디폴트 → 반려 버튼 없음
 });
+$(document).on("click", '.nav-link[data-bs-toggle="tab"]', function () {
 
-// Bootstrap 탭 이벤트(탭이 "실제로" 바뀐 뒤 실행)
-$(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function (e) {
-  const target = $(e.target).attr("data-bs-target"); // "#hqOrderTab" or "#storeOrderTab"
+  const target = $(this).attr("data-bs-target");
 
-  // 버튼/체크 초기화(원하면 체크만 빼도 됨)
+  // 체크 해제
   $(".order-check").prop("checked", false);
+
+  // 버튼 초기화
   $("#approveBtn, #rejectBtn").prop("disabled", true);
 
   if (target === "#hqOrderTab") {
-	currentTab = "HQ";
-    $("#rejectBtn").hide();   // ✅ 본사 탭 → 반려 숨김
-  } else if (target === "#storeOrderTab") {
-	currentTab = "STORE";
-    $("#rejectBtn").show();   // ✅ 가맹 탭 → 반려 표시
+    currentTab = "HQ";
+    $("#rejectBtn").hide();   // 본사 → 반려 숨김
+  }
+
+  if (target === "#storeOrderTab") {
+    currentTab = "STORE";
+    $("#rejectBtn").show();   // 가맹 → 반려 표시
   }
 });
-
 $(document).on("change", ".order-check", function () {
 
   const checked = $(".order-check:checked");
@@ -65,7 +66,6 @@ $(document).on("change", ".order-check", function () {
     }
   }
 });
-
 
 // 반려 버튼 클릭 → 모달 띄우기
 $('#rejectBtn').on('click', function () {
