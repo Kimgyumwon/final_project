@@ -17,7 +17,6 @@ public class OrderDTO {
 	private Date hqOrderCreatedAt;
 	private Date hqOrderApprovaledAt;
 	private Integer hqOrderStatus;
-	private Integer vendorId;
 	private Integer memberId;
 	private Integer hqOrderTotalAmount;
 	

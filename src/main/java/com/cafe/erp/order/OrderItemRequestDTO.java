@@ -9,8 +9,9 @@ public class OrderItemRequestDTO {
 	private Integer itemId;
 	private String itemCode;
 	private String itemName;
-	private Integer ItemQuantity;
+	private Integer itemQuantity;
 	private Integer itemSupplyPrice;
 	private Boolean itemAutoOrder;
+	private Integer vendorId;
 	private Integer vendorCode;
 }

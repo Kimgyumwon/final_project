@@ -64,13 +64,13 @@
     			hq_order_price,
     			hq_order_amount,
     			hq_order_created_at,
-    			vendor_code,
+    			vendor_id,
     			hq_order_id,
     			item_id,
     			hq_order_item_code,
     			hq_order_item_name
     		)
-    		values(null, #{hqOrderQty}, #{hqOrderPrice}, #{hqOrderAmount}, now(), #{vendorCode}, #{hqOrderId}, #{itemId}, #{hqOrderItemCode}, #{hqOrderItemName});
+    		values(null, #{hqOrderQty}, #{hqOrderPrice}, #{hqOrderAmount}, now(), #{vendorId}, #{hqOrderId}, #{itemId}, #{hqOrderItemCode}, #{hqOrderItemName});
     	</insert>
     	<insert id="insertStoreOrderItemDetail" parameterType="OrderDetailDTO">
     		insert into order_store_detail 
@@ -80,13 +80,13 @@
 			    store_order_price,
 			    store_order_amount,
 			    store_order_created_at,
-			    vendor_code,
+			    vendor_id,
 			    store_order_id,
 			    item_id,
 			    store_order_item_code,
 			    store_order_item_name
     		)
-    		values(null, #{hqOrderQty}, #{hqOrderPrice}, #{hqOrderAmount}, now(), #{vendorCode}, #{hqOrderId}, #{itemId}, #{hqOrderItemCode}, #{hqOrderItemName});
+    		values(null, #{hqOrderQty}, #{hqOrderPrice}, #{hqOrderAmount}, now(), #{vendorId}, #{hqOrderId}, #{itemId}, #{hqOrderItemCode}, #{hqOrderItemName});
     	</insert>
     	
     	<!-- 발주 목록 요청 -->

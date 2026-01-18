@@ -146,7 +146,7 @@ public class OrderService {
 						req.getItemQuantity() * req.getItemSupplyPrice()
 						);
 				detail.setItemId(req.getItemId());
-				detail.setVendorCode(req.getVendorCode());
+				detail.setVendorId(req.getVendorId());
 				detail.setHqOrderItemName(req.getItemName());
 				
 				orderDAO.insertHqOrderItemDetail(detail);
@@ -164,7 +164,7 @@ public class OrderService {
 						req.getItemQuantity() * req.getItemSupplyPrice()
 						);
 				detail.setItemId(req.getItemId());
-				detail.setVendorCode(req.getVendorCode());
+				detail.setVendorId(req.getVendorId());
 				detail.setHqOrderItemName(req.getItemName());
 				
 				// 발주 상세 insert
