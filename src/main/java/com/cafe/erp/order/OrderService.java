@@ -21,7 +21,7 @@ import com.cafe.erp.stock.StockDAO;
 import com.cafe.erp.stock.StockDTO;
 import com.cafe.erp.stock.StockInoutDTO;
 import com.cafe.erp.stock.StockService;
-import com.cafe.erp.stock.StoreInventoryDTO;
+import com.cafe.erp.order.StoreInventoryDTO;
 
 @Service
 public class OrderService {
@@ -458,6 +458,6 @@ public class OrderService {
 	public List<StoreInventoryDTO> getStoreInventory(Integer memberId) {
 		int storeId = stockDAO.getStoreIdBymemberId(memberId);
 		int warehouseId = stockDAO.getWarehouseIdByStoreId(storeId);
-        return stockDAO.selectStoreInventory(warehouseId);
+        return orderDAO.selectStoreInventory(warehouseId);
     }
 }

@@ -9,7 +9,7 @@ document.getElementById("btnAddItem").addEventListener("click", () => {
 });
 
 function loadInventory() {
-  fetch("/order/store/inventory")   // ⭐ 절대경로
+  fetch("/order/storeInventory")   // ⭐ 절대경로
     .then(res => {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();

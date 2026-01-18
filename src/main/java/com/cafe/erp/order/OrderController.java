@@ -19,7 +19,7 @@ import com.cafe.erp.item.ItemDTO;
 import com.cafe.erp.item.ItemService;
 import com.cafe.erp.member.MemberDTO;
 import com.cafe.erp.security.UserDTO;
-import com.cafe.erp.stock.StoreInventoryDTO;
+import com.cafe.erp.order.StoreInventoryDTO;
 import com.cafe.erp.store.StoreService;
 import com.cafe.erp.vendor.VendorService;
 
@@ -256,7 +256,7 @@ public class OrderController {
 		return "redirect:/order/release";
 	}
 	
-	@GetMapping("/store/inventory")
+	@GetMapping("storeInventory")
 	@ResponseBody
 	public List<StoreInventoryDTO> getStoreInventory(
 	        @AuthenticationPrincipal UserDTO userDTO

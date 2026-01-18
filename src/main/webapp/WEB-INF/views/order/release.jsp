@@ -324,6 +324,8 @@
 </div>
 <!-- / Layout wrapper -->
 
+
+
 <!-- Core JS -->
 <script src="/vendor/libs/jquery/jquery.js"></script>
 <script src="/vendor/libs/popper/popper.js"></script>
@@ -339,6 +341,7 @@
 
 <!-- Page JS -->
 <script src="/js/order/StoreStockRelease.js"></script>
+<script src="/js/order/oederRelease.js"></script>
 
 </body>
 </html>

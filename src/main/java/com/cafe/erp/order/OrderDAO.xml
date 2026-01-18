@@ -291,7 +291,7 @@
 		</insert>
     	
     	<select id="selectStoreInventory"
-            parameterType="int"
+            parameterType="Integer"
             resultType="StoreInventoryDTO">
 	        SELECT
 	            vi.item_id     AS itemId,
@@ -300,7 +300,7 @@
 		    FROM order_stock s
 		    JOIN vendor_item vi
 		      ON s.item_id = vi.item_id
-		    WHERE s.warehouse_id = #{warehouse_id}
+		    WHERE s.warehouse_id = #{warehouseId}
 		      AND s.stock_quantity> 0
 		    ORDER BY vi.item_name;
 

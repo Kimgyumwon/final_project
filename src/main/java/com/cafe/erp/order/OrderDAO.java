@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 import com.cafe.erp.item.ItemDTO;
 import com.cafe.erp.member.MemberDTO;
 import com.cafe.erp.stock.StockInoutDTO;
-import com.cafe.erp.stock.StoreInventoryDTO;
+import com.cafe.erp.order.StoreInventoryDTO;
 
 @Mapper
 public interface OrderDAO {
