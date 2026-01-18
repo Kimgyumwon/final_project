@@ -86,32 +86,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('수정 중 오류가 발생했습니다.');
             })
             .then(data => {
-                viewStatus.dataset.status = newStatus;
-                statusBadge.textContent = newStatus;
+                if (data.status === 'error') {
+                    alert(data.message);
+                    location.reload();
+                } else if (data.status === 'success') {
+                    viewStatus.dataset.status = newStatus;
+                    statusBadge.textContent = newStatus;
 
-                statusBadge.className = 'badge';
-                if (newStatus === '오픈') statusBadge.classList.add('bg-label-info');
-                else if (newStatus === '오픈 준비') statusBadge.classList.add('bg-label-warning');
-                else statusBadge.classList.add('bg-label-danger');
+                    statusBadge.className = 'badge';
+                    if (newStatus === '오픈') statusBadge.classList.add('bg-label-info');
+                    else if (newStatus === '오픈 준비') statusBadge.classList.add('bg-label-warning');
+                    else statusBadge.classList.add('bg-label-danger');
 
-                if (newStatus === '오픈') {
-                    const formattedStart = formatTime(newStartTime);
-                    const formattedClose = formatTime(newCloseTime);
-                    timeTextSpan.textContent = `${formattedStart} ~ ${formattedClose}`;
-                } else {
-                    timeTextSpan.textContent = '-';
+                    if (newStatus === '오픈') {
+                        const formattedStart = formatTime(newStartTime);
+                        const formattedClose = formatTime(newCloseTime);
+                        timeTextSpan.textContent = `${formattedStart} ~ ${formattedClose}`;
+                    } else {
+                        timeTextSpan.textContent = '-';
+                    }
+
+                    editTime.classList.add('d-none');
+                    viewTime.classList.remove('d-none');
+                    editStatus.classList.add('d-none');
+                    viewStatus.classList.remove('d-none');
+
+                    btnEditInfo.classList.replace('btn-primary', 'btn-outline-warning');
+                    btnText.textContent = '정보 수정';
+                    btnIcon.classList.replace('bx-check', 'bx-edit-alt');
+
+                    alert('가맹점 정보가 수정되었습니다.');
                 }
-
-                editTime.classList.add('d-none');
-                viewTime.classList.remove('d-none');
-                editStatus.classList.add('d-none');
-                viewStatus.classList.remove('d-none');
-
-                btnEditInfo.classList.replace('btn-primary', 'btn-outline-warning');
-                btnText.textContent = '정보 수정';
-                btnIcon.classList.replace('bx-check', 'bx-edit-alt');
-
-                alert('가맹점 정보가 수정되었습니다.');
+                else { alert('수정에 실패했습니다.'); }
             })
             .catch(error => {
                 alert('가맹점 정보수정에 실패했습니다.');

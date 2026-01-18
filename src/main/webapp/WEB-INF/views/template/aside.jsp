@@ -314,4 +314,28 @@
 
   </ul>
 </aside>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const currentPath = window.location.pathname;
+
+      const menuLinks = document.querySelectorAll('.layout-menu .menu-link');
+
+      menuLinks.forEach(link => {
+          const linkPath = link.getAttribute('href');
+
+          if (linkPath && currentPath.includes(linkPath)) {
+              const parentLi = link.parentElement;
+              parentLi.classList.add('active');
+
+              const parentUl = parentLi.parentElement;
+              if (parentUl.classList.contains('menu-sub')) {
+                  const grandParentLi = parentUl.parentElement;
+                  grandParentLi.classList.add('active');
+                  grandParentLi.classList.add('open');
+              }
+          }
+      });
+  });
+</script>
 <!-- / Menu -->

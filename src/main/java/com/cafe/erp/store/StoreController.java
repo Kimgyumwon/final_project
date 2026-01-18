@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cafe.erp.security.UserDTO;
+import com.cafe.erp.store.voc.VocDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -127,13 +128,24 @@ public class StoreController {
 		return response;
 	}
 
-	@PreAuthorize("hasAnyRole('')")
+	@PreAuthorize("hasAnyRole('DEPT_SALES', 'EXEC', 'MASTER')")
 	@PostMapping("updateStatus")
 	@ResponseBody
-	public Map<String, Object> updateStatus(@RequestBody StoreDTO storeDTO) throws Exception {
+	public Map<String, Object> updateStatus(@RequestBody StoreDTO storeDTO, @AuthenticationPrincipal UserDTO user) throws Exception {
+		boolean isSALES = user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_DEPT_SALES"));
+		Map<String, Object> response = new HashMap<>();
+
+		if (isSALES) {
+			boolean isManager = storeService.isCurrentManager(storeDTO.getStoreId(), user.getMember().getMemberId());
+			if (!isManager) {
+				response.put("status", "error");
+				response.put("message", "해당 가맹점의 담당자가 아닙니다.");
+
+				return response;
+			}
+		}
 		int result = storeService.updateInfo(storeDTO);
 
-		Map<String, Object> response = new HashMap<>();
 		if (result > 0) {
 			response.put("status", "success");
 		} else {
