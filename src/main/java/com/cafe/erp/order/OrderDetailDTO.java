@@ -20,5 +20,6 @@ public class OrderDetailDTO {
 	private String hqOrderId;
 	private Integer itemId;
 	private Integer vendorCode;
+	private Integer vendorId;
 	
 }

@@ -138,6 +138,7 @@
     			vip.item_supply_price as itemSupplyPrice,
     			vip.item_price_enable as itemPriceEnable,
     			v.vendor_code as vendorCode,
+    			v.vendor_id as vendorId,
     			v.vendor_name as vendorName
     		 from vendor_item vi
     		join vendor_item_price vip on vi.item_id = vip.item_id
@@ -154,5 +155,3 @@
     		</if>
     	</select>
     </mapper>
-    
-   
