@@ -57,7 +57,9 @@
 				                    location.reload(); 
 				                } else if (data === 'already') {
 				                    alert("이미 출근 처리가 되어 있습니다.");
-				                } else {
+				                } else if (data === 'blocked') {
+									alert("오늘은 공휴일/연차라 퇴근 처리가 불가능합니다.");
+								} else {
 				                    alert("출근 처리에 실패했습니다. (관리자 문의)");
 				                }
 				            })
