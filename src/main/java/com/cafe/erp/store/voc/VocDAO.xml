@@ -33,6 +33,16 @@
 	        <if test="searchVocTitle != null and searchVocTitle != ''">
                 AND v.voc_title LIKE CONCAT('%', #{searchVocTitle}, '%')
             </if>
+
+			<if test="managerId != null and managerId != ''">
+				AND EXISTS (
+					SELECT 1
+					FROM store_manager_history smh
+					WHERE smh.store_id = v.store_id
+					AND smh.member_id = #{managerId}
+					AND smh.manage_end_date IS NULL
+				)
+			</if>
     	</where>
     </sql>
 

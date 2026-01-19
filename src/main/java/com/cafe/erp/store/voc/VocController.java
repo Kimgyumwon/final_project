@@ -57,6 +57,18 @@ public class VocController {
 		return isStoreOwner ? "view_store/store/voc_list" : "voc/list";
 	}
 
+	@PreAuthorize("hasAnyRole('DEPT_SALES')")
+	@GetMapping("my-list")
+	public String myVocList(VocSearchDTO searchDTO, Model model, @AuthenticationPrincipal UserDTO user) throws Exception {
+		searchDTO.setManagerId(user.getMember().getMemberId());
+
+		List<VocDTO> vocList = vocService.list(searchDTO);
+		model.addAttribute("list", vocList);
+		model.addAttribute("pager", searchDTO);
+
+		return "voc/list";
+	}
+
 	@PreAuthorize("hasAnyRole('DEPT_CS', 'EXEC', 'MASTER')")
 	@PostMapping("add")
 	@ResponseBody

@@ -26,5 +26,6 @@ public class VocSearchDTO extends Pager {
 
 	// 분기용
 	private Integer searchStoreId;
+	private Integer managerId;
 
 }

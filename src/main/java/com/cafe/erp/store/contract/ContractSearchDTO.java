@@ -28,6 +28,7 @@ public class ContractSearchDTO extends Pager {
 
 	// 분기용
 	private Integer searchStoreId;
+	private Integer managerId;
 
 	public String getsearchRoyaltyMinFormatted() {
 		if (this.searchRoyaltyMin == null) return "";

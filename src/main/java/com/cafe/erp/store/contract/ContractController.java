@@ -47,6 +47,18 @@ public class ContractController {
 		return isStoreOwner ? "view_store/store/contract" : "store/tab_contract";
 	}
 
+	@PreAuthorize("hasRole('DEPT_SALES')")
+	@GetMapping("my-list")
+	public String myContractList(ContractSearchDTO searchDTO, Model model, @AuthenticationPrincipal UserDTO user) throws Exception {
+		searchDTO.setManagerId(user.getMember().getMemberId());
+
+		List<ContractDTO> contractList = contractService.list(searchDTO);
+		model.addAttribute("list", contractList);
+		model.addAttribute("pager", searchDTO);
+
+		return "store/tab_contract";
+	}
+
 	@PreAuthorize("hasAnyRole('DEPT_SALES', 'EXEC', 'MASTER')")
 	@PostMapping("add")
 	@ResponseBody

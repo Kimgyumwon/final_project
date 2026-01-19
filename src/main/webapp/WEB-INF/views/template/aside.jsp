@@ -157,6 +157,11 @@
           </a>
         </li>
         <li class="menu-item">
+          <a href="/store/contract/list" class="menu-link">
+            <div data-i18n="Error">계약</div>
+          </a>
+        </li>
+        <li class="menu-item">
           <a href="/store/voc/list" class="menu-link">
             <div data-i18n="Under Maintenance">VOC</div>
           </a>
@@ -324,15 +329,36 @@
       menuLinks.forEach(link => {
           const linkPath = link.getAttribute('href');
 
-          if (linkPath && currentPath.includes(linkPath)) {
-              const parentLi = link.parentElement;
-              parentLi.classList.add('active');
+          if (linkPath && linkPath !== 'javascript:void(0);' && linkPath !== '') {
+              // 기본 경로 추출 (예: /store/qsc/list -> /store/qsc)
+              const baseLinkPath = linkPath.split('?')[0]; // 쿼리스트링 제거
+              const baseCurrentPath = currentPath.split('?')[0]; // 쿼리스트링 제거
 
-              const parentUl = parentLi.parentElement;
-              if (parentUl.classList.contains('menu-sub')) {
-                  const grandParentLi = parentUl.parentElement;
-                  grandParentLi.classList.add('active');
-                  grandParentLi.classList.add('open');
+              // 경로 세그먼트 비교 (depth 2까지)
+              const linkSegments = baseLinkPath.split('/').filter(s => s);
+              const currentSegments = baseCurrentPath.split('/').filter(s => s);
+
+              // 최소 2단계 경로 일치 확인 (예: store/qsc)
+              let isMatch = false;
+              if (linkSegments.length >= 2 && currentSegments.length >= 2) {
+                  if (linkSegments[0] === currentSegments[0] &&
+                      linkSegments[1] === currentSegments[1]) {
+                      isMatch = true;
+                  }
+              } else if (baseLinkPath === baseCurrentPath) {
+                  isMatch = true;
+              }
+
+              if (isMatch) {
+                  const parentLi = link.parentElement;
+                  parentLi.classList.add('active');
+
+                  const parentUl = parentLi.parentElement;
+                  if (parentUl.classList.contains('menu-sub')) {
+                      const grandParentLi = parentUl.parentElement;
+                      grandParentLi.classList.add('active');
+                      grandParentLi.classList.add('open');
+                  }
               }
           }
       });

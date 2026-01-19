@@ -86,11 +86,13 @@
 			    <div class="col-12 px-0">
                     <ul class="nav nav-pills mb-3" role="tablist">
                         <li class="nav-item">
-                        	<a href="/store/list" class="nav-link"><i class="bx bx-store me-1"></i> 가맹점 정보</a>
-                        </li>
-                        <li class="nav-item">
                         	<a href="/store/contract/list" class="nav-link active"><i class="bx bx-file me-1"></i> 계약 기록</a>
                         </li>
+						<sec:authorize access="hasAnyRole('DEPT_SALES')">
+							<li class="nav-item">
+								<a href="/store/contract/my-list" class="nav-link"><i class="bx bx-user-check"></i> 담당 가맹점</a>
+							</li>
+						</sec:authorize>
                     </ul>
                 </div>
                 <h4 class="fw-bold py-3 mb-3"><span class="text-muted fw-normal">가맹점 /</span> 계약 목록</h4>

@@ -117,6 +117,16 @@
 			<if test="searchQscGrade != null and searchQscGrade != ''">
 				AND q.qsc_grade = #{searchQscGrade}
 			</if>
+
+			<if test="managerId != null and managerId != ''">
+				AND EXISTS (
+					SELECT 1
+					FROM store_manager_history smh
+					WHERE smh.store_id = q.store_id
+					AND smh.member_id = #{managerId}
+					AND smh.manage_end_date IS NULL
+				)
+			</if>
 		</where>
 	</sql>
 

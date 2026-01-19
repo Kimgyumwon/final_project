@@ -48,6 +48,18 @@ public class QscController {
         return isStoreOwner ? "view_store/store/qsc_list" : "qsc/list";
     }
 
+    @PreAuthorize("hasAnyRole('DEPT_SALES')")
+    @GetMapping("my-list")
+    public String MyqscList(QscSearchDTO searchDTO, Model model, @AuthenticationPrincipal UserDTO user) throws Exception {
+        searchDTO.setManagerId(user.getMember().getMemberId());
+
+        List<QscDTO> qscList = qscService.qscList(searchDTO);
+        model.addAttribute("list", qscList);
+        model.addAttribute("pager", searchDTO);
+
+        return "qsc/list";
+    }
+
     @PreAuthorize("hasAnyRole('DEPT_SALES', 'EXEC', 'MASTER')")
     @GetMapping("add")
     public String qscAdd(QscQuestionSearchDTO searchDTO, Model model) throws Exception {

@@ -42,6 +42,16 @@
             <if test="searchDepositMax != null">
                 AND sc.contract_deposit &lt;= #{searchDepositMax}
             </if>
+
+			<if test="managerId != null and managerId != ''">
+				AND EXISTS (
+					SELECT 1
+					FROM store_manager_history smh
+					WHERE smh.store_id = sc.store_id
+					AND smh.member_id = #{managerId}
+					AND smh.manage_end_date IS NULL
+				)
+			</if>
     	</where>
     </sql>
 

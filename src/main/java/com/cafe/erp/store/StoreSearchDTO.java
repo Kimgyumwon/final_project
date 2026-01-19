@@ -17,4 +17,6 @@ public class StoreSearchDTO extends Pager {
 	private String storeAddress;
 	private String storeName;
 
+	private Integer managerId;
+
 }

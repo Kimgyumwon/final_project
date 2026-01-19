@@ -22,4 +22,6 @@ public class QscSearchDTO extends Pager {
     private LocalDate searchEndDate;
     private String searchQscGrade;
 
+    private Integer managerId;
+
 }
