@@ -148,6 +148,25 @@
                                     </div>
                                 </div>
                             </div>
+					        <div class="d-flex justify-content-center mt-3" id="pagerArea">
+							  <nav aria-label="Page navigation">
+							    <ul class="pagination">
+							      <li class="page-item ${pager.begin == 1 ? 'disabled' : ''}">
+							        <a class="page-link" href="javascript:loadPage(${pager.begin - 1})"><i class="bx bx-chevron-left"></i></a>
+							      </li>
+							
+							      <c:forEach begin="${pager.begin}" end="${pager.end}" var="i">
+							        <li class="page-item ${pager.page == i ? 'active' : ''}">
+							          <a class="page-link" href="javascript:loadPage(${i})">${i}</a>
+							        </li>
+							      </c:forEach>
+							
+							      <li class="page-item">
+							        <a class="page-link" href="javascript:loadPage(${pager.end + 1})"><i class="bx bx-chevron-right"></i></a>
+							      </li>
+							    </ul>
+							  </nav>
+							</div>
                         </div>
                     </div> 
                 </div>
@@ -155,6 +174,7 @@
                 <div class="content-backdrop fade"></div>
             </div>
         </div>
+		        
     </div>
     <div class="layout-overlay layout-menu-toggle"></div>
 </div>

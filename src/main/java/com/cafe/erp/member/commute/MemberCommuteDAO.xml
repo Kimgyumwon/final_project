@@ -86,9 +86,11 @@
 	        
 	        <include refid="searchFrag"/>
 	        
-	        ORDER BY mem_commute_work_date DESC
+	        ORDER BY mem_commute_work_date ASC
 	        
 	        LIMIT #{startNum}, #{perPage}
+	        
+	        
 	    </select>
 			    
 	    
@@ -144,4 +146,15 @@
 		        
 		    WHERE member_commute_id = #{memberCommuteId}
 		</update>
+		
+		<select id="existsApprovedFullDayLeave" resultType="int">
+		    SELECT COUNT(*)
+		    FROM member_attendance ma
+		    JOIN approval a ON ma.approval_id = a.approval_id
+		    WHERE ma.member_id = #{memberId}
+		      AND a.app_status = '승인'
+		      AND DATE(ma.mem_attendance_start_date) = #{date}
+		      AND ma.mem_attendance_type IN ('연차', '휴가')
+		</select>
+				
     </mapper> 

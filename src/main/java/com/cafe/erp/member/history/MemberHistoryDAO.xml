@@ -67,6 +67,8 @@
 		        LEFT JOIN member m ON h.member_id = m.member_id
 		        <include refid="searchFrag"/> 
 	      </select>
+	      
+	    
     </mapper>
     
     

@@ -332,85 +332,99 @@
 									
 			<!-- 근태 기록 -->
 									<div class="tab-pane fade" id="navs-attendance" role="tabpanel">
-									    <form action="./AM_member_detail" method="get" id="attForm">
-									        <input type="hidden" name="page" id="attPage" value="${empty pager.page ? 1 : pager.page}">
-									        <input type="hidden" name="memberId" value="${dto.memberId}">
-									        <input type="hidden" name="tab" value="attendance">
-									        
-									        <div class="card mb-4 border">
-									            <div class="card-body">
-									                <div class="row gx-3 gy-2 align-items-center ">
-									                    <div class="col-md-2">
-									                        <label class="form-label">조회 기준</label>
-									                        <select id="dateType" name="dateType" class="form-select" onchange="toggleDateInputs()">
-									                            <option value="month" ${pager.dateType == 'month' || empty pager.dateType ? 'selected' : ''}>월별 조회</option>
-									                            <option value="year" ${pager.dateType == 'year' ? 'selected' : ''}>연도별 조회</option>
-									                            <option value="custom" ${pager.dateType == 'custom' ? 'selected' : ''}>기간 지정</option>
-									                            <option value="all" ${pager.dateType == 'all' ? 'selected' : ''}>전체</option>
-									                        </select>
-									                    </div>
-									                    
-									                    <div class="col-md-4" id="dateInputArea">
-									                        
-									                        <c:set var="now" value="<%=new java.util.Date()%>" />
-									                        <fmt:formatDate value="${now}" pattern="yyyy" var="curYear" />
+
+									  <form action="./AM_member_detail" method="get" id="attForm">
+									    <input type="hidden" name="aPage" id="attPage" value="${empty pager.page ? 1 : pager.page}">
+									    <input type="hidden" name="memberId" value="${dto.memberId}">
+									    <input type="hidden" name="tab" value="attendance">
 									
-									                        <div id="input-month" class="date-input">
-									                            <label class="form-label">대상 월</label>
-									                            <input type="month" 
-									                                   name="monthDate" 
-									                                   class="form-control" 
-									                                   value="${pager.monthDate}"
-									                                   onclick="this.showPicker()">
-									                        </div>
-									                    
-									                        <div id="input-year" class="date-input d-none">
-									                            <label class="form-label">대상 연도</label>
-									                            <select id="yearPicker" name="yearDate" class="form-select text-center">
-									                                <c:set var="selectedYearOnly" value="${not empty pager.yearDate ? pager.yearDate : curYear}" />
-									                                <c:forEach begin="${curYear - 10}" end="${curYear}" var="y">
-									                                    <option value="${y}" ${y == selectedYearOnly ? 'selected' : ''}>${y}년</option>
-									                                </c:forEach>
-									                            </select>
-									                        </div>
-									                    
-									                        <div id="input-custom" class="date-input d-none">
-									                            <label class="form-label">기간 설정</label>
-									                            <div class="input-group">
-									                                <input type="date" name="startDate" class="form-control" value="${pager.startDate}">
-									                                <span class="input-group-text">~</span>
-									                                <input type="date" name="endDate" class="form-control" value="${pager.endDate}">
-									                            </div>
-									                        </div>
-									                    
-									                    </div>
+									    <div class="card mb-4 border">
+									      <div class="card-body">
 									
-									                    <div class="col-md-3">
-									                        <label class="form-label">근태 상태</label>
-									                        <select name="statusFilter" class="form-select">
-									                            <option value="">전체 상태</option>
-									                            <option value="normal" ${pager.statusFilter == 'normal' ? 'selected' : ''}>정상</option>
-									                            <option value="late" ${pager.statusFilter == 'late' ? 'selected' : ''}>지각/조퇴</option>
-									                            <option value="vacation" ${pager.statusFilter == 'vacation' ? 'selected' : ''}>연차/휴가</option>
-									                            <option value="half" ${pager.statusFilter == 'half' ? 'selected' : ''}>반차</option>
-									                        </select>
-									                    </div>
-									                    <div class="col-md-3 ms-auto">
-														    <label class="form-label d-block">&nbsp;</label>
-														    <div class="d-flex gap-2">
-														        <button type="button" class="btn btn-primary" onclick="movePage(1)">
-														            <i class='bx bx-search me-1'></i> 조회
-														        </button>
-														        <button type="button" class="btn btn-outline-success flex-grow-1">
-														            <i class='bx bx-download me-1'></i> Excel
-														        </button>
-														    </div>
-														</div>
-									                </div>
+									        <div class="row gx-3 gy-2 align-items-end">
+									
+									          <div class="col-md-2">
+									            <label class="form-label">조회 기준</label>
+									            <select id="dateType" name="dateType" class="form-select" onchange="toggleDateInputs()">
+									              <option value="month" ${pager.dateType == 'month' || empty pager.dateType ? 'selected' : ''}>월별 조회</option>
+									              <option value="year" ${pager.dateType == 'year' ? 'selected' : ''}>연도별 조회</option>
+									              <option value="custom" ${pager.dateType == 'custom' ? 'selected' : ''}>기간 지정</option>
+									              <option value="all" ${pager.dateType == 'all' ? 'selected' : ''}>전체</option>
+									            </select>
+									          </div>
+									
+									          <div class="col-md-4" id="dateInputArea">
+									            <c:set var="now" value="<%=new java.util.Date()%>" />
+									            <fmt:formatDate value="${now}" pattern="yyyy" var="curYear" />
+									
+									            <div id="input-month" class="date-input">
+									              <label class="form-label">대상 월</label>
+									              <input type="month"
+									                     name="monthDate"
+									                     class="form-control"
+									                     value="${pager.monthDate}"
+									                     onclick="this.showPicker()">
 									            </div>
-									        </div>
-									    </form> 
 									
+									            <div id="input-year" class="date-input d-none">
+									              <label class="form-label">대상 연도</label>
+									              <select id="yearPicker" name="yearDate" class="form-select text-center">
+									                <c:set var="selectedYearOnly" value="${not empty pager.yearDate ? pager.yearDate : curYear}" />
+									                <c:forEach begin="${curYear - 10}" end="${curYear}" var="y">
+									                  <option value="${y}" ${y == selectedYearOnly ? 'selected' : ''}>${y}년</option>
+									                </c:forEach>
+									              </select>
+									            </div>
+									
+									            <div id="input-custom" class="date-input d-none">
+									              <label class="form-label">기간 설정</label>
+									              <div class="input-group">
+									                <input type="date" name="startDate" class="form-control" value="${pager.startDate}">
+									                <span class="input-group-text">~</span>
+									                <input type="date" name="endDate" class="form-control" value="${pager.endDate}">
+									              </div>
+									            </div>
+									          </div>
+									
+									          <div class="col-md-3">
+									            <label class="form-label">근태 상태</label>
+									            <select name="statusFilter" class="form-select">
+									              <option value="">전체 상태</option>
+									              <option value="normal" ${pager.statusFilter == 'normal' ? 'selected' : ''}>정상</option>
+									              <option value="late" ${pager.statusFilter == 'late' ? 'selected' : ''}>지각/조퇴</option>
+									              <option value="vacation" ${pager.statusFilter == 'vacation' ? 'selected' : ''}>연차/휴가</option>
+									              <option value="half" ${pager.statusFilter == 'half' ? 'selected' : ''}>반차</option>
+									            </select>
+									          </div>
+									
+									          <div class="col-md-3 ms-auto">
+									        <label class="form-label d-block">&nbsp;</label>
+									        <div class="d-flex gap-2">
+									          <button type="button" class="btn btn-primary" onclick="movePage(1)">
+									            <i class='bx bx-search me-1'></i> 조회
+									          </button>
+									          <button type="button" class="btn btn-outline-success flex-grow-1" onclick="downloadAttendanceExcel()">
+									            <i class='bx bx-download me-1'></i> Excel
+									          </button>
+									        </div>
+									      </div>
+									
+									    </div>
+									
+									    <div class="mt-3" style="width: 200px;">
+									      <select name="perPage" id="attPerPage" class="form-select" onchange="movePage(1)">
+									        <option value="10"  ${pager.perPage == 10 ? 'selected' : ''}>10개씩 보기</option>
+									        <option value="20"  ${pager.perPage == 20 ? 'selected' : ''}>20개씩 보기</option>
+									        <option value="50"  ${pager.perPage == 50 ? 'selected' : ''}>50개씩 보기</option>
+									        <option value="100" ${pager.perPage == 100 ? 'selected' : ''}>100개씩 보기</option>
+									      </select>
+									    </div>
+									
+									
+									      </div>
+									    </div>
+									  </form>
+																		
 									    <div class="table-responsive text-nowrap bg-white border rounded">
 									        <table class="table table-striped table-hover mb-0" id="attendanceTable">
 									            <thead class="table-light">
@@ -542,17 +556,28 @@
 													        </select>
 													    </div>
 													
-													    <div class="col-md-3 ms-auto">
-														    <label class="form-label d-block">&nbsp;</label>
-														    <div class="d-flex gap-2">
-														        <button type="button" class="btn btn-primary" onclick="movePage(1)">
-														            <i class='bx bx-search me-1'></i> 조회
-														        </button>
-														        <button type="button" class="btn btn-outline-success flex-grow-1">
-														            <i class='bx bx-download me-1'></i> Excel
-														        </button>
-														    </div>
+													    <div class="col-md-2 ms-auto">
+														  <label class="form-label">표시 개수</label>
+														  <select name="perPage" id="vacPerPage" class="form-select" onchange="moveVacationPage(1)">
+														    <option value="10"  ${vacationSearch.perPage == 10 ? 'selected' : ''}>10개</option>
+														    <option value="20"  ${vacationSearch.perPage == 20 ? 'selected' : ''}>20개</option>
+														    <option value="50"  ${vacationSearch.perPage == 50 ? 'selected' : ''}>50개</option>
+														    <option value="100" ${vacationSearch.perPage == 100 ? 'selected' : ''}>100개</option>
+														  </select>
 														</div>
+														
+														<div class="col-md-3">
+														  <label class="form-label d-block">&nbsp;</label>
+														  <div class="d-flex gap-2">
+														    <button type="button" class="btn btn-primary" onclick="moveVacationPage(1)">
+														      <i class='bx bx-search me-1'></i> 조회
+														    </button>
+														    <button type="button" class="btn btn-outline-success flex-grow-1" onclick="downloadVacationExcel()">
+														      <i class='bx bx-download me-1'></i> Excel
+														    </button>
+														  </div>
+														</div>
+
 													</div>
 									            </div>
 									        </div>
@@ -783,8 +808,8 @@
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <label for="editNote" class="form-label">수정 사유 / 비고</label>
-                            <input type="text" id="editNote" class="form-control" placeholder="수정 사유를 입력하세요." />
+                            <label for="editNote" class="form-label"><!-- 수정 사유 / 비고 --></label>
+                            <input type="hidden" id="editNote" class="form-control" placeholder="수정 사유를 입력하세요." />
                         </div>
                     </div>
                     

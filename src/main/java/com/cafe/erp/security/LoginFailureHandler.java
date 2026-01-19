@@ -36,7 +36,6 @@ public class LoginFailureHandler implements AuthenticationFailureHandler{
 		        history.setMemLogHisActionType("LOGIN_FAIL");
 		        history.setMemLogHisIsSuccess(false);
 		        history.setMemLogHisLoginId(loginId);
-		        history.setMemberId(null); 
 		
 		        try {
 		        	memberHistoryService.insertLoginHistory(history);

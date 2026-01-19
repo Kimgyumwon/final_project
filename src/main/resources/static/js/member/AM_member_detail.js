@@ -43,36 +43,37 @@ $(document).ready(function() {
 
 
 function movePage(page) {
-    if (page < 1) page = 1;
+  if (page < 1) page = 1;
 
-    const form = document.getElementById('attForm'); 
-    document.getElementById("attPage").value = page;
+  const form = document.getElementById('attForm');
+  document.getElementById("attPage").value = page;
 
-    const formData = new FormData(form);
-    const params = new URLSearchParams(formData);
+  const formData = new FormData(form);
+  const params = new URLSearchParams(formData);
 
-    params.set('page', page);
+  params.set('aPage', page);          
+  params.set('tab', 'attendance');
 
-    const currentUrlParams = new URLSearchParams(window.location.search);
-    currentUrlParams.forEach((value, key) => {
-        if (key.startsWith('sortConditions')) {
-            params.append(key, value);
-        }
-    });
-
-    params.set("tab", "attendance");
-
-    location.href = form.action + "?" + params.toString();
+  location.href = form.action + "?" + params.toString();
 }
+
 
 
 function moveVacationPage(page) {
-    if (page < 1) page = 1; 
-    
-    document.getElementById("vacPage").value = page;
-    
-    document.getElementById("vacForm").submit();
+  if (page < 1) page = 1;
+
+  const form = document.getElementById('vacForm');
+  document.getElementById("vacPage").value = page;
+
+  const formData = new FormData(form);
+  const params = new URLSearchParams(formData);
+
+  params.set('vPage', page);
+  params.set('tab', 'vacation');
+
+  location.href = form.action + "?" + params.toString();
 }
+
 
 document.addEventListener("DOMContentLoaded", function() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -355,3 +356,24 @@ function saveAttendanceChanges() {
         alert("저장 중 오류가 발생했습니다. (콘솔 확인)");
     });
 }
+
+
+function downloadAttendanceExcel() {
+  const form = document.getElementById('attForm');
+  const formData = new FormData(form);
+  const params = new URLSearchParams(formData);
+
+  params.set("tab", "attendance");
+
+  location.href = "/member/attendance_excel?" + params.toString();
+}
+
+function downloadVacationExcel() {
+  const form = document.getElementById('vacForm');
+  const formData = new FormData(form);
+  const params = new URLSearchParams(formData);
+
+  params.set('tab', 'vacation');
+  location.href = "/member/vacation_excel?" + params.toString();
+}
+

@@ -9,5 +9,11 @@ public interface MemberHistoryDAO {
 
 	int insertLoginHistory(MemberLoginHistoryDTO historyDTO) throws Exception;
 	List<MemberLoginHistoryDTO> selectLoginHistoryList(MemberHistorySearchDTO memberHistorySearchDTO)throws Exception;
+	// 로그인 이력 엑셀 + 개수	
 	Long totalCount(MemberHistorySearchDTO memberHistorySearchDTO)throws Exception;
+	
+	/*
+	 * Long countLoginHistory(MemberHistorySearchDTO memberHistorySearchDTO)throws
+	 * Exception;
+	 */
 }

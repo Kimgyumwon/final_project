@@ -43,9 +43,30 @@ public class MemberService {
 	}
 	
 	// 조직도(사원 목록)
-	public List<MemberDTO> chatList(Map<String, Object> val) throws Exception{
-		return memberDAO.chatList(val);
+	public Map<String, Object> chatList(GroupChartSearchDTO dto) throws Exception {
+
+	    Long total = memberDAO.chatListCount(dto);
+	    dto.setTotalCount(total);
+
+	    dto.pageing(total);
+
+	    List<MemberDTO> list = memberDAO.chatList(dto);
+
+	    Map<String, Object> checkMem = new HashMap<>();
+	    checkMem.put("deptCode", dto.getDeptCode() == null ? 0 : dto.getDeptCode());
+	    checkMem.put("includeRetired", dto.getIncludeRetired() != null && dto.getIncludeRetired());
+	    checkMem.put("keyword", dto.getKeyword() == null ? "" : dto.getKeyword());
+
+	    List<Map<String, Object>> deptCounts = memberDAO.deptMemberCount(checkMem);
+
+	    Map<String, Object> res = new HashMap<>();
+	    res.put("memberList", list);
+	    res.put("pager", dto);
+	    res.put("totalCount", total);
+	    res.put("deptCounts", deptCounts);
+	    return res;
 	}
+
 	
 	// 부서별 사원 수 조회
 	public List<Map<String, Object>> deptMemberCount(Map<String, Object> checkMem){
@@ -202,6 +223,14 @@ public class MemberService {
 	public List<MemberDTO> positionList() {
 		return memberDAO.positionList();
 	}
+
+	
+	// admin_excel_list 엑셀 다운용	
+	public Long memberCount(MemberSearchDTO searchDTO) throws Exception {
+    return memberDAO.memberCount(searchDTO);
+	}
+
+
 
 	
 

@@ -5,35 +5,59 @@
     
     <mapper namespace="com.cafe.erp.member.MemberDAO">
     
-    <select id="login" parameterType="int" resultType="MemberDTO">
-	    SELECT 
-	        m.*, 
-	        mp.mem_profile_saved_name, 
-	        mp.mem_profile_original_name
-	    FROM member m
-	    LEFT JOIN member_profile mp ON m.member_id = mp.member_id
-	    WHERE m.member_id = #{memberId}
-	</select>
+		<sql id="memberSearch">
+	        <where>
+	            <if test="deptCode != null and deptCode != ''">
+	                AND dept_code = #{deptCode}
+	            </if>
+	            <if test="memIsActive != null">
+	                AND mem_is_active = #{memIsActive}
+	            </if>
+	            <if test="searchKeyword != null and searchKeyword != ''">
+	                AND (mem_name LIKE CONCAT('%', #{searchKeyword}, '%') 
+	                     OR member_id LIKE CONCAT('%', #{searchKeyword}, '%'))
+	            </if>
+	        </where>
+	    </sql>
+	    
+	    
+	    <sql id="chatSearch">
+			<where>
+				<if test="deptCode != null and deptCode != 0">
+			      AND M.dept_code = #{deptCode}
+			    </if>
+			
+			    <if test="includeRetired == null or includeRetired != true">
+			      AND M.mem_is_active = '1'
+			    </if>
+			
+			    <if test="keyword != null and keyword != ''">
+			      AND (
+			        M.mem_name LIKE CONCAT('%', #{keyword}, '%')
+			        OR M.member_id LIKE CONCAT('%', #{keyword}, '%')
+			        OR D.mem_dept_name LIKE CONCAT('%', #{keyword}, '%')
+			      )
+			    </if>
+			</where>
+		</sql>
+	    
+    
+		<select id="login" parameterType="int" resultType="MemberDTO">
+		SELECT 
+			m.*, 
+		    mp.mem_profile_saved_name, 
+		    mp.mem_profile_original_name
+		    FROM member m
+		    LEFT JOIN member_profile mp ON m.member_id = mp.member_id
+		    WHERE m.member_id = #{memberId}
+		</select>
 
-        <sql id="memberSearch">
-        <where>
-            <if test="deptCode != null and deptCode != ''">
-                AND dept_code = #{deptCode}
-            </if>
-            <if test="memIsActive != null">
-                AND mem_is_active = #{memIsActive}
-            </if>
-            <if test="searchKeyword != null and searchKeyword != ''">
-                AND (mem_name LIKE CONCAT('%', #{searchKeyword}, '%') 
-                     OR member_id LIKE CONCAT('%', #{searchKeyword}, '%'))
-            </if>
-        </where>
-    </sql>
 
-    <select id="memberCount" parameterType="MemberSearchDTO" resultType="Long">
-        SELECT COUNT(member_id) FROM member
-        <include refid="memberSearch" />
-    </select>
+
+		<select id="memberCount" parameterType="MemberSearchDTO" resultType="Long">
+		    SELECT COUNT(member_id) FROM member
+		    <include refid="memberSearch" />
+		</select>
     
    
 		<select id="memberList" parameterType="MemberSearchDTO" resultType="MemberDTO">
@@ -59,56 +83,50 @@
 	
 	
 	
-	<select id="countAllMember" resultType="int">
-	    SELECT COUNT(*) FROM member
-	</select>
+		<select id="countAllMember" resultType="int">
+		    SELECT COUNT(*) FROM member
+		</select>
+		
+		<select id="countActiveMember" resultType="int">
+		    SELECT COUNT(*) FROM member WHERE mem_is_active = '1'
+		</select>
+		
+		
+		
+		<select id="chatListCount" parameterType="GroupChartSearchDTO" resultType="Long">
+			  SELECT COUNT(*)
+			  FROM member M
+			  LEFT JOIN member_dept D ON M.dept_code = D.member_dept_code
+			  LEFT JOIN member_position P ON M.position_code = P.member_position_code
+			  LEFT JOIN member_profile MP ON M.member_id = MP.member_id
+			  <include refid="chatSearch"/>
+		</select>
+					
 	
-	<select id="countActiveMember" resultType="int">
-	    SELECT COUNT(*) FROM member WHERE mem_is_active = '1'
-	</select>
-	
-	
-	
-	<select id="chatList" resultType="MemberDTO">
-		SELECT 
-            M.member_id, M.mem_password, M.mem_name, M.mem_zip_code, M.mem_address_detail, M.mem_email, 
-            M.mem_phone, M.mem_hire_date, M.mem_left_date, M.mem_is_active, M.dept_code, M.position_code, 
-            P.mem_position_sequence, D.mem_dept_name, P.mem_position_name, MP.mem_profile_saved_name
-        FROM 
-            member M  
-        LEFT JOIN 
-        	member_dept D ON M.dept_code = D.member_dept_code
-        LEFT JOIN 
-        	member_position P ON M.position_code = P.member_position_code
-        LEFT JOIN
-        	member_profile MP ON M.member_id = MP.member_id
-            
-        <where>
-        	<if test="deptCode != 0">
-        		AND M.dept_code = #{deptCode}
-    	    </if>
 
-	        <if test="includeRetired != true">
-	       		AND  M.mem_is_active = '1' 
-	       	</if>
-	       	
-	       	<if test="keyword != null and keyword != ''">
-	       		AND(
-	       			M.mem_name LIKE CONCAT ('%', #{keyword}, '%') OR
-	       			M.member_id LIKE CONCAT ('%', #{keyword}, '%') OR
-	       			D.mem_dept_name LIKE CONCAT ('%', #{keyword}, '%') 
-	       		)
-	       	</if>
-        </where>
-        
-        ORDER BY
-        	mem_is_active DESC,
-        CASE	
-            WHEN M.member_id = 999999 OR M.position_code = 99 THEN 0  
-            WHEN M.position_code = 17 THEN 999                        
-            ELSE P.mem_position_sequence END ASC,
-        M.mem_hire_date ASC
-	</select>
+	
+		<select id="chatList" resultType="MemberDTO">
+			SELECT
+			    M.member_id, M.mem_password, M.mem_name, M.mem_zip_code, M.mem_address_detail, M.mem_email,
+			    M.mem_phone, M.mem_hire_date, M.mem_left_date, M.mem_is_active, M.dept_code, M.position_code,
+			    P.mem_position_sequence, D.mem_dept_name, P.mem_position_name, MP.mem_profile_saved_name
+			FROM member M
+			LEFT JOIN member_dept D ON M.dept_code = D.member_dept_code
+			LEFT JOIN member_position P ON M.position_code = P.member_position_code
+			LEFT JOIN member_profile MP ON M.member_id = MP.member_id
+			<include refid="chatSearch"/>
+			
+			ORDER BY
+				mem_is_active DESC,
+			    CASE
+			    	WHEN M.member_id = 999999 OR M.position_code = 99 THEN 0
+			        WHEN M.position_code = 17 THEN 999
+			        ELSE P.mem_position_sequence
+			    END ASC,
+			    M.mem_hire_date ASC
+			
+			  LIMIT #{startNum}, #{perPage}
+		</select>
 	
 	<select id="deptMemberCount" resultType="DeptCountDTO">
 	    SELECT

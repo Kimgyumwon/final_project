@@ -10,5 +10,8 @@ public interface CompanyHolidayDAO {
 	public void insertHoliday(CompanyHolidayDTO companyHolidayDTO) throws Exception;
 	
 	public List<CompanyHolidayDTO> selectHolidayList()throws Exception;
+	
+	public int existsHoliday(java.sql.Date date) throws Exception;
+
 
 }

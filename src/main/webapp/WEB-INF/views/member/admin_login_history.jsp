@@ -51,6 +51,8 @@
                 <div class="card-body">
                     <form id="searchForm" action="./admin_login_history" method="get" class="row gx-3 gy-2 align-items-center">
                         <input type="hidden" name="page" id="pageInput" value="${pager.page}">
+                        <input type="hidden" name="perPage" id="perPageInput" value="${empty param.perPage ? 10 : param.perPage}">
+                        
                         
                         <div class="col-md-4">
                             <label class="form-label">조회 기간</label>
@@ -87,19 +89,31 @@
               </div>
 
               <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div class="mb-3">
-                        <h5>총 이력: ${totalCount}건</h5>
-                        <div class="text-muted small">
-                            (최근 3개월 데이터가 기본으로 조회됩니다.)
-                        </div>
-                    </div>
-                    <div>
-                        <button type="button" class="btn btn-outline-success me-2">
-                            <i class='bx bx-download me-1'></i> 엑셀 다운로드
-                        </button>
-                    </div>
-                </div>
+                <div class="card-header">
+				  <div class="d-flex justify-content-between align-items-start">
+				    <div>
+				      <h5 class="mb-1">총 이력: ${totalCount}건</h5>
+				      <div class="text-muted small">
+				        (최근 3개월 데이터가 기본으로 조회됩니다.)
+				      </div>
+				    </div>
+				    <div class="mt-3">
+				      <button type="button" class="btn btn-outline-success" id="btnExcel">
+				        <i class='bx bx-download me-1'></i> 엑셀 다운로드
+				      </button>
+				    </div>
+				  </div>
+				  <div class="mt-3">
+				    <select id="perPageSelect" class="form-select" style="width: 200px;">
+				      <option value="10">10개씩 보기</option>
+				      <option value="20">20개씩 보기</option>
+				      <option value="50">50개씩 보기</option>
+				      <option value="1000">1000개씩 보기</option>
+				    </select>
+				  </div>
+				
+				</div>
+
                 
                 <div class="table-responsive text-nowrap">
                   <table class="table table-hover">
@@ -118,9 +132,16 @@
                         <c:forEach items="${historyList}" var="log">
                             <tr>
                                 <td>
-                                    <fmt:parseDate value="${log.memLogHisCreatedTime}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="parsedDate" type="both" />
-                                    <fmt:formatDate value="${parsedDate}" pattern="yyyy-MM-dd HH:mm:ss" />
-                                </td>
+								    <c:catch var="parseError">
+								        <fmt:parseDate value="${log.memLogHisCreatedTime}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="parsedDate" />
+								    </c:catch>
+								
+								    <c:if test="${not empty parseError}">
+								        <fmt:parseDate value="${log.memLogHisCreatedTime}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDate" />
+								    </c:if>
+								
+								    <fmt:formatDate value="${parsedDate}" pattern="yyyy-MM-dd HH:mm:ss" />
+								</td>
 
                                 <td>
                                     <c:choose>
@@ -204,27 +225,7 @@
     <script src="/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
     <script src="/vendor/js/menu.js"></script>
     <script src="/js/main.js"></script>
+    <script src="/js/member/admin_login_history.js"></script>
 
-    <script>
-        // 페이징 이동 함수
-        function movePage(page) {
-    if (page < 1) page = 1;
-
-    const form = document.getElementById('searchForm');
-    const formData = new FormData(form);
-    const params = new URLSearchParams(formData);
-
-    params.set('page', page);
-
-    const currentUrlParams = new URLSearchParams(window.location.search);
-    currentUrlParams.forEach((value, key) => {
-        if (key.startsWith('sortConditions')) {
-            params.append(key, value);
-        }
-    });
-
-    location.href = form.action + '?' + params.toString();
-}
-    </script>
   </body>
 </html>

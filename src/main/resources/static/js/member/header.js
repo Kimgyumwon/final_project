@@ -23,6 +23,26 @@
 		
 
 	$(document).ready(function(){
+		
+		fetch('/commute/availability', {
+		        method: 'GET'
+		    })
+		    .then(res => res.json())
+		    .then(data => {
+		        if (data && data.canCommute === false) {
+		            $('#inCommute').hide();
+		            $('#outCommute').hide();
+		        } else {
+		            $('#inCommute').show();
+		            $('#outCommute').show();
+		        }
+		    })
+		    .catch(err => {
+		        console.error('availability error:', err);
+		        $('#inCommute').show();
+		        $('#outCommute').show();
+		    });
+
 		$(document).on('click', '#inCommute', function(){
 		        if(!confirm("현재 시간으로 출근하시겠습니까?")) return;
 				
@@ -37,7 +57,9 @@
 				                    location.reload(); 
 				                } else if (data === 'already') {
 				                    alert("이미 출근 처리가 되어 있습니다.");
-				                } else {
+				                } else if (data === 'blocked') {
+									alert("오늘은 공휴일/연차라 퇴근 처리가 불가능합니다.");
+								} else {
 				                    alert("출근 처리에 실패했습니다. (관리자 문의)");
 				                }
 				            })
@@ -63,9 +85,11 @@
 						                    location.reload(); 
 						                } else if (data === 'already') {
 						                    alert("이미 퇴근 처리가 되어 있습니다.");
-						                } else {
+						                } else if (data === 'blocked') {
+										    alert("오늘은 공휴일/연차라 퇴근 처리가 불가능합니다.");
+										} else{
 						                    alert("퇴근 처리에 실패했습니다. (관리자 문의)");
-						                }
+						                } 
 						            })
 						            .catch(error => {
 						                console.error('Error:', error);

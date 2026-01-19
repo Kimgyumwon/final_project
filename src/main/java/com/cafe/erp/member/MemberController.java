@@ -38,7 +38,9 @@ import com.cafe.erp.member.history.MemberHistorySearchDTO;
 import com.cafe.erp.member.history.MemberHistoryService;
 import com.cafe.erp.member.history.MemberLoginHistoryDTO;
 import com.cafe.erp.security.UserDTO;
+import com.cafe.erp.util.ExcelUtil;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Controller
@@ -198,31 +200,38 @@ public class MemberController {
 	
 
 	@GetMapping("AM_group_chart")
-	public String chatList(Model model, @AuthenticationPrincipal UserDTO userDTO, MemberSearchDTO memberSearchDTO)
-			throws Exception {
+	public String chatList(Model model, @AuthenticationPrincipal UserDTO userDTO)throws Exception {
 		// 로그인 한 유저 확인
 		int memberId = userDTO.getMember().getMemberId();
 
 		
 		// 초기 조직도 목록
 		Map<String, Object> startChart = new HashMap<>();
-		startChart.put("deptCode", 0); // 전체 부서
-		startChart.put("includeRetired", false); // 활성 사원만
-		startChart.put("keyword", ""); // 검색어 X
-		// 부서별 활성 인원 수
-		List<Map<String, Object>> deptCount = memberService.deptMemberCount(startChart);
+	    startChart.put("deptCode", 0);
+	    startChart.put("includeRetired", false);
+	    startChart.put("keyword", "");
+	    List<Map<String, Object>> deptCount = memberService.deptMemberCount(startChart);
 
-		// 전체 활성 사원 수
-		int totalCount = memberService.countActiveMember(memberSearchDTO);
+	    // 전체 활성 사원 수(상단 표시용)
+	    int totalCount = memberService.countActiveMember(new MemberSearchDTO());
 
-		List<MemberDTO> startViewChart = memberService.chatList(startChart);
+	    GroupChartSearchDTO dto = new GroupChartSearchDTO();
+	    dto.setDeptCode(0);
+	    dto.setIncludeRetired(false);
+	    dto.setKeyword("");
+	    dto.setPage(1L);          // 첫 페이지
 
-		model.addAttribute("deptCount", deptCount);
-		model.addAttribute("totalCount", totalCount);
-		model.addAttribute("startViewChart", startViewChart);
+	    Map<String, Object> paged = memberService.chatList(dto);
 
-		return "member/AM_group_chart";
+	    model.addAttribute("deptCount", deptCount);
+	    model.addAttribute("totalCount", totalCount);
+
+	    model.addAttribute("startViewChart", paged.get("memberList"));
+	    model.addAttribute("pager", paged.get("pager"));
+
+	    return "member/AM_group_chart";
 	}
+
 	
 	
 	
@@ -230,27 +239,30 @@ public class MemberController {
 
 	@GetMapping("checkCount")
 	@ResponseBody
-	public Map<String, Object> checkMemberCount(@RequestParam(name = "deptCode", defaultValue = "0") int deptCode,
-			@RequestParam(name = "includeRetired", defaultValue = "false") boolean includeRetired,
-			@RequestParam(defaultValue = "") String keyword) throws Exception {
+	public Map<String, Object> checkMemberCount( @RequestParam(name = "deptCode", defaultValue = "0") int deptCode,
+	        @RequestParam(name = "includeRetired", defaultValue = "false") boolean includeRetired,
+	        @RequestParam(defaultValue = "") String keyword,
+	        @RequestParam(name = "page", defaultValue = "1") Long page
+	) throws Exception {
 
-		Map<String, Object> checkMem = new HashMap<>();
-		checkMem.put("deptCode", deptCode);
-		checkMem.put("includeRetired", includeRetired);
+	    GroupChartSearchDTO dto = new GroupChartSearchDTO();
+	    dto.setDeptCode(deptCode);
+	    dto.setIncludeRetired(includeRetired);
+	    dto.setKeyword(keyword);
+	    dto.setPage(page);
+
+
+	    Map<String, Object> result = memberService.chatList(dto);
+
+	    Map<String, Object> checkMem = new HashMap<>();
+	    checkMem.put("deptCode", deptCode);
+	    checkMem.put("includeRetired", includeRetired);
 	    checkMem.put("keyword", keyword);
 
-	    Map<String, Object> resultMem = new HashMap<>();
-	    
-	    List<MemberDTO> memberList = memberService.chatList(checkMem);
-	    resultMem.put("memberList", memberList);
-	    
-		if (!keyword.isEmpty()) {
-			checkMem.put("keyword", keyword);
-		}
-		
-		List<Map<String, Object>> deptCounts = memberService.deptMemberCount(checkMem); 
-	    resultMem.put("deptCounts", deptCounts);
-		return resultMem;
+	    List<Map<String, Object>> deptCounts = memberService.deptMemberCount(checkMem);
+	    result.put("deptCounts", deptCounts);
+
+	    return result;
 	}
 	
 	
@@ -311,7 +323,9 @@ public class MemberController {
 	                     @AuthenticationPrincipal UserDTO userDTO, 
 	                     MemberCommuteSearchDTO memberCommuteSearchDTO,
 	                     @ModelAttribute("vacationSearch") MemberAttendanceSearchDTO memberAttendanceSearchDTO,
-	                     @RequestParam(value = "vPage", defaultValue = "1") Long vPage) throws Exception {
+	                     @RequestParam(value = "aPage", defaultValue = "1") Long aPage,
+	                     @RequestParam(value = "vPage", defaultValue = "1") Long vPage, 
+	                     @RequestParam(value = "tab", required = false) String tab  ) throws Exception {
 	    
 	    int targetMemberId = memberDTO.getMemberId();
 	    if (targetMemberId == 0) {
@@ -327,6 +341,14 @@ public class MemberController {
 	    if (member != null) {
 	        memberCommuteSearchDTO.setMemberId(targetMemberId);
 	        
+	        
+	        memberCommuteSearchDTO.setPage(aPage == null || aPage < 1 ? 1L : aPage);
+	        
+	        Long perPage = memberCommuteSearchDTO.getPerPage();
+	        if (perPage == null || perPage < 1) perPage = 10L;
+	        if (perPage > 1000L) perPage = 1000L;        
+	        memberCommuteSearchDTO.setPerPage(perPage);
+
 	        String dateType = memberCommuteSearchDTO.getDateType();
 	        
 	        if (dateType == null || "month".equals(dateType) || dateType.isEmpty()) {
@@ -355,15 +377,36 @@ public class MemberController {
 	            memberCommuteSearchDTO.setStartDate(null);
 	            memberCommuteSearchDTO.setEndDate(null);
 	        } 
+	        
+	        
+	        Long totalAttendanceCount = commuteService.countAttendance(memberCommuteSearchDTO);
+	        memberCommuteSearchDTO.pageing(totalAttendanceCount);
+	        memberCommuteSearchDTO.setStartNum((memberCommuteSearchDTO.getPage() - 1) * memberCommuteSearchDTO.getPerPage());
+
 
 	        List<MemberCommuteDTO> attendanceList = commuteService.attendanceList(memberCommuteSearchDTO);
 	        
 	        model.addAttribute("attendanceList", attendanceList);
 	        
 	        model.addAttribute("pager", memberCommuteSearchDTO); 
-
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
 	        memberAttendanceSearchDTO.setMemberId(targetMemberId);
-	        memberAttendanceSearchDTO.setPage(vPage); 
+	        memberAttendanceSearchDTO.setPage(vPage == null || vPage < 1 ? 1L : vPage);
+
+	        Long vPerPage = memberAttendanceSearchDTO.getPerPage();
+	        if (vPerPage == null || vPerPage < 1) vPerPage = 10L;
+	        if (vPerPage > 500L) vPerPage = 500L;
 
 	        String vYear = memberAttendanceSearchDTO.getYearDate();
 	        if (vYear == null || vYear.isEmpty()) {
@@ -395,6 +438,7 @@ public class MemberController {
 	@GetMapping("admin_login_history")
     public String loginHistory(Model model, MemberHistorySearchDTO memberHistorySearchDTO) throws Exception{
 		
+		
 		/* 최근 3개월 이력 출력 */
 		if (memberHistorySearchDTO.getStartDate() == null || memberHistorySearchDTO.getStartDate().equals("")) {
 	        LocalDate today = LocalDate.now();
@@ -403,6 +447,18 @@ public class MemberController {
 	        memberHistorySearchDTO.setStartDate(threeMonthsAgo.toString()); 
 	        memberHistorySearchDTO.setEndDate(today.toString());          
 	    }
+		
+		if (memberHistorySearchDTO.getPage() == null || memberHistorySearchDTO.getPage() < 1) memberHistorySearchDTO.setPage(1L);
+	    if (memberHistorySearchDTO.getPerPage() == null || memberHistorySearchDTO.getPerPage() < 1) memberHistorySearchDTO.setPerPage(10L);
+	    
+	    Long totalCount = memberHistoryService.totalCount(memberHistorySearchDTO);
+	    memberHistorySearchDTO.setTotalCount(totalCount);
+
+	    memberHistorySearchDTO.setStartNum((memberHistorySearchDTO.getPage() - 1) * memberHistorySearchDTO.getPerPage());
+
+
+
+	    
         List<MemberLoginHistoryDTO> list = memberHistoryService.selectLoginHistoryList(memberHistorySearchDTO);
         
         model.addAttribute("historyList", list);
@@ -417,6 +473,132 @@ public class MemberController {
 	
 	
 	
+	@GetMapping("attendance_excel")
+	public void attendanceExcel(MemberCommuteSearchDTO dto, HttpServletResponse response) throws Exception {
+
+		
+		if (dto.getPage() == null || dto.getPage() < 1) dto.setPage(1L);
+	    if (dto.getPerPage() == null || dto.getPerPage() < 1) dto.setPerPage(10L);
+	    if (dto.getPerPage() > 200L) dto.setPerPage(200L);
+
+	    dto.setStartNum((dto.getPage() - 1) * dto.getPerPage());
+
+	    List<MemberCommuteDTO> list = commuteService.attendanceList(dto);
+
+	    String[] headers = {"날짜", "출근", "퇴근", "상태", "비고"};
+	    ExcelUtil.download(list, headers, "근태내역", response, (row, a) -> {
+	        row.createCell(0).setCellValue(a.getMemCommuteWorkDate() == null ? "" : a.getMemCommuteWorkDate().toString());
+	        row.createCell(1).setCellValue(a.getFormattedInTime());
+	        row.createCell(2).setCellValue(a.getFormattedOutTime());
+	        row.createCell(3).setCellValue(a.getMemCommuteState() == null ? "" : a.getMemCommuteState());
+	        row.createCell(4).setCellValue(a.getMemCommuteNote() == null ? "" : a.getMemCommuteNote());
+	    });
+	}
+	
+	@GetMapping("vacation_excel")
+	public void vacationExcel(
+	        MemberAttendanceSearchDTO dto,
+	        HttpServletResponse response
+	) throws Exception {
+
+	    // 기본값
+	    if (dto.getPage() == null || dto.getPage() < 1) dto.setPage(1L);
+	    if (dto.getPerPage() == null || dto.getPerPage() < 1) dto.setPerPage(10L);
+	    if (dto.getPerPage() > 500L) dto.setPerPage(500L);
+
+	    dto.setStartNum((dto.getPage() - 1) * dto.getPerPage());
+
+	    List<MemberAttendanceDTO> list = memberAttendanceDAO.attendanceList(dto);
+
+	    String[] headers = {"기간", "종류", "사용", "사유", "상태"};
+
+	    ExcelUtil.download(list, headers, "휴가내역", response, (row, v) -> {
+	        String start = (v.getMemAttendanceStartDate() == null) ? "" : v.getMemAttendanceStartDate().toString();
+	        String end   = (v.getMemAttendanceEndDate() == null) ? "" : v.getMemAttendanceEndDate().toString();
+	        row.createCell(0).setCellValue(start + " ~ " + end);
+
+	        row.createCell(1).setCellValue(v.getMemAttendanceType() == null ? "" : v.getMemAttendanceType());
+	        row.createCell(2).setCellValue(String.valueOf(v.getMemAttendanceUsedDays())); // usedDays 타입이 숫자면 OK
+	        row.createCell(3).setCellValue(v.getMemAttendanceReason() == null ? "" : v.getMemAttendanceReason());
+	        row.createCell(4).setCellValue(v.getAppStatus() == null ? "" : v.getAppStatus());
+	    });
+	}
+
+
+	
+	
+	@GetMapping("admin_member_excel")
+	public void adminMemberExcel(MemberSearchDTO memberSearchDTO, HttpServletResponse response) throws Exception {
+
+
+	    Long totalCount = memberService.memberCount(memberSearchDTO); // 아래 서비스 추가 (또는 DAO 직접 호출)
+	    memberSearchDTO.pageing(totalCount);
+
+	    List<MemberDTO> list = memberService.getMemberList(memberSearchDTO);
+
+	    String[] headers = {"사번", "이름", "부서", "직급", "입사일", "퇴사일", "상태"};
+
+	    ExcelUtil.download(
+	        list,
+	        headers,
+	        "사원목록",
+	        response,
+	        (row, dto) -> {
+	            row.createCell(0).setCellValue(dto.getMemberId());
+	            row.createCell(1).setCellValue(dto.getMemName());
+	            row.createCell(2).setCellValue(dto.getMemDeptName());
+	            row.createCell(3).setCellValue(dto.getMemPositionName());
+	            row.createCell(4).setCellValue(dto.getMemHireDate() == null ? "" : dto.getMemHireDate().toString());
+	            row.createCell(5).setCellValue(dto.getMemLeftDate() == null ? "" : dto.getMemLeftDate().toString());
+	            row.createCell(6).setCellValue(dto.getMemIsActive() ? "재직" : "퇴사");
+	        }
+	    );
+	}
+
+	
+	
+	
+	@GetMapping("admin_login_history_excel")
+	public void adminLoginHistoryExcel(MemberHistorySearchDTO dto, HttpServletResponse response) throws Exception {
+
+	    if (dto.getStartDate() == null || dto.getStartDate().equals("")) {
+	        LocalDate today = LocalDate.now();
+	        LocalDate threeMonthsAgo = today.minusMonths(3);
+	        dto.setStartDate(threeMonthsAgo.toString());
+	        dto.setEndDate(today.toString());
+	    }
+
+	    if (dto.getPage() == null || dto.getPage() < 1) dto.setPage(1L);
+	    if (dto.getPerPage() == null || dto.getPerPage() < 1) dto.setPerPage(10L);
+
+	    dto.setStartNum((dto.getPage() - 1) * dto.getPerPage());
+
+	    List<MemberLoginHistoryDTO> list = memberHistoryService.selectLoginHistoryList(dto);
+
+	    String[] headers = {"일시", "접속자(사번)", "로그인 ID(입력값)", "IP 주소", "유형", "결과"};
+
+	    ExcelUtil.download(
+	        list,
+	        headers,
+	        "로그인이력",
+	        response,
+	        (row, log) -> {
+	            row.createCell(0).setCellValue(log.getMemLogHisCreatedTime() == null ? "" : log.getMemLogHisCreatedTime().toString());
+	            String name = (log.getMemName() == null ? "-" : log.getMemName());
+	            
+	            // null일때 다운 안되는 거 방지
+	            Integer mid = log.getMemberId();
+	            String memberId = (mid == null || mid == 0) ? "-" : String.valueOf(mid);
+	            
+	            row.createCell(1).setCellValue(name + " (" + memberId + ")");
+	            row.createCell(2).setCellValue(log.getMemLogHisLoginId() == null ? "" : log.getMemLogHisLoginId());
+	            row.createCell(3).setCellValue(log.getMemLogHisClientIp() == null ? "" : log.getMemLogHisClientIp());
+	            row.createCell(4).setCellValue(log.getMemLogHisActionType() == null ? "" : log.getMemLogHisActionType());
+	            row.createCell(5).setCellValue(log.isMemLogHisIsSuccess() ? "성공" : "실패");
+	        }
+	    );
+	}
+
 	
 	
 	

@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 var month = String(date.getMonth() + 1).padStart(2, '0');
                 titleEl.innerText = year + '. ' + month;
             }
+			
+			refreshMonthList(calendar);
         },
         
         eventSources: [
@@ -74,3 +76,87 @@ document.addEventListener('DOMContentLoaded', function() {
         calendar.render(); 
     });
 });
+
+function loadMonthList(startDate, endDate, page = 1) {
+
+  $.ajax({
+    url: "/commute/list",
+    type: "GET",
+    data: {
+      startDate: startDate,
+      endDate: endDate,
+      page: page,
+      perPage: 50
+    },
+    success: function(res) {
+      drawAttendanceList(res.list || []);
+    },
+    error: function(xhr, status, error) {
+      console.error("리스트 로드 실패:", error);
+      drawAttendanceList([]);
+    }
+  });
+
+}
+
+function drawAttendanceList(list) {
+  const $tbody = $("#attendanceListBody");
+  $tbody.empty();
+
+  if (!list || list.length === 0) {
+    $tbody.append(`
+      <tr>
+        <td colspan="4" class="text-center py-4 text-muted">표시할 내역이 없습니다.</td>
+      </tr>
+    `);
+    return;
+  }
+
+  list.forEach(row => {
+    const date = row.memCommuteWorkDate || "-";
+    const type = row.memCommuteState || "-";
+
+    let timeOrDays = "-";
+    if (type.includes("연차") || type.includes("휴가") || type.includes("반차")) {
+      timeOrDays = row.memCommuteNote || "-"; 
+    } else {
+      const inTime = row.memCommuteInTime ? row.memCommuteInTime.substring(11, 16) : "-";
+      const outTime = row.memCommuteOutTime ? row.memCommuteOutTime.substring(11, 16) : "-";
+      timeOrDays = `${inTime} ~ ${outTime}`;
+    }
+
+    const note = row.memCommuteNote || "";
+
+    $tbody.append(`
+      <tr>
+        <td class="text-center">${date}</td>
+        <td class="text-center">${type}</td>
+        <td class="text-center">${timeOrDays}</td>
+        <td class="ps-4">${note}</td>
+      </tr>
+    `);
+  });
+}
+
+
+function toYMD(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function refreshMonthList(calendar) {
+  const current = calendar.getDate();
+  const y = current.getFullYear();
+  const m = current.getMonth();
+
+  const first = new Date(y, m, 1);
+  const last  = new Date(y, m + 1, 0);
+
+  const startDate = toYMD(first);
+  const endDate   = toYMD(last);
+
+  loadMonthList(startDate, endDate, 1);
+}
+

@@ -26,4 +26,9 @@ public class MemberHistoryService {
 		return memberHistoryDAO.selectLoginHistoryList(memberHistorySearchDTO);
 		
 	}
+
+	// 로그인 이력 엑셀 + 개수	
+	public Long totalCount(MemberHistorySearchDTO memberHistorySearchDTO) throws Exception{
+		return memberHistoryDAO.totalCount(memberHistorySearchDTO);
+	}
 }

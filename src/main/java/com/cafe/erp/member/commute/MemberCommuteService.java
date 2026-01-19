@@ -42,4 +42,8 @@ public class MemberCommuteService {
 	public int updateCommute(MemberCommuteDTO commuteDTO) throws Exception{
 		return commuteDAO.updateCommute(commuteDTO);
 	}
+	public Long countAttendance(MemberCommuteSearchDTO memberCommuteSearchDTO)throws Exception {
+	    return commuteDAO.countCommuteList(memberCommuteSearchDTO);
+	}
+
 }

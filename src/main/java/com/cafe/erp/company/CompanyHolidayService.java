@@ -88,4 +88,10 @@ public class CompanyHolidayService {
 	public List<CompanyHolidayDTO> selectHolidaysList() throws Exception{
 		return companyHolidayDAO.selectHolidayList();
 	}
+	
+	public boolean isHoliday(java.time.LocalDate date) throws Exception {
+	    int cnt = companyHolidayDAO.existsHoliday(java.sql.Date.valueOf(date));
+	    return cnt > 0;
+	}
+
 }

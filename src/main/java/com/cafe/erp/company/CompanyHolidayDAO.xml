@@ -12,4 +12,11 @@
     	<select id="selectHolidayList" resultType="CompanyHolidayDTO">
     		SELECT * FROM company_holiday
     	</select>
+    	
+    	<select id="existsHoliday" parameterType="java.sql.Date" resultType="int">
+		    SELECT COUNT(*)
+		    FROM company_holiday
+		    WHERE com_holiday_date = #{date}
+		</select>
+		    	
     </mapper>

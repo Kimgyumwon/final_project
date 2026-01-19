@@ -3,6 +3,7 @@ package com.cafe.erp.member.commute;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface MemberCommuteDAO {
@@ -14,6 +15,8 @@ public interface MemberCommuteDAO {
 
 	public int checkOut(MemberCommuteDTO commuteDTO) throws Exception;
 	public int updateCommute(MemberCommuteDTO commuteDTO) throws Exception;
+
+	public int existsApprovedFullDayLeave(@Param("memberId") int memberId, @Param("date") java.sql.Date date) throws Exception;
 
 
 	

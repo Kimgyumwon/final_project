@@ -48,7 +48,10 @@
 				    <div class="card-body">
 				        <form id="searchForm" action="./admin_member_list" method="get" class="row gx-3 gy-2 align-items-center">
 				            <input type="hidden" name="page" id="pageInput" value="${pager.page}">
+				            <input type="hidden" name="perPage" id="perPageInput" value="${empty param.perPage ? 10 : param.perPage}">
 				            
+				            
+											            
 				            <div class="col-md-3">
 							    <label class="form-label" for="selectTypeOpt">부서 선택</label>
 							    <select id="selectTypeOpt" name="deptCode" class="form-select color-dropdown">
@@ -84,23 +87,37 @@
 				</div>
 
               <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div class="mb-3">
-                    	<h5>재직원: ${activeCount}명</h5>
-                    	<div>
-						    <span>(총 사원: ${totalCount}명 | </span>
-						    <span>퇴사자: ${totalCount - activeCount}명)</span>
-                    	</div>
-					</div>
-                    <div>
-                        <button type="button" class="btn btn-outline-success me-2">
-                            <i class='bx bx-download me-1'></i> 엑셀 다운로드
-                        </button>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
-                            <span class="tf-icons bx bx-user-plus"></span> 사원 등록
-                        </button>
-                    </div>
-                </div>
+                <div class="card-header">
+				  <div class="d-flex justify-content-between align-items-start">
+				    <div>
+				      <h5 class="mb-1">재직원: ${activeCount}명</h5>
+				      <div class="text-muted">
+				        <span>(총 사원: ${totalCount}명 | </span>
+				        <span>퇴사자: ${totalCount - activeCount}명)</span>
+				      </div>
+				    </div>
+				
+				    <div class="d-flex align-items-center gap-2 ">
+				      <button type="button" class="btn btn-outline-success" id="btnExcel">
+				        <i class='bx bx-download me-1'></i> 엑셀 다운로드
+				      </button>
+				
+				      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+				        <span class="tf-icons bx bx-user-plus"></span> 사원 등록
+				      </button>
+				    </div>
+				  </div>
+				
+				  <div class="mt-3">
+				    <select id="perPageSelect" class="form-select" style="width: 160px;">
+				      <option value="10">10개씩 보기</option>
+				      <option value="20">20개씩 보기</option>
+				      <option value="50">50개씩 보기</option>
+				      <option value="100">100개씩 보기</option>
+				    </select>
+				  </div>
+				
+				</div>
                 
                 <div class="table-responsive text-nowrap">
                   <table class="table table-hover">

@@ -63,3 +63,21 @@ function previewEmpId() {
 
 		    location.href = form.action + '?' + params.toString();
 		}
+		
+		$(document).ready(function () {
+
+		  const init = $("#perPageInput").val() || "10";
+		  $("#perPageSelect").val(init);
+
+		  $("#perPageSelect").on("change", function () {
+		    $("#perPageInput").val($(this).val());
+		    movePage(1);
+		  });
+
+		  $("#btnExcel").on("click", function () {
+		    const form = document.getElementById("searchForm");
+		    const params = new URLSearchParams(new FormData(form));
+		    location.href = "/member/admin_member_excel?" + params.toString();
+		  });
+
+		});

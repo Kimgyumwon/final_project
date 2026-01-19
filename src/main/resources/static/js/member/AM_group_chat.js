@@ -1,11 +1,14 @@
 let currentDeptFilter = 0; 
 let currentDeptName = "전체 사원";
+let currentPage = 1; // 페이지
 let searchTimer = null; // 검색어 딜레이
 
 $(document).ready(function() {
     renderTable(0);
 
-    $(".dept-item").click(function() {
+    $(".dept-item").click(function(e) {
+		if ($(e.target).hasClass("dept-edit-icon")) return;
+		
         $(".dept-item").removeClass("active");
         $(this).addClass("active");
 
@@ -17,22 +20,31 @@ $(document).ready(function() {
 
         $("#searchMember").val(''); 
 
+		currentPage = 1;
         renderTable(currentDeptFilter, currentDeptName);
     });
 
     $("#searchMember").on("keyup", function() {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function() {
+			currentPage = 1;
             renderTable(currentDeptFilter, currentDeptName);
         }, 300);
     });
 
     $("#checkRetired").change(function() {
-        renderTable(currentDeptFilter, currentDeptName);
+		currentPage = 1;
+        renderTable(currentDeptFilter, currentDeptName, true); 
     });
 });
 
-function renderTable(deptCode, deptName = currentDeptName) {
+function loadPage(page) {
+	if (page < 1) page = 1;
+	currentPage = page;
+	renderTable(currentDeptFilter, currentDeptName);
+}
+
+function renderTable(deptCode, deptName = currentDeptName, updateCounts = false) {
     let searchKeyword = $("#searchMember").val();
     let isRetiredIncluded = $("#checkRetired").is(":checked"); 
 
@@ -48,17 +60,31 @@ function renderTable(deptCode, deptName = currentDeptName) {
         data: { 
             deptCode: deptCode, 
             includeRetired: isRetiredIncluded, 
-            keyword: searchKeyword
+            keyword: searchKeyword,
+			page: currentPage
         },
         success: function(data) {
+			let memberList = [];
+			let totalCount = 0;
+			let pager = null;
+			
 			if(data.memberList){
-				drawTable(data.memberList)
+				memberList = data.memberList;
+				totalCount = data.totalCount != null ? data.totalCount : memberList.length;
+				pager = data.pager || null;
+				drawTable(memberList, totalCount);
 			}else{
-	            drawTable(data); 
+	            memberList = data;
+				totalCount = memberList.length;
+	            drawTable(memberList, totalCount); 
 			}
 			
-			if(data.deptCounts){
+			if(updateCounts && data.deptCounts){
 				updateSidebarCounts(data.deptCounts);
+			}
+
+			if(pager){
+				renderPager(pager);
 			}
         },
         error: function(xhr, status, error) {
@@ -67,11 +93,11 @@ function renderTable(deptCode, deptName = currentDeptName) {
     });
 }
 
-function drawTable(memberList) {
+function drawTable(memberList, totalCount) {
     const tbody = $("#memberTableBody");
     tbody.empty();
 
-    $("#selectedDeptCount").text(`(총 ${memberList.length}명)`);
+    $("#selectedDeptCount").text(`(총 ${totalCount}명)`);
     
     if (memberList.length === 0) {
         $("#noDataMessage").show();
@@ -133,7 +159,48 @@ function drawTable(memberList) {
     });
 }
 
+function renderPager(pager) {
+	const $area = $("#pagerArea");
 
+	if (!pager || pager.end == null || pager.begin == null) {
+		$area.hide();
+		return;
+	}
+
+	const begin = Number(pager.begin);
+	const end = Number(pager.end);
+	const page = Number(pager.page);
+
+	let html = `
+		<nav aria-label="Page navigation">
+			<ul class="pagination">
+				<li class="page-item ${begin === 1 ? 'disabled' : ''}">
+					<a class="page-link" href="javascript:loadPage(${begin - 1})">
+						<i class="bx bx-chevron-left"></i>
+					</a>
+				</li>
+	`;
+
+	for (let i = begin; i <= end; i++) {
+		html += `
+			<li class="page-item ${page === i ? 'active' : ''}">
+				<a class="page-link" href="javascript:loadPage(${i})">${i}</a>
+			</li>
+		`;
+	}
+
+	html += `
+				<li class="page-item">
+					<a class="page-link" href="javascript:loadPage(${end + 1})">
+						<i class="bx bx-chevron-right"></i>
+					</a>
+				</li>
+			</ul>
+		</nav>
+	`;
+
+	$area.html(html).show();
+}
 
 function updateSidebarCounts(deptCounts) {
 
