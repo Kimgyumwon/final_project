@@ -70,6 +70,7 @@
 		    SELECT COUNT(*)
 		    FROM company_holiday
 		    WHERE com_holiday_date = #{_parameter}
+			AND com_holiday_is_active = 1
 		  </select>
 		
 		

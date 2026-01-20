@@ -377,3 +377,85 @@ function downloadVacationExcel() {
   location.href = "/member/vacation_excel?" + params.toString();
 }
 
+
+// 모달 열기
+window.openVacApplyModal = function () {
+  $('#vacType').val('연차');
+  $('#vacStart').val('');
+  $('#vacEnd').val('');
+  $('#vacReason').val('');
+  $('#vacError').hide().text('');
+
+  new bootstrap.Modal(document.getElementById('vacApplyModal')).show();
+};
+
+// 타입 변경 시 반차면 종료일 자동 맞추기(선택사항)
+$(document).on('change', '#vacType', function () {
+  const type = $('#vacType').val();
+  const start = $('#vacStart').val();
+
+  if ((type === '오전반차' || type === '오후반차') && start) {
+    $('#vacEnd').val(start); // 반차는 하루만
+  }
+});
+
+// 시작일 바뀌면 반차일 경우 종료일 자동 맞추기(선택사항)
+$(document).on('change', '#vacStart', function () {
+  const type = $('#vacType').val();
+  const start = $('#vacStart').val();
+
+  if (type === '오전반차' || type === '오후반차') {
+    $('#vacEnd').val(start);
+  }
+});
+
+// 신청 버튼
+window.submitVacation = function () {
+  const type = $('#vacType').val();
+  const start = $('#vacStart').val();
+  const end = $('#vacEnd').val();
+  const reason = $('#vacReason').val().trim();
+  const $err = $('#vacError');
+
+  $err.hide().text('');
+
+  if (!type) {
+    $err.text('유형을 선택하세요.').show();
+    return;
+  }
+  if (!start || !end) {
+    $err.text('기간을 선택하세요.').show();
+    return;
+  }
+  if (start > end) {
+    $err.text('종료일은 시작일 이후여야 합니다.').show();
+    return;
+  }
+  if ((type === '오전반차' || type === '오후반차') && start !== end) {
+    $err.text('반차는 시작일/종료일이 같아야 합니다.').show();
+    return;
+  }
+
+  $.ajax({
+    url: '/member/vacation_apply',
+    type: 'POST',
+    data: {
+      memAttendanceType: type,
+      memAttendanceStartDate: start,
+      memAttendanceEndDate: end,
+      memAttendanceReason: reason
+    },
+    success: function (res) {
+      if (res === 'success') {
+        alert('휴가가 승인되었습니다.');
+        location.reload();
+      } else {
+        // 서버에서 "이미 등록된 날짜입니다" 같은 메시지 내려오면 그대로 띄움
+        $err.text(res).show();
+      }
+    },
+    error: function () {
+      $err.text('서버 오류').show();
+    }
+  });
+};

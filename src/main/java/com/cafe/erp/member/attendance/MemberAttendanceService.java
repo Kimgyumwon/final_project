@@ -19,6 +19,6 @@ public class MemberAttendanceService {
     }
     
     public MemberLeaveStatsDTO selectLeaveStats(int memberId) throws Exception{
-        return memberAttendanceDAO.selectLeaveStats(memberId);
+        return memberAttendanceDAO.selectLeaveStatsNOW(memberId);
     }
 }

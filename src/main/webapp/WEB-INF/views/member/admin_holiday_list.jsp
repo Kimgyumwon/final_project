@@ -107,6 +107,7 @@
 										</sec:authorize>
 									</div>
 								</div>
+								<div class="mt-3 text-muted small">총 ${totalCount}건</div>
 
 								<div class="mt-3">
 									<select id="perPageSelect" class="form-select"
@@ -118,7 +119,6 @@
 									</select>
 								</div>
 
-								<div class="mt-3 text-muted small">총 ${totalCount}건</div>
 							</div>
 
 							<div class="table-responsive text-nowrap">

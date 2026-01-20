@@ -59,8 +59,9 @@
       </ul>
     </li>
     <!-- 거래처 등록 -->
+    
     <li class="menu-item">
-      <a href="javascript:void(0);" class="menu-link menu-toggle">
+      <a href="javascript:void(0);" class="menu-link">
         <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
         <div data-i18n="Authentications">거래처</div>
       </a>
@@ -101,7 +102,20 @@
         </li>
       </ul>
     </li>
-    <!-- 가맹점 발주 -->
+    <!-- 재고 -->
+    <li class="menu-item">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
+        <div data-i18n="Authentications">재고</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item">
+          <a href="/stock/stock" class="menu-link">
+            <div data-i18n="Notifications">재고정보</div>
+          </a>
+        </li>
+      </ul>
+    </li>
     <li class="menu-item">
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-store"></i>
@@ -130,14 +144,7 @@
         </li>
       </ul>
     </li>
-    <!-- 재고 -->
-    <li class="menu-item">
-      <a href="javascript:void(0);" class="menu-link menu-toggle">
-        <i class="menu-icon tf-icons bx bx-cube-alt"></i>
-		<!-- <i class='menu-icon bx  bx-package'></i> -->
-        <div data-i18n="Misc">Stock</div>
-      </a>
-    </li>
+    
     
     
     

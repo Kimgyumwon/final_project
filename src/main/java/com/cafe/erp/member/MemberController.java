@@ -431,7 +431,7 @@ public class MemberController {
 	        
 	        model.addAttribute("vacationList", vacationList);
 	        
-	        model.addAttribute("stats", memberAttendanceDAO.selectLeaveStats(targetMemberId));
+	        model.addAttribute("stats", memberAttendanceDAO.selectLeaveStatsNOW(targetMemberId));
 	    
 	    }
 
