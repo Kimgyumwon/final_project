@@ -475,6 +475,8 @@
 										  </form>
 																			
 										    <div class="table-responsive text-nowrap bg-white border rounded">
+											    
+										    
 										        <table class="table table-striped table-hover mb-0" id="attendanceTable">
 										            <thead class="table-light">
 										                <tr>
@@ -588,14 +590,17 @@
 										                <div class="row gx-3 gy-2 align-items-center">
 	    
 														    <div class="col-md-3">
-														        <label class="form-label">대상 연도</label>
-														        <c:set var="nowYear" value="<%=java.time.Year.now().getValue()%>"/>
-														        <select name="yearDate" class="form-select text-center">
-														            <c:forEach begin="${nowYear - 5}" end="${nowYear + 1}" var="y">
-														                <option value="${y}" ${y == vacationSearch.yearDate ? 'selected' : ''}>${y}년</option>
-														            </c:forEach>
-														        </select>
-														    </div>
+																  <label class="form-label">대상 연도</label>
+																
+																  <c:set var="nowYear" value="<%=java.time.Year.now().getValue()%>"/>
+																
+																  <select class="form-select text-center" disabled>
+																    <option selected>${nowYear}년</option>
+																  </select>
+																
+																  <input type="hidden" name="yearDate" value="${nowYear}" />
+															</div>
+
 														
 														    <div class="col-md-3">
 														        <label class="form-label">결재 상태</label>
@@ -693,9 +698,14 @@
 										        </div>
 										    </div>
 										
-										    <h6 class="fw-bold text-muted mb-3">사용 내역</h6>
-										    
-										    <div class="card border-0 shadow-sm">
+										    <div class="d-flex align-items-center justify-content-between mb-2">
+											  <h6 class="fw-bold text-muted mb-0">사용 내역</h6>
+											
+											  <button type="button" class="btn btn-primary" onclick="openVacApplyModal()">
+											    <i class="bx bx-plus me-1"></i> 휴가 신청
+											  </button>
+											</div>
+										    <div class="card border-0 shadow-sm mt-3">
 										        <div class="table-responsive">
 										            <table class="table align-middle table-hover">
 										                <thead class="table-light">
@@ -912,6 +922,55 @@
         </div>
     </div>
 </div>
+
+<!-- 휴가 신청 모달 -->
+<div class="modal fade" id="vacApplyModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-md modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">휴가 신청</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <div class="col-md-4">
+            <label class="form-label">유형</label>
+            <select id="vacType" class="form-select">
+              <option value="연차" selected>연차</option>
+              <option value="오전반차">오전반차</option>
+              <option value="오후반차">오후반차</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">시작일</label>
+            <input type="date" id="vacStart" class="form-control">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">종료일</label>
+            <input type="date" id="vacEnd" class="form-control">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">사유</label>
+            <textarea id="vacReason" class="form-control" rows="3" placeholder="사유를 입력하세요"></textarea>
+            <div class="text-danger small mt-2" id="vacError" style="display:none;"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" onclick="submitVacation()">신청</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script src="/vendor/libs/jquery/jquery.js"></script>
 <script src="/vendor/libs/popper/popper.js"></script>

@@ -50,7 +50,7 @@
         LIMIT #{startNum}, #{perPage}
     </select>
     
-    <select id="selectLeaveStats" parameterType="int" resultType="MemberLeaveStatsDTO">
+    <select id="selectLeaveStatsNOW" parameterType="int" resultType="MemberLeaveStatsDTO">
         SELECT 
             ml.mem_leave_total_days,
             (
@@ -78,4 +78,24 @@
           AND a.app_status = '승인'
     </select>
     
+    <insert id="insertAttendance" parameterType="MemberAttendanceDTO">
+		  INSERT INTO member_attendance (
+		    mem_attendance_type,
+		    mem_attendance_start_date,
+		    mem_attendance_end_date,
+		    mem_attendance_used_days,
+		    mem_attendance_reason,
+		    member_id,
+		    approval_id
+		  ) VALUES (
+		    #{memAttendanceType},
+		    #{memAttendanceStartDate},
+		    #{memAttendanceEndDate},
+		    #{memAttendanceUsedDays},
+		    #{memAttendanceReason},
+		    #{memberId},
+		    #{approvalId}
+		  )
+		</insert>
+		    
  </mapper>

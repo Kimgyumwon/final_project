@@ -52,6 +52,7 @@ function submitAddHoliday() {
     }
   });
 
+}
 
 
 function submitEditHoliday() {
@@ -100,5 +101,4 @@ function openEditModal(id, date, name, type) {
   } else {
     $('#holidayEditModal').modal('show');
   }
-}
 }
