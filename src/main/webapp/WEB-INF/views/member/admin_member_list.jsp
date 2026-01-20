@@ -91,10 +91,6 @@
 				  <div class="d-flex justify-content-between align-items-start">
 				    <div>
 				      <h5 class="mb-1">재직원: ${activeCount}명</h5>
-				      <div class="text-muted">
-				        <span>(총 사원: ${totalCount}명 | </span>
-				        <span>퇴사자: ${totalCount - activeCount}명)</span>
-				      </div>
 				    </div>
 				
 				    <div class="d-flex align-items-center gap-2 ">
@@ -135,36 +131,56 @@
                     <tbody class="table-border-bottom-0">
                     
                     	<c:forEach items="${list}" var="member">
-		                    <tr>
-        	                	<td><i class="fab fa-angular fa-lg text-danger me-3"></i>${member.memberId}</td>
-            	            	<td><a href="./AM_member_detail?memberId=${member.memberId}"><span class="fw-bold text-primary"> ${member.memName}</span> </a></td>
-            	            	<td>${member.memDeptName}</td>
-								<td>
-								    <span class="badge ${member.positionCode == 99 ? 'bg-label-info' : 'bg-label-primary'}">
-								        ${member.memPositionName}
-								    </span>
-								</td>
-                        		<td>${member.memHireDate}</td>
-                        		<td>${member.memLeftDate}</td>
-                        		<td>
-								    <c:choose>
-								        <c:when test="${member.memIsActive}">
-								        <span class="badge bg-label-success">
-								                재직중
-								            </span>
-								        </c:when>
-
-								        <c:otherwise>
-								            <span class="badge bg-label-dark">
-								                퇴직
-								            </span>
-								        </c:otherwise>
-								    </c:choose>
-                        		</td>
-                      		</tr>
-                    	
-                    	
-                    	</c:forEach>
+						    <tr>
+						        <td><i class="fab fa-angular fa-lg text-danger me-3"></i>${member.memberId}</td>
+						        <td>
+						            <a href="./AM_member_detail?memberId=${member.memberId}">
+						                <span class="fw-bold text-primary"> ${member.memName}</span>
+						            </a>
+						        </td>
+						        <td>${member.memDeptName}</td>
+						        
+						        <td>
+						            <c:choose>
+						                <c:when test="${member.memPositionName eq 'admin' or member.positionCode == 99}">
+						                    <span class="badge bg-label-info">관리자</span>
+						                </c:when>
+						
+						                <c:when test="${member.memPositionName eq '이사' or member.memPositionName eq '상무' or member.memPositionName eq '전무'}">
+						                    <span class="badge bg-label-danger">${member.memPositionName}</span>
+						                </c:when>
+						
+						                <c:when test="${member.memPositionName eq '팀장' or member.memPositionName eq '차장' or member.memPositionName eq '과장'}">
+						                    <span class="badge bg-label-primary">${member.memPositionName}</span>
+						                </c:when>
+						
+						                <c:when test="${member.memPositionName eq '대리' or member.memPositionName eq '주임' or member.memPositionName eq '사원'}">
+						                    <span class="badge bg-label-dark">${member.memPositionName}</span>
+						                </c:when>
+						
+						                <c:when test="${fn:contains(member.memPositionName, '가맹점')}">
+						                    <span class="badge bg-label-warning">${member.memPositionName}</span>
+						                </c:when>
+						
+						                <c:otherwise>
+						                    <span class="badge bg-label-primary">${member.memPositionName}</span>
+						                </c:otherwise>
+						            </c:choose>
+						        </td>
+						        <td>${member.memHireDate}</td>
+						        <td>${member.memLeftDate}</td>
+						        <td>
+						            <c:choose>
+						                <c:when test="${member.memIsActive}">
+						                    <span class="badge bg-label-success">재직중</span>
+						                </c:when>
+						                <c:otherwise>
+						                    <span class="badge bg-label-dark">퇴직</span>
+						                </c:otherwise>
+						            </c:choose>
+						        </td>
+						    </tr>
+						</c:forEach>
                       </tbody>
                       
                   </table>

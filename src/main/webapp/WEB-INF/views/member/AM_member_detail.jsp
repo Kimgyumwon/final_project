@@ -510,10 +510,10 @@
 										                                    <span class="badge bg-label-primary status-badge">${attendance.memCommuteState}</span>
 										                                </c:when>
 										                                <c:when test="${fn:contains(attendance.memCommuteState, '출근') or fn:contains(attendance.memCommuteState, '퇴근')}">
-										                                    <span class="badge bg-label-secondary status-badge">${attendance.memCommuteState}</span>
+										                                    <span class="badge bg-label-info status-badge">${attendance.memCommuteState}</span>
 										                                </c:when>
 										                                <c:otherwise>
-										                                    <span class="badge bg-label-success status-badge">${attendance.memCommuteState}</span>
+										                                    <span class="badge bg-label-info status-badge">${attendance.memCommuteState}</span>
 										                                </c:otherwise>
 										                            </c:choose>
 										                        </td>

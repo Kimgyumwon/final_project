@@ -185,7 +185,7 @@
 
 
 <div class="modal fade" id="modalDeptEdit" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-sm">
+    <div class="modal-dialog modal-dialog-scrollable modal-sm modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title fw-bold">부서명 수정</h5>
