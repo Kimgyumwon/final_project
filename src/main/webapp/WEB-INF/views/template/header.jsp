@@ -5,73 +5,116 @@
 
 <link rel="stylesheet" href="/css/notification/notification.css" />
 
+<style>
+/* 1. 헤더 전체 스타일: 다우오피스 특유의 플랫하고 깨끗한 디자인 */
+#layout-navbar {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e1e4e8 !important;
+    box-shadow: none !important; /* 그림자 제거로 모던함 강조 */
+    height: 64px;
+    padding: 0 1.5rem;
+}
+
+/* 2. 날짜 및 시간 영역 */
+.header-datetime {
+    font-family: 'Segoe UI', 'Pretendard', sans-serif;
+    color: #4b4b4b;
+    border-right: 1px solid #f0f0f0;
+    padding-right: 15px;
+    margin-right: 15px;
+}
+#date { font-size: 0.9rem; font-weight: 500; color: #777; }
+#headerClock { font-size: 1rem; font-weight: 700; color: #333; }
+
+/* 3. 출퇴근 버튼: 다우오피스 특유의 둥근 사각형 + 파스텔톤 */
+.header-actions .btn {
+    border-radius: 4px !important;
+    height: 34px;
+    padding: 0 15px !important;
+    transition: all 0.2s ease;
+    border: 1px solid transparent !important;
+}
+
+#inCommute {
+    background-color: #ebf9f1 !important; /* 연한 연두 */
+    color: #28c76f !important;
+}
+#inCommute:hover { background-color: #d8f5e5 !important; }
+
+#outCommute {
+    background-color: #f8f9fa !important; /* 연한 회색 */
+    color: #697a8d !important;
+    border-color: #e6e8eb !important;
+}
+#outCommute:hover { background-color: #f1f2f4 !important; }
+
+/* 4. 알림 및 프로필 */
+.nav-link i.bx-bell { color: #697a8d; }
+.profile_img img { 
+    border: 1px solid #eee; 
+    padding: 2px;
+    background: #fff;
+}
+.navbar-nav .fw-semibold {
+    font-size: 0.9rem;
+    color: #444;
+}
+
+/* 드롭다운 메뉴 스타일 최적화 */
+.dropdown-menu {
+    border: 1px solid #dbe0e6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 6px;
+}
+</style>
+
 <nav
-  class="layout-navbar  navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+  class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
   id="layout-navbar"
 >
-
   <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
 
-   <!-- ⏰ 날짜 / 시간 -->
-    <div class="navbar-nav align-items-center header-datetime">
+   <div class="navbar-nav align-items-center header-datetime">
       <span class="date" id="date" ></span>
       <div style="width: 4px;height: 2px;"></div>
-      <li class="nav-item lh-1 me-3">
+      <li class="nav-item lh-1">
           <span id="headerClock" class="header-clock">Loading...</span>
       </li>
     </div>
 
       <sec:authentication property="principal.member" var="Info"/>
       <c:if test="${fn:startsWith(Info.memberId, '1')}">
-        <!-- 🟣 출근 / 퇴근 -->
         <div class="header-actions d-flex gap-2">
-              <button id="inCommute" class="btn btn-sm d-flex align-items-center gap-1 px-2 fw-bold"
-                      style="background-color: #e8fadf; color: #28c76f; border: none; border-radius: 6px;">
+              <button id="inCommute" class="btn btn-sm d-flex align-items-center gap-1 fw-bold">
                   <i class='bx bx-log-in-circle fs-5'></i>
                   <span style="font-size: 0.85rem;">출근</span>
               </button>
 
-              <button id="outCommute" class="btn btn-sm d-flex align-items-center gap-1 px-2 fw-bold"
-                      style="background-color: #f2f2f2; color: #697a8d; border: none; border-radius: 6px;">
+              <button id="outCommute" class="btn btn-sm d-flex align-items-center gap-1 fw-bold">
                   <i class='bx bx-log-out-circle fs-5'></i>
                   <span style="font-size: 0.85rem;">퇴근</span>
               </button>
            </div>
       </c:if>
 
-    
-    <!-- 오른쪽 영역 -->
-    <ul class="navbar-nav flex-row align-items-center">
-		<!-- 🔔 알림 -->
-		<li class="nav-item dropdown">
+    <ul class="navbar-nav flex-row align-items-center ms-auto">
+		<li class="nav-item dropdown me-2">
 		  <a class="nav-link dropdown-toggle hide-arrow position-relative"
 		     href="#"
 		     data-bs-toggle="dropdown">
-		
 		    <i class="bx bx-bell bx-sm"></i>
-		
-		    <!-- 🔔 안읽은 알림 개수 -->
 		    <span class="badge bg-danger rounded-pill position-absolute"
 		          id="notificationBadge"
 		          style="top: 0; right: 0; font-size: 0.65rem; display:none;">
 		    </span>
 		  </a>
 		
-		  <!-- 🔔 알림 드롭다운 -->
 		  <ul class="dropdown-menu dropdown-menu-end p-2"
 		      style="width: 380px;"
 		      id="notificationDropdown">
-		
-		    <!-- 헤더 -->
-		    <li class="dropdown-header fw-bold mb-2">
-		      알림
-		    </li>
-		
+		    <li class="dropdown-header fw-bold mb-2">알림</li>
 		    <ul id="notificationList" class="notification-list"></ul>
-		
 		    <li><hr class="dropdown-divider"></li>
-		
-		    <!-- 전체 알림 보기 -->
 		    <li>
 		      <button class="dropdown-item text-center fw-bold text-primary"
 		              data-bs-toggle="modal"
@@ -79,13 +122,9 @@
 		        전체 알림 보기
 		      </button>
 		    </li>
-		
 		  </ul>
 		</li>
 
-
-      <!-- 👤 사용자 -->
-      
       <div class="profile_img">
 	      	<input type="hidden" id="loggedInMemberId" value="${Info.memberId}">
             <c:choose>
@@ -94,86 +133,65 @@
                         alt="user-avatar" 
                         class="d-block object-fit-cover rounded-circle"
                         id="headerProfileImage" 
-                        style="width: 32px; height: 32px; border: 1px solid #eee;">
+                        style="width: 32px; height: 32px;">
                 </c:when>
                 <c:otherwise>
                     <img src="/fileDownload/profile?fileSavedName=${Info.memProfileSavedName}"
                         alt="user-avatar" 
                         class="d-block object-fit-cover rounded-circle"
                         id="headerProfileImage" 
-                        style="width: 32px; height: 32px; border: 1px solid #eee;">
+                        style="width: 32px; height: 32px;">
                 </c:otherwise>
-                
-                
-                
             </c:choose>
-          </div>
-      <li class="nav-item dropdown">
+      </div>
+      
+      <li class="nav-item dropdown ms-2">
         <a class="nav-link dropdown-toggle hide-arrow" href="#" data-bs-toggle="dropdown">
           <span class="fw-semibold">
           	${Info.memName}님 
           </span>
+          <i class='bx bx-chevron-down ms-1 text-muted' style="font-size: 1rem;"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
-        <li>
-            <a class="dropdown-item" href="/member/AM_member_detail">내정보</a>
-        </li>
-          <li>
-            <a class="dropdown-item" href="/member/logout">로그아웃</a>
-          </li>
+          <li><a class="dropdown-item" href="/member/AM_member_detail">내정보</a></li>
+          <li><a class="dropdown-item" href="/member/logout">로그아웃</a></li>
         </ul>
       </li>
 
     </ul>
   </div>
 </nav>
+
 <div id="toast-container"></div>
 <script src="/vendor/libs/jquery/jquery.js"></script>
 <script type="text/javascript" src="/js/member/header.js"></script>
 
-<!-- 알람 전체 보기 모달 -->
 <div class="modal fade" id="notificationModal">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
     <div class="modal-content notification-modal">
-
-      <!-- 헤더 -->
       <div class="modal-header notification-modal-header">
-        <h5 class="modal-title">
-          <i class="bx bx-bell me-2"></i> 알림 센터
-        </h5>
+        <h5 class="modal-title"><i class="bx bx-bell me-2"></i> 알림 센터</h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-		<!-- 바디 -->
 		<div class="modal-body notification-modal-body">
-		
-		  <!-- 탭 -->
 		  <div class="notification-tabs">
 		    <button data-filter="ALL" class="active">전체</button>
 		    <button data-filter="UNREAD">안읽음</button>
 		    <button data-filter="READ">읽음</button>
 		  </div>
-		
 		  <div class="notification-list-wrapper">
-		    <ul id="modalNotificationList"
-		        class="notification-list modal-list">
-		    </ul>
+		    <ul id="modalNotificationList" class="notification-list modal-list"></ul>
 		  </div>
-		
 		</div>
-
-
-      <!-- 푸터 -->
       <div class="modal-footer notification-modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
       </div>
-
     </div>
   </div>
 </div>
 
 <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered  modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalCenterTitle">비밀번호 변경</h5>
@@ -181,7 +199,6 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="modalMemberId">
-
                 <div class="row">
                     <div class="col mb-3">
                         <label for="nowPassword" class="form-label">현재 비밀번호</label>
@@ -210,13 +227,7 @@
     </div>
 </div>
 
-
-
-
-<!-- WebSocket -->
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-
-
 <script type="text/javascript" src="/js/notification/notification.js"></script>
 <script type="text/javascript" src="/js/notification/notification-realtime.js"></script>

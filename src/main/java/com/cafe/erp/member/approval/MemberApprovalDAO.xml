@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    
+<mapper namespace="com.cafe.erp.member.approval.MemberApprovalDAO">
+  <insert id="insertApprovalAuto" parameterType="MemberApprovalDTO">
+    INSERT INTO approval (
+      approval_id, app_draft_date, app_status, app_title,
+      app_content, app_created_at, app_updated_at,
+      app_is_active, member_id
+    ) VALUES (
+      #{approvalId}, NOW(), #{appStatus}, #{appTitle},
+      #{appContent}, NOW(), NOW(),
+      1, #{memberId}
+    )
+  </insert>
+</mapper>

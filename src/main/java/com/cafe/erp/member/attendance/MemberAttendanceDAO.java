@@ -2,15 +2,24 @@ package com.cafe.erp.member.attendance;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.cafe.erp.member.approval.MemberApprovalDTO;
 
 @Mapper
 public interface MemberAttendanceDAO {
     
-    Long countAttendanceList(MemberAttendanceSearchDTO searchDTO) throws Exception;
+	public Long countAttendanceList(MemberAttendanceSearchDTO searchDTO) throws Exception;
 
-    List<MemberAttendanceDTO> attendanceList(MemberAttendanceSearchDTO searchDTO) throws Exception;
+	public List<MemberAttendanceDTO> attendanceList(MemberAttendanceSearchDTO searchDTO) throws Exception;
     
-    MemberLeaveStatsDTO selectLeaveStats(int memberId) throws Exception;
+	public MemberLeaveStatsDTO selectLeaveStatsNOW(int memberId) throws Exception;
 
-    List<MemberAttendanceDTO> selectApprovedAttendance(int memberId) throws Exception;
+	public List<MemberAttendanceDTO> selectApprovedAttendance(int memberId) throws Exception;
+    
+
+	public int insertAttendance(MemberAttendanceDTO dto) throws Exception;
+	public MemberLeaveStatsDTO selectLeaveStats(@Param("memberId") int memberId, @Param("year") int year) throws Exception;
+
+
 }
