@@ -3,7 +3,7 @@
 <!-- Menu -->
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
   <div class="app-brand demo">
-    <a href="index.html" class="app-brand-link">
+    <a href="/store/detail" class="app-brand-link">
       <span class="app-brand-logo demo">
         <svg
           width="25"
@@ -72,8 +72,8 @@
   <ul class="menu-inner py-1">
     <!-- Dashboard -->
     <li class="menu-item">
-      <a href="/" class="menu-link">
-        <i class="menu-icon tf-icons bx bx-home-circle"></i>
+      <a href="/store/detail" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-store"></i>
         <div data-i18n="Analytics">HOME</div>
       </a>
     </li>
@@ -91,7 +91,7 @@
     <li class="menu-item">
       <a href="/order/approval" class="menu-link">
         <i class="menu-icon tf-icons bx bx-select-multiple"></i>
-        <div data-i18n="Under Maintenance">승인</div>
+        <div data-i18n="Under Maintenance">발주 상태</div>
       </a>
     </li>
     <li class="menu-header small text-uppercase">
@@ -112,12 +112,6 @@
 
     <li class="menu-header small text-uppercase">
       <span class="menu-header-text">가맹점</span>
-    </li>
-    <li class="menu-item">
-      <a href="/store/detail" class="menu-link">
-        <i class="menu-icon tf-icons bx bx-store"></i>
-        <div data-i18n="Analytics">정보</div>
-      </a>
     </li>
     <li class="menu-item">
       <a href="/store/voc/list" class="menu-link">
