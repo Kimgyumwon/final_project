@@ -108,8 +108,8 @@ function searchPrices(){
 	          /* 사용 여부 뱃지 */
 	          const priceEnableBadge =
 	            itemPrice.itemPriceEnable
-	              ? `<span class="badge bg-label-danger" style="width: 46px;">미사용</span>`
-	              : `<span class="badge bg-label-success" style="width: 46px;">사용</span>`;
+	              ? `<span class="badge bg-label-success" style="width: 46px;">사용</span>`
+	              : `<span class="badge bg-label-danger" style="width: 46px;">미사용</span>`;
 
 	          /* 숫자 포맷 */
 	          const price =
