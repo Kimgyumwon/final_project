@@ -52,6 +52,7 @@
   <!-- Helpers -->
   <script src="/vendor/js/helpers.js"></script>
   <script src="/js/config.js"></script>
+  <base href="${pageContext.request.contextPath}/">
 </head>
 
 <body data-user-type="${fn:startsWith(member.memberId, '1') ? 'HQ' : 'STORE'}">
@@ -74,21 +75,15 @@
       <c:import url="/WEB-INF/views/template/header.jsp"/>
 
       <!-- Content wrapper -->
-      <div class="content-wrapper">
+      <div class="content-wrapper d-flex flex-column">
 
         <!-- Content -->
         <div class="container-fluid flex-grow-1 container-p-y">
-
-          <div class="layout-wrapper layout-content-navbar">
-            <div class="layout-container">
-              <div class="layout-page">
-                <div class="content-wrapper">
-
                   <!-- ================= 제목 ================= -->
                   <div class="row mb-4">
                     <div class="col">
                       <h4 class="fw-bold">
-                        <span class="text-muted fw-light">발주 관리 /</span> 출고 처리
+                        <span class="text-muted fw-normal">발주 관리 /</span> 출고 처리
                       </h4>
                     </div>
                   </div>
@@ -110,9 +105,6 @@
                                 <button class="btn btn-danger btn-sm" id="updateCancelReceiveStatusByStoreOrder">출고취소</button>
                               </c:if>
 
-                              <c:if test="${fn:startsWith(member.memberId, '2')}">
-                                <button class="btn btn-success btn-sm" id="requestReleaseBtn">출고요청</button>
-                              </c:if>
                             </div>
                           </div>
 
@@ -235,12 +227,6 @@
                       </div>
                     </div>
                   </div>
-
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
         <!-- / Content -->
 
@@ -254,11 +240,15 @@
     </div>
     <!-- / Layout page -->
   </div>
+  
+  
 
   <!-- Overlay -->
   <div class="layout-overlay layout-menu-toggle"></div>
 </div>
 <!-- / Layout wrapper -->
+
+
 
 <!-- Core JS -->
 <script src="/vendor/libs/jquery/jquery.js"></script>
