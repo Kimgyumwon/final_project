@@ -172,6 +172,45 @@
   </div>
 </div>
 
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered  modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCenterTitle">비밀번호 변경</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modalMemberId">
+
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="nowPassword" class="form-label">현재 비밀번호</label>
+                        <input type="password" id="nowPassword" class="form-control" placeholder="현재 비밀번호를 입력하세요">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="newPassword" class="form-label">새 비밀번호</label>
+                        <input type="password" id="newPassword" class="form-control" placeholder="새로운 비밀번호">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-0">
+                        <label for="confirmPassword" class="form-label">새 비밀번호 확인</label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="새로운 비밀번호 확인">
+                        <div id="pwErrorMsg" class="form-text text-danger mt-1" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="submitPasswordChange()">변경 저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 <!-- WebSocket -->

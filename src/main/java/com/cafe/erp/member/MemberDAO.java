@@ -85,6 +85,10 @@ public interface MemberDAO {
 
 	// 상세페이지 직급 리스트 가져오기
 	public List<MemberDTO> positionList();
+	
+	// 부서명 변경
+	int updateDeptName(@Param("deptCode") int deptCode, @Param("memDeptName") String memDeptName);
+
 
 	
 	}

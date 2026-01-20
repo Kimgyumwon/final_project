@@ -36,5 +36,8 @@ public class MemberDTO {
 	private String memProfileSavedName;
 	private String memProfileOriginalName;
 	
+	private Boolean memIsLocked;
+	
+	
     
 }

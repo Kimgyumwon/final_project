@@ -4,19 +4,81 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
     
     <mapper namespace="com.cafe.erp.company.CompanyHolidayDAO">
-    	<insert id="insertHoliday" parameterType="CompanyHolidayDTO">
-    		INSERT INTO company_holiday(com_holiday_date, com_holiday_name, com_holiday_type, member_id)
-    		VALUES(#{comHolidayDate}, #{comHolidayName}, #{comHolidayType}, #{memberId})
-    	</insert>
-    	
-    	<select id="selectHolidayList" resultType="CompanyHolidayDTO">
-    		SELECT * FROM company_holiday
-    	</select>
-    	
-    	<select id="existsHoliday" parameterType="java.sql.Date" resultType="int">
+    	<sql id="searchFrag">
+		    <where>
+		      <if test="startDate != null and startDate != ''">
+		        AND com_holiday_date &gt;= #{startDate}
+		      </if>
+		      <if test="endDate != null and endDate != ''">
+		        AND com_holiday_date &lt;= #{endDate}
+		      </if>
+		
+		      <if test="type != null and type != ''">
+		        AND com_holiday_type = #{type}
+		      </if>
+		
+		      <if test="keyword != null and keyword != ''">
+		        AND com_holiday_name LIKE CONCAT('%', #{keyword}, '%')
+		      </if>
+		
+		      <if test="isActive != null">
+		        AND com_holiday_is_active = #{isActive}
+		      </if>
+		    </where>
+		  </sql>
+		
+		  <insert id="insertHoliday" parameterType="CompanyHolidayDTO">
+		    INSERT INTO company_holiday(
+		      com_holiday_date, com_holiday_name, com_holiday_type, member_id, com_holiday_is_active
+		    ) VALUES (
+		      #{comHolidayDate}, #{comHolidayName}, #{comHolidayType}, #{memberId}, 1
+		    )
+		  </insert>
+		
+		  <select id="selectHolidayList" parameterType="CompanyHolidaySearchDTO" resultType="CompanyHolidayDTO">
+		    SELECT *
+		    FROM company_holiday
+		    <include refid="searchFrag"/>
+		    ORDER BY com_holiday_date DESC, company_holiday_id DESC
+		    LIMIT #{startNum}, #{perPage}
+		  </select>
+		
+		  <select id="totalCount" parameterType="CompanyHolidaySearchDTO" resultType="Long">
 		    SELECT COUNT(*)
 		    FROM company_holiday
-		    WHERE com_holiday_date = #{date}
+		    <include refid="searchFrag"/>
+		  </select>
+		
+		  <update id="updateHoliday" parameterType="CompanyHolidayDTO">
+		    UPDATE company_holiday
+		    SET
+		      com_holiday_date = #{comHolidayDate},
+		      com_holiday_name = #{comHolidayName},
+		      com_holiday_updated_time = NOW()
+		    WHERE company_holiday_id = #{companyHolidayId}
+		  </update>
+		
+		  <update id="updateHolidayActive" parameterType="CompanyHolidayDTO">
+		    UPDATE company_holiday
+		    SET
+		      com_holiday_is_active = #{comHolidayIsActive},
+		      com_holiday_updated_time = NOW()
+		    WHERE company_holiday_id = #{companyHolidayId}
+		  </update>
+		
+		  <select id="existsHoliday" parameterType="java.sql.Date" resultType="int">
+		    SELECT COUNT(*)
+		    FROM company_holiday
+		    WHERE com_holiday_date = #{_parameter}
+		  </select>
+		
+		
+		<select id="selectHolidayAllActive" resultType="CompanyHolidayDTO">
+		  SELECT *
+		  FROM company_holiday
+		  WHERE com_holiday_is_active = 1
+		  ORDER BY com_holiday_date DESC, company_holiday_id DESC
 		</select>
-		    	
+				
+	
     </mapper>

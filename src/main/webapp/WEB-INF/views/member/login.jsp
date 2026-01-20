@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <!-- beautify ignore:start -->
 <html
@@ -152,10 +153,17 @@
 		
 		
           <form action="/login" class="auth-login-form" method="post">
-			<c:if test="${not empty param.error }">
-				<div class="alert alert-danger alert-dismissible login-error" role="alert">
+			<c:if test="${param.error == 'true'}">
+			  <p class="text-danger">
+			    <c:choose>
+			      <c:when test="${not empty param.message}">
+			        ${fn:escapeXml(param.message)}
+			      </c:when>
+			      <c:otherwise>
 			        아이디 또는 비밀번호를 다시 확인해 주세요.
-			    </div>
+			      </c:otherwise>
+			    </c:choose>
+			  </p>
 			</c:if>
             <input type="text" name="memberId" id="memberId" placeholder="아이디를 입력하세요" />
 

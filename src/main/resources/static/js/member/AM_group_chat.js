@@ -226,17 +226,43 @@ function updateSidebarCounts(deptCounts) {
 
 
 
-function openMemberDetail(id) {
-    const myModal = new bootstrap.Modal(document.getElementById('modalMemberDetail'));
-    $("#modalId").val(id);
-    myModal.show();
+function openDeptEdit(event, deptCode, deptName) {
+  event.stopPropagation();
+  $('#editDeptId').val(deptCode);
+  $('#editDeptName').val(deptName);
+
+  const modalEl = document.getElementById('modalDeptEdit');
+  if (window.bootstrap) {
+    new bootstrap.Modal(modalEl).show();
+  } else {
+    $('#modalDeptEdit').modal('show');
+  }
 }
 
+function saveDeptName() {
+  const deptCode = $('#editDeptId').val();
+  const deptName = $('#editDeptName').val().trim();
 
-function openDeptEdit(event, deptId, deptName) {
-    event.stopPropagation();
-    $("#editDeptId").val(deptId);
-    $("#editDeptName").val(deptName);
-    new bootstrap.Modal(document.getElementById('modalDeptEdit')).show();
+  if (!deptName) {
+    alert("부서명을 입력하세요.");
+    return;
+  }
+
+  $.ajax({
+    url: '/member/deptNameChange',
+    type: 'POST',
+    data: { deptCode: deptCode, deptName: deptName },
+    success: function(res) {
+      if (res === 'success') {
+        alert('수정되었습니다.');
+        location.reload(); 
+      } else {
+        alert(res);
+      }
+    },
+    error: function() {
+      alert('서버 통신 오류');
+    }
+  });
 }
 

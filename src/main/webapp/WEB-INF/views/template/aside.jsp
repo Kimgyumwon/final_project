@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!-- Menu -->
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
@@ -194,11 +195,13 @@
         <div data-i18n="Basic">사원</div>
       </a>
       <ul class="menu-sub">
-       <li class="menu-item">
-         <a href="/member/admin_member_list" class="menu-link">
-           <div data-i18n="Perfect Scrollbar">사원 목록</div>
-         </a>
-       </li>
+      	<sec:authorize access="hasAnyRole('MASTER','DEPT_HR')">
+	       <li class="menu-item">
+	         <a href="/member/admin_member_list" class="menu-link">
+	           <div data-i18n="Perfect Scrollbar">사원 목록</div>
+	         </a>
+	       </li>
+	    </sec:authorize>
        <li class="menu-item">
          <a href="/member/member_mypage" class="menu-link">
            <div data-i18n="Text Divider">근태 목록</div>
@@ -209,28 +212,25 @@
            <div data-i18n="Text Divider">부서 목록</div>
          </a>
        </li>
-       <li class="menu-item">
-         <a href="/member/admin_login_history" class="menu-link">
-           <div data-i18n="Text Divider">로그인 이력 목록</div>
-         </a>
-       </li>
+       	<sec:authorize access="hasAnyRole('MASTER')">
+	       <li class="menu-item">
+	         <a href="/member/admin_login_history" class="menu-link">
+	           <div data-i18n="Text Divider">로그인 이력 목록</div>
+	         </a>
+	       </li>
+	   </sec:authorize>
       </ul>
     </li>
     <!-- User interface -->
     <li class="menu-item">
       <a href="javascript:void(0)" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-box"></i>
-        <div data-i18n="User interface">User interface</div>
+        <div data-i18n="User interface">회사</div>
       </a>
       <ul class="menu-sub">
         <li class="menu-item">
-          <a href="ui-accordion.html" class="menu-link">
-            <div data-i18n="Accordion">Accordion</div>
-          </a>
-        </li>
-        <li class="menu-item">
-          <a href="ui-alerts.html" class="menu-link">
-            <div data-i18n="Alerts">Alerts</div>
+          <a href="/member/admin_holiday_list" class="menu-link">
+            <div data-i18n="Accordion">휴무일 목록</div>
           </a>
         </li>
       </ul>

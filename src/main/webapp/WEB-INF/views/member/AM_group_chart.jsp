@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <html lang="ko" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="/assets/" data-template="vertical-menu-template-free">
 <head>
@@ -71,13 +72,15 @@
 										            <span>${dept.memDeptName}</span>
 										            
 										            <div class="d-flex align-items-center">
-										                <i class='bx bx-edit-alt me-2 text-muted dept-edit-icon' 
-										                   style="cursor: pointer; opacity: 0.6;" 
-										                   onclick="openDeptEdit(event, '${dept.deptCode}', '${dept.memDeptName}')"
-										                   onmouseover="this.style.opacity=1" 
-										                   onmouseout="this.style.opacity=0.6">
-										                </i>
-														
+										            	<sec:authorize access="hasAnyRole('MASTER','DEPT_HR')">
+
+											                <i class='bx bx-edit-alt me-2 text-muted dept-edit-icon' 
+											                   style="cursor: pointer; opacity: 0.6;" 
+											                   onclick="openDeptEdit(event, '${dept.deptCode}', '${dept.memDeptName}')"
+											                   onmouseover="this.style.opacity=1" 
+											                   onmouseout="this.style.opacity=0.6">
+											                </i>
+										            	</sec:authorize>
 										                <span class="badge bg-white text-primary shadow-sm rounded-pill" style="font-size:0.75rem;">
 										                    ${dept.count}
 										                </span>
@@ -197,7 +200,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-primary" onclick="alert('수정되었습니다.')">저장</button>
+                <button type="button" class="btn btn-primary" onclick="saveDeptName()">저장</button>
+                
             </div>
         </div>
     </div>

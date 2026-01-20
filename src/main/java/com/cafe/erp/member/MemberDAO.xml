@@ -328,7 +328,8 @@
 		UPDATE member
 		SET
 			mem_is_active = #{memIsActive},
-			mem_left_date = now()
+			mem_left_date = now(),
+			mem_is_locked = TRUE
 		WHERE member_id = #{memberId}
 	</update>
 	
@@ -383,8 +384,13 @@
     </insert>
 	
 	
-	
-	
+	<!-- 부서명 변경 -->
+	<update id="updateDeptName">
+	  UPDATE member_dept
+	  SET mem_dept_name = #{memDeptName}
+	  WHERE member_dept_code = #{deptCode}
+	</update>
+		
 	
 
 	

@@ -99,7 +99,7 @@
 				    </div>
 				    <div class="mt-3">
 				      <button type="button" class="btn btn-outline-success" id="btnExcel">
-				        <i class='bx bx-download me-1'></i> 엑셀 다운로드
+				        <i class='bx bx-download me-1'></i> 엑셀 다운
 				      </button>
 				    </div>
 				  </div>

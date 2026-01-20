@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,22 @@ public class CompanyHolidayService {
             e.printStackTrace();
         }
     }
+    
+    
+    
+    // 캘린더 및 출퇴근 버튼 용
+    public List<CompanyHolidayDTO> selectHolidayAllActive() throws Exception {
+        return companyHolidayDAO.selectHolidayAllActive();
+    }
 
+    public boolean isHoliday(LocalDate date) throws Exception {
+        int cnt = companyHolidayDAO.existsHoliday(java.sql.Date.valueOf(date));
+        return cnt > 0;
+    }
+    // 캘린더 및 출퇴근 버튼 용 끝
+
+    
+    
     // api텍스트 추출
     private static String getTagValue(String tag, Element eElement) {
         NodeList nlList = eElement.getElementsByTagName(tag);
@@ -80,18 +96,61 @@ public class CompanyHolidayService {
         Node nValue = childNodes.item(0);
         return nValue.getNodeValue();
     }
+    
 
-	public void addHoliday(CompanyHolidayDTO companyHolidayDTO) {
-		
-	}
+    
 
-	public List<CompanyHolidayDTO> selectHolidaysList() throws Exception{
-		return companyHolidayDAO.selectHolidayList();
-	}
-	
-	public boolean isHoliday(java.time.LocalDate date) throws Exception {
-	    int cnt = companyHolidayDAO.existsHoliday(java.sql.Date.valueOf(date));
-	    return cnt > 0;
-	}
+    public List<CompanyHolidayDTO> getHolidayList(CompanyHolidaySearchDTO dto) throws Exception {
+
+        if (dto.getPage() == null || dto.getPage() < 1) dto.setPage(1L);
+        if (dto.getPerPage() == null || dto.getPerPage() < 1) dto.setPerPage(10L);
+
+        Long total = companyHolidayDAO.totalCount(dto);
+        dto.setTotalCount(total);
+
+        dto.pageing(total);
+
+        if (dto.getStartNum() == null) {
+            dto.setStartNum((dto.getPage() - 1) * dto.getPerPage());
+        }
+
+        return companyHolidayDAO.selectHolidayList(dto);
+    }
+
+
+    public List<CompanyHolidayDTO> selectHolidayList(CompanyHolidaySearchDTO dto) throws Exception {
+        return companyHolidayDAO.selectHolidayList(dto);
+    }
+
+    
+    
+    
+     // 엑셀 페이징용
+
+      public Long totalCount(CompanyHolidaySearchDTO searchDTO) throws Exception {
+        return companyHolidayDAO.totalCount(searchDTO);
+      }
+
+      public void addHoliday(CompanyHolidayDTO dto) throws Exception {
+    	  int cnt = companyHolidayDAO.existsHoliday(dto.getComHolidayDate());
+
+    	    if (cnt > 0) {
+    	        throw new IllegalArgumentException("이미 등록된 날짜입니다.");
+    	    }
+    	    companyHolidayDAO.insertHoliday(dto);
+    	}
+
+
+      public boolean updateHoliday(CompanyHolidayDTO dto) throws Exception {
+        return companyHolidayDAO.updateHoliday(dto) > 0;
+      }
+
+      public boolean toggleHolidayActive(int id, boolean active) throws Exception {
+        CompanyHolidayDTO dto = new CompanyHolidayDTO();
+        dto.setCompanyHolidayId(id);
+        dto.setComHolidayIsActive(active);
+        return companyHolidayDAO.updateHolidayActive(dto) > 0;
+      }
+
 
 }

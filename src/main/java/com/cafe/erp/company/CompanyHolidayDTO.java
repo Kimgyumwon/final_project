@@ -16,4 +16,9 @@ public class CompanyHolidayDTO {
 	private String comHolidayName;
 	private String comHolidayType;
 	private int memberId;
+	
+	private Boolean comHolidayIsActive;     
+    private Date comHolidayUpdatedTime; 
+    private Date comHolidayCreatedTime; 
+    
 }

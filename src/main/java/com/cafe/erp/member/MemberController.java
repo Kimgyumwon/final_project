@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -91,7 +92,7 @@ public class MemberController {
 	@GetMapping("calendar")
 	@ResponseBody
 	public List<Map<String, Object>> holidayView(@AuthenticationPrincipal UserDTO userDTO) throws Exception{
-		List<CompanyHolidayDTO> list = companyHolidayService.selectHolidaysList();
+		List<CompanyHolidayDTO> list = companyHolidayService.selectHolidayAllActive();
 		int memberId = userDTO.getMember().getMemberId();
 		
 		
@@ -266,10 +267,16 @@ public class MemberController {
 	}
 	
 	
-
 	@GetMapping("admin_member_list")
-	public String list( Model model, MemberSearchDTO memberSearchDTO) throws Exception {
+	public String list( Model model, MemberSearchDTO memberSearchDTO, @AuthenticationPrincipal UserDTO user) throws Exception {
 		/* List<MemberDTO> list = memberService.list(memberDTO); */
+		
+		boolean isMaster = user.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals("ROLE_MASTER")
+			               || a.getAuthority().equals("ROLE_DEPT_HR"));
+
+	    if (!isMaster) return "error/403"; 
+	    
 		List<MemberDTO> list = memberService.getMemberList(memberSearchDTO); 
 		
 		model.addAttribute("list", list);
@@ -434,10 +441,13 @@ public class MemberController {
 	
 	
 	
-	
 	@GetMapping("admin_login_history")
-    public String loginHistory(Model model, MemberHistorySearchDTO memberHistorySearchDTO) throws Exception{
+    public String loginHistory(Model model, MemberHistorySearchDTO memberHistorySearchDTO, @AuthenticationPrincipal UserDTO user) throws Exception{
 		
+		boolean isMaster = user.getAuthorities().stream()
+	            .anyMatch(a -> a.getAuthority().equals("ROLE_MASTER"));
+
+	    if (!isMaster) return "error/403"; 
 		
 		/* 최근 3개월 이력 출력 */
 		if (memberHistorySearchDTO.getStartDate() == null || memberHistorySearchDTO.getStartDate().equals("")) {
@@ -638,7 +648,7 @@ public class MemberController {
 	    return response;
 	}
 	
-	
+	@PreAuthorize("hasAnyRole('MASTER','DEPT_HR')")
 	@PostMapping("reset_password")
 	@ResponseBody
 	public String resetPassword(@RequestParam("memberId") int memberId) throws Exception {
@@ -687,6 +697,20 @@ public class MemberController {
 		return result > 0 ? "success" : "fail";
 	}
 	
+	
+	@PreAuthorize("hasAnyRole('MASTER','DEPT_HR')")
+	@PostMapping("deptNameChange")
+	@ResponseBody
+	public String updateDeptName(@RequestParam int deptCode,
+	                             @RequestParam String deptName) throws Exception {
+
+	    if (deptCode == 0) return "부서를 선택하세요.";
+	    if (deptName == null || deptName.trim().isEmpty()) return "부서명을 입력하세요.";
+
+	    int result = memberService.updateDeptName(deptCode, deptName.trim());
+	    return result > 0 ? "success" : "fail";
+	}
+
 
 	
 	

@@ -203,7 +203,7 @@ public class MemberService {
 		return memberDAO.changePassword(changePasswordDTO);
 	}
 	
-	
+	// 현재 비밀번호가 1234면 변경 유도	
 	public Boolean pwPass(int memberId) throws Exception{
 		String db = memberDAO.getMemberPassword(memberId);
 		return passwordEncoder.matches("1234", db);
@@ -232,7 +232,11 @@ public class MemberService {
 
 
 
-	
+	// 부서명 변경
+	public int updateDeptName(int deptCode, String deptName) throws Exception {
+	    return memberDAO.updateDeptName(deptCode, deptName);
+	}
+
 
 
 

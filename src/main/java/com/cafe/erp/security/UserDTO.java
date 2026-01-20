@@ -54,6 +54,9 @@ public class UserDTO implements UserDetails {
 		return Objects.hash(this.member.getMemberId());
 	}
 	
+	// !!!! mem_is_active = 1, mem_is_locked = 'N' => 로그인 가능 !!!!
+	// !!!! mem_is_active = 0, mem_is_locked = 'Y' => 로그인 불가능 !!!!
+	
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
@@ -61,7 +64,7 @@ public class UserDTO implements UserDetails {
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return true;
+		return Boolean.TRUE.equals(member.getMemIsLocked());
 	}
 
 	@Override
@@ -71,7 +74,8 @@ public class UserDTO implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return Boolean.TRUE.equals(member.getMemIsActive());
+	
 	}
 
 }
