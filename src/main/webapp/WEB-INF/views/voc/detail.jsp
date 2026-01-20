@@ -68,7 +68,12 @@
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
         <!-- Menu -->
-		<c:import url="/WEB-INF/views/template/aside.jsp"></c:import>
+		  <sec:authorize access="hasAnyRole('STORE')">
+			  <c:import url="/WEB-INF/views/template/aside_store.jsp"></c:import>
+		  </sec:authorize>
+		  <sec:authorize access="!hasAnyRole('STORE')">
+			  <c:import url="/WEB-INF/views/template/aside.jsp"></c:import>
+		  </sec:authorize>
         <!-- / Menu -->
 
         <!-- Layout container -->

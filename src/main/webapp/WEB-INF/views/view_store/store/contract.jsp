@@ -69,7 +69,7 @@
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
         <!-- Menu -->
-		<c:import url="/WEB-INF/views/template/aside.jsp"></c:import>
+		<c:import url="/WEB-INF/views/template/aside_store.jsp"></c:import>
         <!-- / Menu -->
 
         <!-- Layout container -->
@@ -82,28 +82,6 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <div class="row">
-
-				  <sec:authentication property="principal.store" var="storeInfo"/>
-			    <div class="col-12 px-0">
-                    <ul class="nav nav-pills mb-3" role="tablist">
-						<c:if test="${not empty storeInfo}">
-							<li class="nav-item">
-								<a href="/store/detail?storeId=${storeInfo.storeId}" class="nav-link active">
-									<i class="bx bx-store me-1"></i> 기본 정보
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="/store/voc/list?searchStoreId=${storeInfo.storeId}" class="nav-link active"><i class="bx bx-support me-1"></i> VOC</a>
-							</li>
-							<li class="nav-item">
-								<a href="/store/qsc/list" class="nav-link active"><i class="bx bx-task me-1"></i> QSC</a>
-							</li>
-							<li class="nav-item">
-								<a href="/store/contract/list?searchStoreId=${storeInfo.storeId}" class="nav-link"><i class="bx bx-file me-1"></i> 계약 기록</a>
-							</li>
-						</c:if>
-                    </ul>
-                </div>
                 <div id="tab-content-area">
         		    <div class="card shadow-none border bg-white mb-4">
 				        <div class="card-body py-4 px-4">

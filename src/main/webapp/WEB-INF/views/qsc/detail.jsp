@@ -59,6 +59,7 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="/js/config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   </head>
 
   <body>
@@ -66,7 +67,12 @@
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
         <!-- Menu -->
-		<c:import url="/WEB-INF/views/template/aside.jsp"></c:import>
+          <sec:authorize access="hasAnyRole('STORE')">
+              <c:import url="/WEB-INF/views/template/aside_store.jsp"></c:import>
+          </sec:authorize>
+          <sec:authorize access="!hasAnyRole('STORE')">
+              <c:import url="/WEB-INF/views/template/aside.jsp"></c:import>
+          </sec:authorize>
         <!-- / Menu -->
 
         <!-- Layout container -->
@@ -85,10 +91,12 @@
                             <div class="row g-3 p-4">
                                 <div class="col-12 text-center mb-4" style="margin-top: 50px">
                                     <h3 class="fw-bold">[ ${dto.qscTitle} ]</h3>
+                                    <input type="hidden" id="qscTitle" value="${dto.qscTitle}">
                                 </div>
                                 <div class="col-12 text-end">
                                     <h6 class="mb-1 text-muted">담당자 : <span class="text-dark fw-bold">${dto.memName}</span></h6>
                                     <h6 class="mb-4 text-muted">가맹점명 : <span class="text-dark fw-bold">${dto.storeName}</span></h6>
+                                    <input type="hidden" id="storeName" value="${dto.storeName}">
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -142,8 +150,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-end gap-2 p-4">
+                            <div class="d-flex justify-content-end gap-2 p-4" id="btnArea" data-html2canvas-ignore="true">
                                 <a href="/store/qsc/list" class="btn btn-outline-secondary">목록</a>
+                                <button type="button" id="btnPdfDownload" class="btn btn-danger" onclick="downloadPdf()">
+                                    <i class="bx bxs-file-pdf me-1"></i> PDF 저장
+                                </button>
                                 <sec:authentication property="principal.member" var="memberInfo"/>
                                 <sec:authorize access="hasAnyRole('EXEC', 'MASTER')" var="isAdmin" />
                                 <c:if test="${(dto.memberId eq memberInfo.memberId) or isAdmin}">
@@ -201,5 +212,6 @@
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     
     <script type="text/javascript" src="/js/store/qsc/add.js"></script>
+    <script type="text/javascript" src="/js/store/qsc/detail.js"></script>
   </body>
 </html>

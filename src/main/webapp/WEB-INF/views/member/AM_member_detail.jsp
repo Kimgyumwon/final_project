@@ -3,6 +3,7 @@
 <%@taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <html lang="ko" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="/assets/" data-template="vertical-menu-template-free">
 <head>
@@ -26,8 +27,13 @@
 <body>
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
-        
-        <c:import url="/WEB-INF/views/template/aside.jsp"></c:import>
+
+		<sec:authorize access="hasAnyRole('STORE')">
+			<c:import url="/WEB-INF/views/template/aside_store.jsp"></c:import>
+		</sec:authorize>
+		<sec:authorize access="!hasAnyRole('STORE')">
+			<c:import url="/WEB-INF/views/template/aside.jsp"></c:import>
+		</sec:authorize>
 
         <div class="layout-page">
         
