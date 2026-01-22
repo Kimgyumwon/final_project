@@ -75,7 +75,7 @@
 		    WHERE
 		      so2.store_id = t.store_id
 		      AND DATE_FORMAT(r2.receivable_date, '%Y-%m') = t.base_month
-		      AND rb2.remain_amount > 0   <!-- 🔥 이게 핵심 -->
+		      AND rb2.remain_amount > 0
 		  )
 		</if>
 	  </where>
@@ -86,68 +86,76 @@
   	
   	
   	<!-- 가맹 미수금 조회 SQL -->
-	<select 
-	  id="receivableSearchList" 
-	  parameterType="ReceivableSearchDTO"
-	  resultType="ReceivableSummaryDTO">
-	
-	  SELECT
-	    t.store_id,
-	    t.store_name,
-	    t.base_month,
-	    t.total_amount
-	  FROM (
-	    SELECT
-	      s.store_id,
-	      s.store_name,
-	      DATE_FORMAT(r.receivable_date, '%Y-%m') AS base_month,
-	      SUM(rb.remain_amount) AS total_amount
-	
-	    FROM receivable r
-	
-	    LEFT JOIN (
-	        SELECT
-	            r2.receivable_id,
-	            r2.receivable_total_amount
-	            - IFNULL(SUM(rt.transaction_amount), 0) AS remain_amount
-	        FROM receivable r2
-	        LEFT JOIN receivable_transaction rt
-	            ON r2.receivable_id = rt.receivable_id
-	        WHERE r2.receivable_type = 'R'
-	        GROUP BY
-	            r2.receivable_id,
-	            r2.receivable_total_amount
-	    ) rb
-	      ON r.receivable_id = rb.receivable_id
-	      
-	    LEFT JOIN store_contract c
-	      ON r.contract_id = c.contract_id
-	    LEFT JOIN order_store so
-	      ON r.store_order_id = so.store_order_id
-	    JOIN store s
-	      ON s.store_id = COALESCE(c.store_id, so.store_id)
-	
-	    WHERE r.receivable_type = 'R'
-	
-	    <if test="baseMonth != null and baseMonth != ''">
-	      AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
-	    </if>
-	
-	    <if test="storeName != null and storeName != ''">
-	      AND s.store_name LIKE CONCAT('%',#{storeName},'%')
-	    </if>
-	
-	    GROUP BY
-	      s.store_id,
-	      s.store_name,
-	      base_month
-		HAVING SUM(rb.remain_amount) > 0
-	  ) t
-	  <include refid="receivableSourceTypeFilter"/>
-	  ORDER BY t.base_month DESC
-	  LIMIT #{pager.perPage}
-	  OFFSET #{pager.startNum}
-	</select>
+<select 
+  id="receivableSearchList" 
+  parameterType="ReceivableSearchDTO"
+  resultType="ReceivableSummaryDTO">
+
+  SELECT
+    s.store_id,
+    s.store_name,
+    DATE_FORMAT(r.receivable_date, '%Y-%m') AS base_month,
+    SUM(
+      r.receivable_total_amount
+      - IFNULL(paid.paid_amount, 0)
+    ) AS total_amount
+
+  FROM receivable r
+
+  LEFT JOIN (
+    SELECT
+      receivable_id,
+      SUM(transaction_amount) AS paid_amount
+    FROM receivable_transaction
+    WHERE transaction_type = 'C'
+    GROUP BY receivable_id
+  ) paid
+    ON r.receivable_id = paid.receivable_id
+
+  LEFT JOIN store_contract c
+    ON r.contract_id = c.contract_id
+  LEFT JOIN order_store so
+    ON r.store_order_id = so.store_order_id
+  JOIN store s
+    ON s.store_id = COALESCE(c.store_id, so.store_id)
+
+  WHERE r.receivable_type = 'R'
+    AND r.receivable_status != 'C'
+
+  <if test="baseMonth != null and baseMonth != ''">
+    AND DATE_FORMAT(r.receivable_date, '%Y-%m') = #{baseMonth}
+  </if>
+
+  <if test="storeName != null and storeName != ''">
+    AND s.store_name LIKE CONCAT('%',#{storeName},'%')
+  </if>
+
+  <!-- sourceType 필터를 여기서 직접 -->
+  <if test="sourceType == 'CONTRACT'">
+    AND r.contract_id IS NOT NULL
+  </if>
+
+  <if test="sourceType == 'ORDER'">
+    AND r.store_order_id IS NOT NULL
+  </if>
+
+  GROUP BY
+    s.store_id,
+    s.store_name,
+    base_month
+
+  HAVING total_amount > 0
+
+  ORDER BY
+    base_month DESC,
+    total_amount DESC
+
+  LIMIT #{pager.perPage}
+  OFFSET #{pager.startNum}
+
+</select>
+
+
   	
   	<!-- 페이지네이션 갯수 -->
 	<select 
@@ -240,8 +248,7 @@
 	
 	      <if test="sourceType == 'ORDER'">
 	        AND (
-	          r.hq_order_id IS NOT NULL
-	          OR r.store_order_id IS NOT NULL
+	        r.store_order_id IS NOT NULL
 	        )
 	      </if>
 	

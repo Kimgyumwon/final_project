@@ -131,7 +131,7 @@
         <div class="card bg-label-danger border-0 shadow-none">
           <div class="card-body d-flex align-items-center">
             <div class="avatar flex-shrink-0 me-3">
-              <span class="avatar-initial rounded bg-danger shadow-sm"><i class="bx bx-wallet"></i></span>
+              <span class="avatar-initial rounded bg-danger shadow-sm"><i class="bx bx-error"></i></span>
             </div>
             <div>
               <small class="text-danger fw-semibold d-block">총 미수금</small>
@@ -142,13 +142,13 @@
       </div>
 
       <div class="col-md-4">
-        <div class="card bg-label-primary border-0 shadow-none">
+        <div class="card bg-label-info border-0 shadow-none">
           <div class="card-body d-flex align-items-center">
             <div class="avatar flex-shrink-0 me-3">
-              <span class="avatar-initial rounded bg-primary shadow-sm"><i class="bx bx-receipt"></i></span>
+              <span class="avatar-initial rounded bg-info shadow-sm"><i class="bx bx-spreadsheet"></i></span>
             </div>
             <div>
-              <small class="text-primary fw-semibold d-block">미수 채권 수</small>
+              <small class="text-info fw-semibold d-block">미수 채권 수</small>
               <h4 class="fw-bold mb-0 text-dark" id="receivableCount">0</h4>
             </div>
           </div>
