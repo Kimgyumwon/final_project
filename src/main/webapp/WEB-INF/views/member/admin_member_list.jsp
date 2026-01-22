@@ -95,7 +95,7 @@
 				
 				    <div class="d-flex align-items-center gap-2 ">
 				      <button type="button" class="btn btn-outline-success" id="btnExcel">
-				        <i class='bx bx-download me-1'></i> 엑셀 다운
+				        <i class='bx bx-download me-1'></i> 엑셀 다운로드
 				      </button>
 				
 				      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">

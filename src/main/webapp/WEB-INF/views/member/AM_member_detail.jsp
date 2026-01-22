@@ -453,7 +453,7 @@
 										            <i class='bx bx-search me-1'></i> 조회
 										          </button>
 										          <button type="button" class="btn btn-outline-success flex-grow-1" onclick="downloadAttendanceExcel()">
-										            <i class='bx bx-download me-1'></i> 엑셀 다운
+										            <i class='bx bx-download me-1'></i> 엑셀 다운로드
 										          </button>
 										        </div>
 										      </div>
@@ -629,7 +629,7 @@
 															      <i class='bx bx-search me-1'></i> 조회
 															    </button>
 															    <button type="button" class="btn btn-outline-success flex-grow-1" onclick="downloadVacationExcel()">
-															      <i class='bx bx-download me-1'></i> 엑셀 다운
+															      <i class='bx bx-download me-1'></i> 엑셀 다운로드
 															    </button>
 															  </div>
 															</div>
@@ -700,13 +700,13 @@
 										
 										    <div class="d-flex align-items-center justify-content-between mb-2">
 											  <h6 class="fw-bold text-muted mb-0">사용 내역</h6>
-											<sec:authentication property="principal.member" var="loginUser"/>
+										<sec:authentication property="principal.member" var="loginUser"/>>
 											  <c:if test="${loginUser.memberId == dto.memberId}">
 												  <button type="button" class="btn btn-primary" onclick="openVacApplyModal()">
 												    <i class="bx bx-plus me-1"></i> 휴가 신청
 												  </button>
 												</c:if>
-											
+												
 											</div>
 										    <div class="card border-0 shadow-sm mt-3">
 										        <div class="table-responsive">
