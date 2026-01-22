@@ -14,9 +14,14 @@
     	</insert>
     	
     	<!-- 거래처코드 max값 가져오기 / 거래처코드 생성시 필요 -->
-    	<select id="selectMaxVendorCodeByRegion" parameterType="String" resultType="int">
-    		select IFNULL(MAX(vendor_code), 0) from vendor where vendor_code Like CONCAT(#{regionCode}, '%')
-    	</select>
+    	<select id="selectMaxVendorCodeByRegion"
+        parameterType="String"
+        resultType="int">
+    SELECT IFNULL(MAX(vendor_code), 0)
+    FROM vendor
+    WHERE vendor_code LIKE CONCAT(#{regionCode}, '%')
+      AND LENGTH(vendor_code) = 6
+</select>
     	
     	<select id="findAll" resultType="VendorDTO">
     		select * from vendor
